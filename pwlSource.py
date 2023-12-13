@@ -94,7 +94,49 @@ class InputGenerator:
             exit()
     
     def __openCsvFile(self):
-        pass
+        """
+        This function reads inputs from a csv file.
+        It assumes that the newline was set to "" while creating the file 
+
+        A sample creation in python:
+        
+            import csv
+            with open("Test.csv", "w", newline='') as file:
+                csw=csv.writer(file)
+                for i in range(5):
+                    csw.writerow([i+0.1,i+1])
+
+        Input format that is expected in the file as follows:
+        <time>,<input>
+        <time>,<input>
+        ...
+
+        time should be convertible to float.
+        input should be convertible to integer
+
+        Returns a list consisting of (time, input) as entries
+        """
+        import csv
+        try:
+            with open(self.__filePath, "r", newline='') as file:
+                csr=csv.reader(file)
+                input_schedule=[]       
+                for i in csr:       
+                    if len(i) == 2:                 
+                        try:
+                            input_schedule.append((float(i[0]),int(i[1])))                              
+                        except ValueError:
+                            raise ValueError("Input Error: Inputs are not valid type")                          
+                        else:                
+                            raise ValueError("Input Error: Corrupt input / Garbage input")
+            return input_schedule
+        except IOError:
+            print(f"The file path {self.__filePath} does not exist")
+            exit()
+        except ValueError as e:
+            print(e)
+            exit()
+                
     
     def __openTxtFile(self):
         """
