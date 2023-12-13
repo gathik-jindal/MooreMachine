@@ -129,15 +129,15 @@ class InputGenerator:
                             raise ValueError("Input Error: Inputs are not valid type")                          
                         else:                
                             raise ValueError("Input Error: Corrupt input / Garbage input")
-            return input_schedule
         except IOError:
             print(f"The file path {self.__filePath} does not exist")
             exit()
         except ValueError as e:
             print(e)
             exit()
-                
-    
+            
+        return input_schedule   
+        
     def __openTxtFile(self):
         """
         This function reads inputs from a text file.
@@ -229,6 +229,9 @@ class InputGenerator:
 
 if __name__ == "__main__":
 
+
+    ############################# Need to stuff add for csv also #################################
+    
     #Correct ways for getting inputs
     #Note: Test.txt and Test.xlsx must be in the same directory
     fileInput = InputGenerator("Test\\Test.txt")
