@@ -87,7 +87,7 @@ class InputGenerator:
             elif(self.__filePath.endswith(".xlsx")):
                 return self.__openExcelFile()
             else:
-                raise ValueError("File path is not of type csv, txt, or xslx.")
+                raise ValueError("File path is not of type csv, txt, or xlsx.")
         
         except ValueError as e:
             print(e)
