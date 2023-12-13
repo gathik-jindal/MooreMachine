@@ -16,14 +16,14 @@ class InputGenerator:
 
     def __init__(self, filePath:str):
         """
-        filepath is the filepath of your txt, csv, or xslx file relative to this directory in str.
+        filepath is the filepath of your txt, csv, or xlsx file relative to this directory in str.
         """
 
         self.setFilePath(filePath)
     
     def setFilePath(self, filePath:str):
         """
-        filepath is the filepath of your txt, csv, or xslx file relative to this directory in str.
+        filepath is the filepath of your txt, csv, or xlsx file relative to this directory in str.
         """
         
         try:
@@ -48,7 +48,7 @@ class InputGenerator:
         This function reads the input stored in the file specified by the given filePath.
         For txt files, the delimiter should be a space ' '
         For csv files, the delimiter should be a comma ','
-        For xslx files, the delimeter should be a tab '\t'
+        For xlsx files, the delimeter should be a tab '\t'
         
         For txt files, the format should be as follows: 
             Input format that is expected in the file as follows:
@@ -63,7 +63,7 @@ class InputGenerator:
         For csv files, the format should be as follows:
             TODO
         
-        For xslx files, the format should be as follows:
+        For xlsx files, the format should be as follows:
             Input format is expected in the file as follows:
             Column:  A         B
                     Time     Input
