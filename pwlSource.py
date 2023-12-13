@@ -37,6 +37,10 @@ class InputGenerator:
             exit()
     
     def getFilePath(self):
+        """
+        Returns the current file path
+        """
+
         return self.__filePath
     
     def getInput(self):
@@ -70,7 +74,9 @@ class InputGenerator:
 
 
             time should be convertible to a float
-            input should be convertible to integer   
+            input should be convertible to integer 
+
+        Returns a list consisting of (time, input) as entries  
         """
 
         try:
@@ -102,6 +108,8 @@ class InputGenerator:
 
         time should be convertible to float.
         input should be convertible to integer
+
+        Returns a list consisting of (time, input) as entries
         """
 
         try:
@@ -145,6 +153,8 @@ class InputGenerator:
 
         time should be convertible to a float
         input should be convertible to integer
+
+        Returns a list consisting of (time, input) as entries
         """
         import pandas as pd
 
