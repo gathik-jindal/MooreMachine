@@ -1,20 +1,47 @@
-def fac(n):
-    r = 1
-    while (n > 1):
-        r = r*n
-        n -= 1
-    return r
+import csv
+# VERSION V1
 
 
-def comb(n, r):
-    return fac(n)/(fac(r)*fac(n-r))
+def read_inputs(filePath, delimiter=" "):
+    """
+    This function reads inputs from a text file and csv file.
+
+    Input format that is expected in the file is as follows:
+    <time> <input>
+    <time> <input>
+    ...
 
 
-def num_ways(k, n):
-    if n == 1:
-        return (k+1)/2
-    else:
-        return k*()
+    time should be convertible to float.
+    input should be convertible to integer
+    """
+
+    try:
+        with open(filePath, 'r') as fh:
+            # readerObject = csv.reader(fh, delimiter=delimiter)
+            # input_schedule = []
+            # for x in readerObject:
+            #     # x = x[0].split(delimiter)
+            #     tu = (float(x[0]), int(x[1]))
+            #     input_schedule.append(tu)
+
+            lines = fh.readlines()
+            input_schedule = []
+            for x in lines:
+                tu = x.split(delimiter)
+                if len(tu) != 2:
+                    print("Input Error: Corrupt input / Garbage input", tu)
+                    return input_schedule
+                try:
+                    input_schedule.append((float(tu[0]), int(tu[1])))
+                except:
+                    print("Input Error: Inputs are not valid type")
+
+    except FileNotFoundError:
+        print("File Error: Does not exist")
+        return []
+
+    return input_schedule
 
 
-print("HEllo world")
+print(read_inputs("file.txt"))
