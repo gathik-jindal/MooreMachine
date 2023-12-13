@@ -175,11 +175,11 @@ if __name__ == "__main__":
 
     #Correct ways for getting inputs
     #Note: Test.txt and Test.xlsx must be in the same directory
-    fileInput = InputGenerator("Test.txt")
+    fileInput = InputGenerator("Test\\Test.txt")
     inputs = fileInput.getInput()
     print(inputs)
     
-    fileInput.setFilePath("Test.xlsx")
+    fileInput.setFilePath("Test\\Test.xlsx")
     inputs = fileInput.getInput()
     print(inputs)
 
