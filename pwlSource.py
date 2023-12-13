@@ -22,6 +22,10 @@ class InputGenerator:
         self.setFilePath(filePath)
     
     def setFilePath(self, filePath:str):
+        """
+        filepath is the filepath of your txt, csv, or xslx file relative to this directory in str.
+        """
+        
         try:
             if(filePath == None or not isinstance(filePath, str)):
                 raise TypeError(f"File path \"{filePath}\" is not of type string.")
