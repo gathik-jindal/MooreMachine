@@ -140,13 +140,15 @@ class InputGenerator:
                         try:
                             input_schedule.append((float(i[0]),int(i[1])))                              
                         except ValueError:
-                            raise ValueError("Input Error: Inputs are not valid type")                          
+                            #raise ValueError("Input Error: Inputs are not valid type")
+                            self.__printErrorAndExit("Input Error: Inputs are not valid type")
                     else:                
-                        raise ValueError("Input Error: Corrupt input / Garbage input")
+                        #raise ValueError("Input Error: Corrupt input / Garbage input")
+                        self.__printErrorAndExit(("Input Error: Corrupt input / Garbage input")
         except IOError:
             self.__printErrorAndExit(f"The file path {self.__filePath} does not exist")
-        except ValueError as e:
-            self.__printErrorAndExit(e)
+        #except ValueError as e:
+            #self.__printErrorAndExit(e)
             
         return input_schedule   
         
@@ -241,15 +243,19 @@ class InputGenerator:
 if __name__ == "__main__":
 
 
-    ############################# Need to stuff add for csv also #################################
+    ############################# Need to test for csv also #################################
     
     #Correct ways for getting inputs
-    #Note: Test.txt and Test.xlsx must be in the same directory
+    #Note: Test.txt, Test.csv and Test.xlsx must be in the same directory
     fileInput = InputGenerator("Test\\Test.txt")
     inputs = fileInput.getInput()
     print(inputs)
     
     fileInput.setFilePath("Test\\Test.xlsx")
+    inputs = fileInput.getInput()
+    print(inputs)
+
+    fileInput.setFilePath("Test\\Test.csv")
     inputs = fileInput.getInput()
     print(inputs)
 
