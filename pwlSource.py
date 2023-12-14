@@ -1,9 +1,7 @@
 """
 This class is used for getting input from the user.
 The valid formats are txt, csv, and xlsx.
-In order to use this class for reading xlsx, one needs to have pandas and openpyxl installed.
-One can install pandas by the following method:
-    pip install pandas
+In order to use this class for reading xlsx, one needs to have openpyxl installed.
 One can install openpyxl by the following method:
     pip install openpyxl
 
@@ -11,6 +9,8 @@ One can install openpyxl by the following method:
 @date: 13/12/2023
 @version: 1.0
 """
+
+import sys
 
 class InputGenerator:
 
@@ -33,8 +33,7 @@ class InputGenerator:
             self.__filePath = filePath
 
         except TypeError as e:
-            print(e)
-            exit()
+            self.__printErrorAndExit(e)
     
     def getFilePath(self):
         """
@@ -61,12 +60,28 @@ class InputGenerator:
             input should be convertible to integer
         
         For csv files, the format should be as follows:
-            TODO
-        
+            This function reads inputs from a csv file.
+            It assumes that the newline was set to "" while creating the file 
+
+            A sample creation in python:
+            
+                import csv
+                with open("Test.csv", "w", newline='') as file:
+                    csw=csv.writer(file)
+                    for i in range(5):
+                        csw.writerow([i+0.1,i+1])
+
+            Input format that is expected in the file as follows:
+            <time>,<input>
+            <time>,<input>
+            ...
+
+            time should be convertible to float.
+            input should be convertible to integer
+
         For xlsx files, the format should be as follows:
             Input format is expected in the file as follows:
             Column:  A         B
-                    Time     Input
                     <time>   <input>
                     <time>   <input>
                     <time>   <input>
@@ -90,8 +105,7 @@ class InputGenerator:
                 raise ValueError("File path is not of type csv, txt, or xlsx.")
         
         except ValueError as e:
-            print(e)
-            exit()
+           self.__printErrorAndExit(e)
     
     def __openCsvFile(self):
         """
@@ -127,14 +141,12 @@ class InputGenerator:
                             input_schedule.append((float(i[0]),int(i[1])))                              
                         except ValueError:
                             raise ValueError("Input Error: Inputs are not valid type")                          
-                        else:                
-                            raise ValueError("Input Error: Corrupt input / Garbage input")
+                    else:                
+                        raise ValueError("Input Error: Corrupt input / Garbage input")
         except IOError:
-            print(f"The file path {self.__filePath} does not exist")
-            exit()
+            self.__printErrorAndExit(f"The file path {self.__filePath} does not exist")
         except ValueError as e:
-            print(e)
-            exit()
+            self.__printErrorAndExit(e)
             
         return input_schedule   
         
@@ -164,20 +176,18 @@ class InputGenerator:
 
                     tu = x.split(" ")
 
-                    if len(tu) != 2:
+                    if len(tu) == 2:
+                        try:
+                           input_schedule.append((float(tu[0]), int(tu[1])))
+                        except ValueError:
+                            self.__printErrorAndExit("Input Error: Inputs are not valid type")
+                    else:
                         raise ValueError("Input Error: Corrupt input / Garbage input")
 
-                    try:
-                        input_schedule.append((float(tu[0]), int(tu[1])))
-                    except ValueError:
-                        print("Input Error: Inputs are not valid type")
-                        exit()
         except IOError:
-            print(f"The file path {self.__filePath} does not exist")
-            exit()
+            self.__printErrorAndExit(f"The file path {self.__filePath} does not exist")
         except ValueError as e:
-            print(e)
-            exit()
+            self.__printErrorAndExit(e)
 
         return input_schedule
 
@@ -187,7 +197,6 @@ class InputGenerator:
 
         Input format is expected in the file as follows:
         Column:  A         B
-                Time     Input
                 <time>   <input>
                 <time>   <input>
                 <time>   <input>
@@ -198,34 +207,36 @@ class InputGenerator:
 
         Returns a list consisting of (time, input) as entries
         """
-        import pandas as pd
+        import openpyxl as xl
 
         try:
-            df = pd.read_excel(self.__filePath, usecols='A, B')
-            values = df.to_dict()
-            
-            if(len(values) == 0):
-                return []
-            
-            time, inputs = values.values()
-            time = tuple(time.values())
-            inputs = tuple(inputs.values())
-            
-            input_schedule = []
+            wb = xl.load_workbook(self.__filePath)
+            sheet = wb.active
 
-            try:
-                time = tuple(map(float, time))
-                inputs = tuple(map(int, inputs))
-            except ValueError:
-                print("Input Error: Inputs are not valid type")
-                exit()
-            
-            input_schedule = list(map(lambda x, y: (x, y), time, inputs))
+            input_schedule = []
+            for row in sheet.values:
+                if(len(row) == 2):
+                    try:
+                        input_schedule.append((float(row[0]), int(row[1])))
+                    except (ValueError, TypeError):
+                        self.__printErrorAndExit("Input Error: Inputs are not valid type")
+                else:   
+                    raise ValueError("Input Error: Corrupt input/Garbage input")
+
         except IOError:
-            print(f"The file path {self.__filePath} does not exist")
-            exit()
+            self.__printErrorAndExit(f"The file path {self.__filePath} does not exist")
+        except ValueError as e:
+            self.__printErrorAndExit(e)
         
         return input_schedule
+
+    def __printErrorAndExit(self, message:str):
+        """
+        This function prints the error message specified by message and exits. 
+        """
+
+        print(message)
+        sys.exit(1)
 
 if __name__ == "__main__":
 
