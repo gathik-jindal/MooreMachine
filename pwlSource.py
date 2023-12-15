@@ -121,7 +121,7 @@ class InputGenerator:
                         except ValueError:
                             self.__printErrorAndExit("Input Error: Inputs are not valid type")
                     else:                
-                        self.__printErrorAndExit(("Input Error: Corrupt input / Garbage input")
+                        self.__printErrorAndExit(("Input Error: Corrupt input / Garbage input"))
         except IOError:
             self.__printErrorAndExit(f"The file path {self.__filePath} does not exist")
         except ValueError as e:
