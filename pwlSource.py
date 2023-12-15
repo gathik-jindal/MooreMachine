@@ -47,7 +47,7 @@ class InputGenerator:
         This function reads the input stored in the file specified by the given filePath.
         For txt files, the delimiter should be a space ' '
         For csv files, the delimiter should be a comma ','
-        For xlsx files, the delimeter should be a tab '\t'
+        For xlsx files, the columns used should be A and B
         
         For txt files, the format should be as follows: 
             Input format that is expected in the file as follows:
