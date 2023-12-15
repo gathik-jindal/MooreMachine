@@ -108,28 +108,7 @@ class InputGenerator:
            self.__printErrorAndExit(e)
     
     def __openCsvFile(self):
-        """
-        This function reads inputs from a csv file.
-        It assumes that the newline was set to "" while creating the file 
 
-        A sample creation in python:
-        
-            import csv
-            with open("Test.csv", "w", newline='') as file:
-                csw=csv.writer(file)
-                for i in range(5):
-                    csw.writerow([i+0.1,i+1])
-
-        Input format that is expected in the file as follows:
-        <time>,<input>
-        <time>,<input>
-        ...
-
-        time should be convertible to float.
-        input should be convertible to integer
-
-        Returns a list consisting of (time, input) as entries
-        """
         import csv
         try:
             with open(self.__filePath, "r", newline='') as file:
@@ -140,33 +119,17 @@ class InputGenerator:
                         try:
                             input_schedule.append((float(i[0]),int(i[1])))                              
                         except ValueError:
-                            #raise ValueError("Input Error: Inputs are not valid type")
                             self.__printErrorAndExit("Input Error: Inputs are not valid type")
                     else:                
-                        #raise ValueError("Input Error: Corrupt input / Garbage input")
                         self.__printErrorAndExit(("Input Error: Corrupt input / Garbage input")
         except IOError:
             self.__printErrorAndExit(f"The file path {self.__filePath} does not exist")
-        #except ValueError as e:
-            #self.__printErrorAndExit(e)
+        except ValueError as e:
+            self.__printErrorAndExit(e)
             
         return input_schedule   
         
     def __openTxtFile(self):
-        """
-        This function reads inputs from a text file.
-
-        Input format that is expected in the file as follows:
-        <time> <input>
-        <time> <input>
-        ...
-
-
-        time should be convertible to float.
-        input should be convertible to integer
-
-        Returns a list consisting of (time, input) as entries
-        """
 
         try:
             with open(self.__filePath, 'r') as fh:
@@ -194,21 +157,7 @@ class InputGenerator:
         return input_schedule
 
     def __openExcelFile(self):
-        """
-        This function reads input from an excel file.
 
-        Input format is expected in the file as follows:
-        Column:  A         B
-                <time>   <input>
-                <time>   <input>
-                <time>   <input>
-                ...
-
-        time should be convertible to a float
-        input should be convertible to integer
-
-        Returns a list consisting of (time, input) as entries
-        """
         import openpyxl as xl
 
         try:
