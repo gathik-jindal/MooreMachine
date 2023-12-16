@@ -140,7 +140,8 @@ class InputGenerator:
         except ValueError as e:
             self.__printErrorAndExit(e)
             
-        return input_schedule   
+        # return input_schedule
+        return self.__returnProperInputs(input_schedule) 
         
     def __openTxtFile(self):
 
@@ -171,7 +172,8 @@ class InputGenerator:
         except ValueError as e:
             self.__printErrorAndExit(e)
 
-        return input_schedule
+        # return input_schedule
+        return self.__returnProperInputs(input_schedule)
 
     def __openExcelFile(self):
 
@@ -198,7 +200,19 @@ class InputGenerator:
         except ValueError as e:
             self.__printErrorAndExit(e)
         
-        return input_schedule
+        # return input_schedule
+        return self.__returnProperInputs(input_schedule)
+    
+    def __returnProperInputs(self, input_schedule:list):
+        """
+        This function return the input_schedule in form a dictionary.
+        The return is:
+            {\"Inputs\": input_schedule}
+        
+        This return type is compatible to scope.
+        """
+
+        return {"Inputs": input_schedule}
 
     def __printErrorAndExit(self, message:str):
         """
