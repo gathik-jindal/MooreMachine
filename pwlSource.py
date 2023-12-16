@@ -22,8 +22,11 @@ class InputGenerator:
         self.setFilePath(filePath)
 
     def __str__(self): ################ Need to Test ##################
-        out=sel.getFilePath()
-        print(f"The file linked is: {self.getFilePath}")
+        """
+        returns the linked file name
+        """
+        
+        return f"The file linked is: {self.getFilePath}"
     
     def setFilePath(self, filePath:str):
         """
