@@ -121,8 +121,14 @@ class InputGenerator:
             with open(self.__filePath, "r", newline='') as file:
                 csr=csv.reader(file)
                 input_schedule=[]       
-                for i in csr:       
-                    if len(i) == 2:                 
+
+                counter = 0
+                for i in csr:
+                    if len(i) == 2:
+                        if (isinstance(i[0], str) and isinstance(i[1], str) and counter == 0):
+                            counter += 1
+                            continue
+
                         try:
                             input_schedule.append((float(i[0]),int(i[1])))                              
                         except ValueError:
@@ -144,11 +150,15 @@ class InputGenerator:
                 lines = fh.readlines()
                 input_schedule = []
 
+                counter = 0
                 for x in lines:
 
                     tu = x.split(" ")
 
                     if len(tu) == 2:
+                        if (isinstance(tu[0], str) and isinstance(tu[1], str) and counter == 0):
+                            counter += 1
+                            continue
                         try:
                            input_schedule.append((float(tu[0]), int(tu[1])))
                         except ValueError:
