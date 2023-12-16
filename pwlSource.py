@@ -21,12 +21,12 @@ class InputGenerator:
 
         self.setFilePath(filePath)
 
-    def __str__(self): ################ Need to Test ##################
+    def __str__(self):
         """
         returns the linked file name
         """
         
-        return f"The file linked is: {self.getFilePath}"
+        return f"The file linked is: {self.getFilePath()}"
     
     def setFilePath(self, filePath:str):
         """
@@ -224,9 +224,6 @@ class InputGenerator:
 
 if __name__ == "__main__":
 
-
-    ############################# Need to test for csv also #################################
-    
     #Correct ways for getting inputs
     #Note: Test.txt, Test.csv and Test.xlsx must be in the same directory
     fileInput = InputGenerator("Test\\Test.txt")
@@ -241,6 +238,9 @@ if __name__ == "__main__":
     inputs = fileInput.getInput()
     print(inputs)
 
+    print("Current File Path", fileInput.getFilePath())
+    print("String Representation:", fileInput)
+
     #Incorrect ways for getting inputs
     #It generates error message and exits
 
@@ -252,6 +252,10 @@ if __name__ == "__main__":
     #inputs = fileInput.getInput()
     #print(inputs)
 
+    #fileInput.setFilePath("Test1.csv")
+    #inputs = fileInput.getInput()
+    #print(inputs)
+
     #fileInput.setFilePath(2)
     #inputs = fileInput.getInput()
     #print(inputs)
@@ -260,3 +264,9 @@ if __name__ == "__main__":
     #inputs = fileInput.getInput()
     #print(inputs)
     
+    #Creating the CSV file
+    #import csv
+    #with open("Test\\Test.csv", "w", newline='') as file:
+    #    csw=csv.writer(file)
+    #    for i in range(5):
+    #        csw.writerow([i+0.1,i+1])
