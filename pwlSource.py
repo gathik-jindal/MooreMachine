@@ -125,12 +125,11 @@ class InputGenerator:
                 counter = 0
                 for i in csr:
                     if len(i) == 2:
-                        if (isinstance(i[0], str) and isinstance(i[1], str) and counter == 0):
-                            continue
                         try:
                             input_schedule.append((float(i[0]),int(i[1])))                              
                         except ValueError:
-                            self.__printErrorAndExit("Input Error: Inputs are not valid type")
+                            if(counter != 0):
+                                self.__printErrorAndExit("Input Error: Inputs are not valid type")
                     else:                
                         self.__printErrorAndExit("Input Error: Corrupt input / Garbage input")
                     counter += 1
@@ -156,15 +155,14 @@ class InputGenerator:
                     tu = x.split(" ")
 
                     if len(tu) == 2:
-                        if (isinstance(tu[0], str) and isinstance(tu[1], str) and counter == 0):
-                            continue
                         try:
-                           input_schedule.append((float(tu[0]), int(tu[1])))
+                            input_schedule.append((float(tu[0]), int(tu[1])))
                         except ValueError:
-                            self.__printErrorAndExit("Input Error: Inputs are not valid type")
+                            if(counter != 0):
+                                self.__printErrorAndExit("Input Error: Inputs are not valid type")
                     else:
-                        raise ValueError("Input Error: Corrupt input / Garbage input")
-
+                        raise ValueError("Input Error: Corrupt input / Garbage input")                
+                    
                     counter += 1
 
         except IOError:
@@ -188,12 +186,11 @@ class InputGenerator:
             counter = 0
             for row in sheet.values:
                 if(len(row) == 2):
-                    if (isinstance(row[0], str) and isinstance(row[1], str) and counter == 0):
-                        continue
                     try:
                         input_schedule.append((float(row[0]), int(row[1])))
                     except (ValueError, TypeError):
-                        self.__printErrorAndExit("Input Error: Inputs are not valid type")
+                        if(counter != 0):
+                            self.__printErrorAndExit("Input Error: Inputs are not valid type")
                 else:   
                     raise ValueError("Input Error: Corrupt input/Garbage input")
                 counter += 1
