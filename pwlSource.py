@@ -55,6 +55,9 @@ class InputGenerator:
         For txt files, the delimiter should be a space ' '
         For csv files, the delimiter should be a comma ','
         For xlsx files, the columns used should be A and B
+
+        Feature: Each of the specified file types can have a header line which can contain anything,
+                 the program will automatically skip it / ignore it.
         
         For txt files, the format should be as follows: 
             Input format that is expected in the file as follows:
