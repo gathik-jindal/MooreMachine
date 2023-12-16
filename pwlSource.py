@@ -174,6 +174,8 @@ class InputGenerator:
             input_schedule = []
             for row in sheet.values:
                 if(len(row) == 2):
+                    if (isinstance(row[0], str) and isinstance(row[1], str)):
+                        continue
                     try:
                         input_schedule.append((float(row[0]), int(row[1])))
                     except (ValueError, TypeError):
