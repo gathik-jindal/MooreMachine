@@ -118,102 +118,76 @@ class InputGenerator:
            self.__printErrorAndExit(e)
     
     def __openCsvFile(self):
+        """
+        Returns valid input from a csv file
+        """
 
         import csv
         try:
             with open(self.__filePath, "r", newline='') as file:
                 csr=csv.reader(file)
-                input_schedule=[]       
-
-                counter = 0
-                for i in csr:
-                    if len(i) == 2:
-                        try:
-                            input_schedule.append((float(i[0]),int(i[1])))                              
-                        except ValueError:
-                            if(counter != 0):
-                                self.__printErrorAndExit("Input Error: Inputs are not valid type")
-                    else:                
-                        self.__printErrorAndExit("Input Error: Corrupt input / Garbage input")
-                    counter += 1
+                return self.__returnProperInputs(csr)
         except IOError:
-            self.__printErrorAndExit(f"The file path {self.__filePath} does not exist")
+            self.__printErrorAndExit(f"The file path {self.__filePath} does not exist.")
         except ValueError as e:
             self.__printErrorAndExit(e)
-            
-        # return input_schedule
-        return self.__returnProperInputs(input_schedule) 
         
     def __openTxtFile(self):
+        """
+        Returns valid input from a txt file
+        """
 
         try:
             with open(self.__filePath, 'r') as fh:
-
                 lines = fh.readlines()
-                input_schedule = []
-
-                counter = 0
-                for x in lines:
-
-                    tu = x.split(" ")
-
-                    if len(tu) == 2:
-                        try:
-                            input_schedule.append((float(tu[0]), int(tu[1])))
-                        except ValueError:
-                            if(counter != 0):
-                                self.__printErrorAndExit("Input Error: Inputs are not valid type")
-                    else:
-                        raise ValueError("Input Error: Corrupt input / Garbage input")                
-                    
-                    counter += 1
-
+                lines = list(map(lambda x: x.split(" "), lines))
+                return self.__returnProperInputs(lines)
         except IOError:
-            self.__printErrorAndExit(f"The file path {self.__filePath} does not exist")
+            self.__printErrorAndExit(f"The file path {self.__filePath} does not exist.")
         except ValueError as e:
             self.__printErrorAndExit(e)
 
-        # return input_schedule
-        return self.__returnProperInputs(input_schedule)
-
     def __openExcelFile(self):
+        """
+        Returns valid input from an excel file
+        """
 
         import openpyxl as xl
 
         try:
             wb = xl.load_workbook(self.__filePath)
             sheet = wb.active
+            return self.__returnProperInputs(sheet.values)
+        except IOError:
+            self.__printErrorAndExit(f"The file path {self.__filePath} does not exist.")
+        except ValueError as e:
+            self.__printErrorAndExit(e)
+    
+    def __returnProperInputs(self, iterable):
+        """
+        This function return the input_schedule in form a dictionary.
+        The output format is
+            {\"Inputs\": [(time1, input1), (time2, input2), ...]}
+        This function expects an iterable object.
+        This function raises a ValueError if any error is encountered. 
+        """
 
-            input_schedule = []
-
-            counter = 0
-            for row in sheet.values:
+        input_schedule = []
+        counter = 0
+        try:
+            for row in iterable:
+                row = [i for i in row if i]
                 if(len(row) == 2):
                     try:
                         input_schedule.append((float(row[0]), int(row[1])))
                     except (ValueError, TypeError):
                         if(counter != 0):
-                            self.__printErrorAndExit("Input Error: Inputs are not valid type")
+                            raise ValueError(f"Input Error: Inputs are not valid type. Check row {counter + 1} of file {self.getFilePath()}.")
                 else:   
-                    raise ValueError("Input Error: Corrupt input/Garbage input")
+                    raise ValueError(f"Input Error: Corrupt input/Garbage input because row {counter + 1} is not of length 2. Check file {self.getFilePath()}.")
                 counter += 1
-
-        except IOError:
-            self.__printErrorAndExit(f"The file path {self.__filePath} does not exist")
-        except ValueError as e:
-            self.__printErrorAndExit(e)
-        
-        # return input_schedule
-        return self.__returnProperInputs(input_schedule)
-    
-    def __returnProperInputs(self, input_schedule:list):
-        """
-        This function return the input_schedule in form a dictionary.
-        The return is:
-            {\"Inputs\": input_schedule}
-        
-        This return type is compatible to scope.
-        """
+        except TypeError:
+            raise ValueError(f"{iterable} cannot be iterated upon.")
 
         return {"Inputs": input_schedule}
 
