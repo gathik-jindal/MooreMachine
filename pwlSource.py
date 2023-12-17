@@ -203,15 +203,15 @@ if __name__ == "__main__":
 
     #Correct ways for getting inputs
     #Note: Test.txt, Test.csv and Test.xlsx must be in the same directory
-    fileInput = InputGenerator("Test\\Test.txt")
+    fileInput = InputGenerator("Tests\\Test.txt")
     inputs = fileInput.getInput()
     print(inputs)
     
-    fileInput.setFilePath("Test\\Test.xlsx")
+    fileInput.setFilePath("Tests\\Test.xlsx")
     inputs = fileInput.getInput()
     print(inputs)
 
-    fileInput.setFilePath("Test\\Test.csv")
+    fileInput.setFilePath("Tests\\Test.csv")
     inputs = fileInput.getInput()
     print(inputs)
 
@@ -220,7 +220,7 @@ if __name__ == "__main__":
 
     #Creating the CSV file
     #import csv
-    #with open("Test\\Test.csv", "w", newline='') as file:
+    #with open("Tests\\Test.csv", "w", newline='') as file:
     #    csw=csv.writer(file)
     #    for i in range(5):
     #        csw.writerow([i+0.1,i+1])
