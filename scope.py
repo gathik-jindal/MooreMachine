@@ -29,8 +29,7 @@ def plot(inputs: dict):
 
 if __name__ == "__main__":
     import pwlSource
-    from scope import plot
-
+    
     inputGen = pwlSource.InputGenerator("Tests\\Test.csv")
     print("-----printing .csv-------")
     inputs = inputGen.getInput()
