@@ -10,6 +10,7 @@ One can download matplotlib by
 """
 
 from matplotlib import pyplot as plt
+import sys
 
 class Plotter:
 
@@ -27,7 +28,12 @@ class Plotter:
         """
         plots the wave forms in a single window that are supplied in form of a dict.
         """
-
+        
+        if(inputs == None or not(isinstance(inputs, dict))):
+            self.__printErrorAndExit(f"{inputs} is not of type dict.")
+        elif(name == None or not(isinstance(name, str))):
+            self.__printErrorAndExit(f"{name} is not of type str.")
+        
         self.__addNewFigure(name)
 
         n_rows = len(inputs)
@@ -56,6 +62,14 @@ class Plotter:
         """
 
         plt.show()
+    
+    def __printErrorAndExit(self, message:str):
+        """
+        This function prints the error message specified by message and exits. 
+        """
+
+        print(message)
+        sys.exit(1)
 
 if __name__ == "__main__":
     import pwlSource
@@ -79,5 +93,11 @@ if __name__ == "__main__":
     inputs = inputGen.getInput()
     print(inputs)
     plot.plot(inputs, "XLSX")
-
     plot.show()
+
+    #Incorrect ways to use the class
+    #plot.plot(None, "Wrong")
+    #plot.plot(inputs, None)
+    #plot.plot(inputs, 2)
+    #plot.plot(2, "Wrong")
+    #plot.plot(None, None)
