@@ -5,7 +5,7 @@ One can download matplotlib by
     pip install matplotlib
 
 @author: Abhirath, Aryan, Gathik
-@date: 13/12/2023
+@date: 17/12/2023
 @version: 1.0
 """
 
@@ -93,6 +93,8 @@ if __name__ == "__main__":
     inputs = inputGen.getInput()
     print(inputs)
     plot.plot(inputs, "XLSX")
+    
+    #Remember to call this method at the end in order to show all the plots
     plot.show()
 
     #Incorrect ways to use the class
