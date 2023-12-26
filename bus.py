@@ -1,51 +1,100 @@
+"""
+This class is used for simulating a bus.
+It allows one to get specific inputs from the bus
+and also combine two buses. 
+"""
+
 import sys
 
 class Bus:
     def __init__(self, number:int):
+        """
+        Number must of type integer and must be non-negative. 
+        Number represents the bus value. 
+        """
+
         self.__checkType(number, int)
 
         if(number < 0):
             self.__printErrorAndExit(f"{number} is not greater than or equal to 0.")
-        
-        self.__binary = bin(number)[2:]
+
         self.__number = number
 
     def getNumber(self):
+        """
+        Returns the numeric representation of the bus value.
+        """
+
         return self.__number
     
     def getBinary(self):
-        return self.__binary
+        """
+        Returns the binary representation of the bus value. 
+        """
+
+        return bin(self.getNumber())[2:]
     
     def __str__(self):
-        return self.__binary
+        """
+        Returns the string representation of this class.
+        The returned value is equivalent to calling getBinary().
+        """
+
+        return self.getBinary()
 
     def __getitem__(self, sliced):
+        """
+        Returns a Bus value after slicing the bus value. 
+        Sliced must be a valid sliced object and must consist
+        of only integers.
+        If the resulting value is an empty string, then error is
+        thrown. 
+        """
+
         try:
-            temp = self.__binary[sliced]
+            temp = self.getBinary()[sliced]
 
             if(temp == None or temp == ''):
                 raise IndexError()
             
-            return temp
+            return Bus(int("0b"+temp, 2))
+
         except IndexError:
             self.__printErrorAndExit(f"{sliced} is not a valid index.")
         except TypeError:
             self.__printErrorAndExit(f"{sliced} is not of valid type.")
         
     def __add__(self, other):
-        self.__checkType(other, Bus)
-        return bin(self.__number + other.__number)[2:]
+        """
+        Returns a Bus value after adding this object and other object.
+        other must be of Bus type. 
+        """
 
-    def append(self, other):
-        self.__binary = self.__add__(other)
+        self.__checkType(other, Bus)
+        return Bus(self.__number + other.__number)
+
+    def iadd(self, other):
+        """
+        Adds this object with the other object and changes this object's input.
+        other must be of Bus type. 
+        """
+
+        self.__checkType(other, Bus)
         self.__number = self.__number + other.__number
 
     def __checkType(self, value, classType):
+        """
+        Checks if value is of type classType. 
+        If not, then throws error. Otherwise, returns True. 
+        """
+
         try:
             if(value == None or classType == None or not isinstance(value, classType)):
                 raise ValueError(f"{value} is not of type {classType}")
         except ValueError as e:
             self.__printErrorAndExit(e)
+        
+        return True
 
     def __printErrorAndExit(self, message:str):
         """
@@ -76,7 +125,7 @@ if __name__ == "__main__":
 
     print("Adding", bus, "and", bus2, bus + bus2)
     
-    bus.append(bus2)
+    bus += bus2
     print("After appending bus2 to bus, bus is", bus, "while bus2 is", bus2)
 
     #Invalid adding
