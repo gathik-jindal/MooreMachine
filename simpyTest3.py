@@ -1,7 +1,11 @@
 import simpy
 
+class Scopedump():
+           dic={}
+
 class Run():
            lst=[]
+           idlst=[]
            def __init__(self):
                       for i in Run.lst:
                                  print(i)
@@ -9,7 +13,7 @@ class Run():
 
 class Input(Run):
            
-           def __init__(self,lst,env):
+           def __init__(self, lst, env, blockID=None):
 
                       self.env=env
                       self.input=lst
@@ -18,6 +22,13 @@ class Input(Run):
                       self.output=[0]
 
                       Run.lst.append(self)
+                      Run.idlst.append(self)
+
+                      if blockID==None:
+                                 self.blockID = Run.idlst.index(self)
+                      else:
+                                 self.blockID = blockID
+                                 
                       
            def __le__(self):
                       print("Invaid connection")
@@ -41,7 +52,7 @@ class Input(Run):
 
 class Machine(Run):
          
-           def __init__(self, env, clock, NSL, OL):
+           def __init__(self, env, clock, NSL, OL, blockID=None):
                       
                       self.env=env
                       self.clock=clock
@@ -54,6 +65,12 @@ class Machine(Run):
                       
                       self.fanoutCount=0
                       self.output=[0]
+
+                      Run.idlst.append(self)
+                      if blockID==None:
+                                 self.blockID = Run.idlst.index(self)
+                      else:
+                                 self.blockID = blockID
                       
            def __le__(self,other):
                       self.input=other.output
@@ -62,6 +79,9 @@ class Machine(Run):
                       Run.lst.append(self)
 
                       return True
+
+           def __str__(self):
+                      return f"Machine ID{self.blockID}"
 
            def addFanout(self):
                       self.fanoutCount+=1
@@ -154,7 +174,3 @@ r=Run()
 env.run(until=40)
 print("\nMachine out is:", ans,"\nreal output is:")#, [(i[0]+2,i[1]+1) for i in ([(0,0)]+question)])
 input()
-                      
-                      
-                      
-                      
