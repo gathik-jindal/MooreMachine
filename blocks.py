@@ -10,7 +10,7 @@ pip install simpy
 """
 
 from abc import ABC, abstractmethod
-from Utilities import checkType, printErrorAndExit
+from utilities import checkType, printErrorAndExit
 from pwlSource import InputGenerator
 import simpy
 

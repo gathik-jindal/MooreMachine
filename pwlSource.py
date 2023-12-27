@@ -11,7 +11,7 @@ One can install openpyxl by the following method:
 """
 
 import sys
-from Utilities import checkType, printErrorAndExit
+from utilities import checkType, printErrorAndExit
 
 class InputGenerator:
 
