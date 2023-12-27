@@ -11,6 +11,7 @@ One can install openpyxl by the following method:
 """
 
 import sys
+from Utilities import checkType, printErrorAndExit
 
 class InputGenerator:
 
@@ -33,14 +34,9 @@ class InputGenerator:
         filepath is the filepath of your txt, csv, or xlsx file relative to this directory in str.
         """
         
-        try:
-            if(filePath == None or not isinstance(filePath, str)):
-                raise TypeError(f"File path \"{filePath}\" is not of type string.")
-
-            self.__filePath = filePath
-
-        except TypeError as e:
-            self.__printErrorAndExit(e)
+        checkType([(filePath, str)])
+        
+        self.__filePath = filePath
     
     def getFilePath(self):
         """
@@ -115,7 +111,7 @@ class InputGenerator:
                 raise ValueError("File path is not of type csv, txt, or xlsx.")
         
         except ValueError as e:
-           self.__printErrorAndExit(e)
+           printErrorAndExit(e)
     
     def __openCsvFile(self):
         """
@@ -128,9 +124,9 @@ class InputGenerator:
                 csr=csv.reader(file)
                 return self.__returnProperInputs(csr)
         except IOError:
-            self.__printErrorAndExit(f"The file path {self.__filePath} does not exist.")
+            printErrorAndExit(f"The file path {self.__filePath} does not exist.")
         except ValueError as e:
-            self.__printErrorAndExit(e)
+            printErrorAndExit(e)
         
     def __openTxtFile(self):
         """
@@ -143,9 +139,9 @@ class InputGenerator:
                 lines = list(map(lambda x: x.split(" "), lines))
                 return self.__returnProperInputs(lines)
         except IOError:
-            self.__printErrorAndExit(f"The file path {self.__filePath} does not exist.")
+            printErrorAndExit(f"The file path {self.__filePath} does not exist.")
         except ValueError as e:
-            self.__printErrorAndExit(e)
+            printErrorAndExit(e)
 
     def __openExcelFile(self):
         """
@@ -159,9 +155,9 @@ class InputGenerator:
             sheet = wb.active
             return self.__returnProperInputs(sheet.values)
         except IOError:
-            self.__printErrorAndExit(f"The file path {self.__filePath} does not exist.")
+            printErrorAndExit(f"The file path {self.__filePath} does not exist.")
         except ValueError as e:
-            self.__printErrorAndExit(e)
+            printErrorAndExit(e)
     
     def __returnProperInputs(self, iterable):
         """
@@ -190,14 +186,6 @@ class InputGenerator:
             raise ValueError(f"{iterable} cannot be iterated upon.")
 
         return {"Inputs": input_schedule}
-
-    def __printErrorAndExit(self, message:str):
-        """
-        This function prints the error message specified by message and exits. 
-        """
-
-        print(message)
-        sys.exit(1)
 
 if __name__ == "__main__":
 
