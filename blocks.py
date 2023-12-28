@@ -97,7 +97,23 @@ class Manager:
                 printErrorAndExit(f"{i} is not connected.")
         
         self.__env.run(until=until)
+
+class ScopeDump:
+
+    def __init__(self):
+        self.__values = {}
     
+    def add(self, classification:str, time:float, value:int):
+        checkType([(classification, str), (time, (float, int)), (value, int)])
+
+        if(classification in self.__values):
+            self.__values[classification].append((time, value))
+        else:
+            self.__values[classification] = [(time, value)]
+    
+    def getValues(self):
+        return self.__values
+
 class Block(ABC):
     """
     This class specifies the methods and variables that are common to each block.
@@ -114,7 +130,8 @@ class Block(ABC):
         """
         
         self._env = env
-        
+        self._scopeDump = ScopeDump()
+
         if blockID == None:
             self._blockID = Block.__count
             Block.__count += 1
@@ -151,6 +168,9 @@ class Block(ABC):
         """
         
         pass
+    
+    def getScopeDump(self):
+        return self._scopeDump.getValues()
 
 class HasInputConnections(Block):
     """
@@ -278,8 +298,8 @@ class Machine(HasInputConnections, HasOutputConnections):
         while True:
             yield self._input[self._connectedID].get()
             
-            print("recalculate at ", self._env.now, "using", self._input[0], "inside", self)
-            
+            self._scopeDump.add("Input", self._env.now, self._input[0])
+
             tempout = self._input[0] + 1
             yield self._env.timeout(0.6)
             
@@ -288,7 +308,7 @@ class Machine(HasInputConnections, HasOutputConnections):
             for i in range(1, self._fanOutCount + 1):
                 self._output[i].put(True)
             
-            print(self._input[0], self, self._env.now)
+            self._scopeDump.add("NS", self._env.now, self._output[0])
     
     def __runNSLp(self):
         """
@@ -366,14 +386,15 @@ class Input(HasOutputConnections):
         
         for i in self._input:
 
-            yield self._env.timeout(i[1]-self._env.now)
+            yield self._env.timeout(i[0]-self._env.now)
             
-            print("Input changed at",self._env.now)
+            self._output[0]=i[1]
             
-            self._output[0]=i[0]
             for i in range(1,self._fanOutCount+1):
                 self._output[i].put(True)
-    
+
+            self._scopeDump.add("Input", self._env.now, self._output[0])
+
     def run(self):
         """
         Runs this block.
@@ -395,8 +416,6 @@ class Output(HasInputConnections):
         """
         
         super().__init__(env, blockID)
-
-        self._ans = []
     
     def __str__(self):
         """
@@ -412,15 +431,7 @@ class Output(HasInputConnections):
         
         while True:
             yield self._input[self._connectedID].get()
-            print("Output is",self._input[0],"at",self._env.now)
-            self._ans.append((self._input[0],self._env.now))
-    
-    def getOutput(self):
-        """
-        Returns a list containing the time the output changed and the output value.
-        """
-        
-        return self._ans
+            self._scopeDump.add("Output", self._env.now, self._input[0])
     
     def run(self):
         """
@@ -451,4 +462,7 @@ if __name__ == "__main__":
 
     #Running all the blocks.
     manager.run(until = 40)
-    print("\nMachine out is:", o.getOutput())
+    print("InputBlock:", i.getScopeDump())
+    print("Machine M1:", m1.getScopeDump())
+    print("Machine M2:", m2.getScopeDump())
+    print("OutputBlock:", o.getScopeDump())
