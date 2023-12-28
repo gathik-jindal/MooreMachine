@@ -13,6 +13,7 @@ from abc import ABC, abstractmethod
 from utilities import checkType, printErrorAndExit
 from pwlSource import InputGenerator
 import simpy
+import uuid
 
 class Manager: 
     """
@@ -139,8 +140,8 @@ class Block(ABC):
     This class specifies the methods and variables that are common to each block.
     It includes some abstract methods that should be implemented by its subclasses.
     """
-    
-    __count = 1
+
+    __uniqueIDlist = []
 
     def __init__(self, env, blockID = None):
         """
@@ -151,13 +152,25 @@ class Block(ABC):
         
         self._env = env
         self._scopeDump = ScopeDump()
+        
+        self._blockID = Block.__uniqueID(blockID)
 
-        if blockID == None:
-            self._blockID = Block.__count
-            Block.__count += 1
-        else:
-            self._blockID = blockID
 
+    @staticmethod
+    def __uniqueID(blockID):
+        """
+        Creates a unique ID for each block
+        """
+
+        if(blockID != None and blockID in Block.__uniqueIDlist):
+            printErrorAndExit(f"{blockID} has already been used as an ID for another block.")
+        elif(blockID == None):
+            blockID = uuid.uuid4()
+        
+        Block.__uniqueIDlist.append(blockID)
+        return blockID
+        
+        
     def getBlockID(self):
         """
         Returns the block ID of the current block.
