@@ -98,11 +98,28 @@ class Manager:
         self.__env.run(until=until)
 
 class ScopeDump:
+    """
+    This class is used for creating the scope. 
+    All the different values that the user wants
+    should be added to this class.
+    """
 
     def __init__(self):
+        """
+        Creates a ScopeDumpy Object.
+        """
+
         self.__values = {}
     
     def add(self, classification:str, time:float, value:int):
+        """
+        classification must be of type string and must specify
+        what the value (time, value) represents. 
+        time represents the time at which this value occured.
+        value represents the value of the bus at this point.
+        Adds (time, float) to classification.
+        """
+        
         checkType([(classification, str), (time, (float, int)), (value, int)])
 
         if(classification in self.__values):
@@ -111,7 +128,11 @@ class ScopeDump:
             self.__values[classification] = [(time, value)]
     
     def getValues(self):
-        return self.__values
+        """
+        Returns all the values added to this class.
+        """
+
+        return dict(self.__values)
 
 class Block(ABC):
     """
