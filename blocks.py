@@ -91,7 +91,6 @@ class Manager:
 
         for i in self.__components:
             if(isinstance(i, Input) or i.isConnected()):
-                print(i)
                 i.run()
             else:
                 printErrorAndExit(f"{i} is not connected.")
