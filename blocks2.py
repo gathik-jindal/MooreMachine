@@ -36,6 +36,7 @@ class Manager:
 
         self.__env = simpy.Environment()
         self.__components = []
+        self.__scope=ScopeDump()
 
     def addMachine(self, clock, nsl, ol, blockID=None):
         """
@@ -98,7 +99,7 @@ class Manager:
         
         self.__env.run(until=until)
 
-class ScopeDump:
+class ScopeDump():
     """
     This class is used for creating the scope. 
     All the different values that the user wants
