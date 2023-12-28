@@ -203,6 +203,10 @@ class Block(ABC):
         pass
     
     def getScopeDump(self):
+        """
+        Returns the scope dump values for this block.
+        """
+
         return self._scopeDump.getValues()
 
 class HasInputConnections(Block):
