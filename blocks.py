@@ -63,7 +63,6 @@ class Manager:
         """
 
         temp = Clock()
-        self.__components.append(temp)
         return temp
     
     def addInput(self, filePath:str, blockID=None):
