@@ -29,7 +29,6 @@ In order to install this project, download the zip file from above and extract i
 The following code specifies a sample way to create and run the Moore Machine. It is also present in the file main.py.
 It consists of 2 machines m1 and m2. The input is received from the text file and the final output is stored in the object o. 
 The input can be from any type of file that has the extension .txt, .csv, and .xslx. 
-Furthermore, the input must be of the format:
 
 Feature: Each of the specified file types can have a header line which can contain anything, the program will automatically skip it / ignore it.
 
