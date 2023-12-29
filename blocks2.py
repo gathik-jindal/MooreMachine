@@ -97,6 +97,8 @@ class Manager:
                 printErrorAndExit(f"{i} is not connected.")
         
         self.__env.run(until=until)
+        dump = Block.run()
+        print(dump)
 
 class ScopeDump():
     """
@@ -215,7 +217,7 @@ class Block(ABC):
     def run():
         for i in __dumpList:
             __dump.update(i._scopeDump)
-        ##########
+        return __dump
 
 class HasInputConnections(Block):
     """
