@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 from utilities import checkType, printErrorAndExit
 from pwlSource import InputGenerator
 from scope import Plotter
-from Blocks import Manager, ScopeDump, Block, HasInputConnections, HasOutputConnections, Input, Machine, Output, Clock
+from blocks import Manager, Clock
 import simpy
 import uuid
 
