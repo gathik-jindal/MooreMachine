@@ -8,10 +8,11 @@ pip install simpy
 @date: 27/12/2023
 @version: 1.0
 """
-
+from matplotlib import pyplot as plt
 from abc import ABC, abstractmethod
 from utilities import checkType, printErrorAndExit
 from pwlSource import InputGenerator
+from scope import Plotter
 import simpy
 import uuid
 
@@ -29,13 +30,14 @@ class Manager:
     This class does not perform the connections. See the classes Input, Machine, or Output for connecting purposes. 
     """
 
-    def __init__(self):
+    def __init__(self, name="Manager"):
         """
         Creates a new simpy environment.
         """
 
         self.__env = simpy.Environment()
         self.__components = []
+        self.__name=name
 
     def addMachine(self, clock, nsl, ol, plot=False, blockID=None):
         """
@@ -100,6 +102,10 @@ class Manager:
         dump = Block.dumpAll()
         print(dump)
 
+        plot=Plotter()
+        plot.plot(dump, f"Plot of {self.__name}")
+        plot.show()
+
 class ScopeDump():
     """
     This class is used for creating the scope. 
@@ -156,7 +162,7 @@ class Block(ABC):
         
         self._env = env
         self._scopeDump = ScopeDump()
-        print(plot)
+        
         if plot==True:
             Block.__dumpList.append(self)
         
