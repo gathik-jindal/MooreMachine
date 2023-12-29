@@ -127,4 +127,4 @@ manager.run(until = 40)
 ```
 
 ## License
-It is an open-source project. 
+It is an open source project. 
