@@ -26,7 +26,7 @@ In order to install this project, download the zip file from above and extract i
 
 ## Usage
 
-The inputs to the Moore Machine can be from files that have the extension .txt, .csv, or .xslx. 
+The inputs to the Moore Machine can be from files that have the extension .txt, .csv, or .xlsx. 
 
 Feature: Each of the specified file types can have a header line which can contain anything, the program will automatically skip it / ignore it.
 
@@ -65,9 +65,9 @@ Feature: Each of the specified file types can have a header line which can conta
             time should be convertible to a float.
             input should be convertible to integer.
 
-Look at Tests\\Test.txt, Tests\\Test.csv, Tests\\Tests.xslx for more information.
+Look at Tests\\Test.txt, Tests\\Test.csv, Tests\\Tests.xlsx for more information.
 
-A sample txt file, csv file, and xslx file are shown below (Note headers are not required) :
+A sample txt file, csv file, and xlsx file are shown below (Note headers are not required) :
 
     Txt File: 
             Time Input
@@ -83,7 +83,7 @@ A sample txt file, csv file, and xslx file are shown below (Note headers are not
             2.1,3
             3.1,4
             4.1,5
-    XSLX File:
+    XLSX File:
     Column: A    B
             Time Input
             0.1  1
