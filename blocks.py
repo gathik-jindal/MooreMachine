@@ -8,7 +8,7 @@ pip install simpy
 @date: 27/12/2023
 @version: 1.0
 """
-from matplotlib import pyplot as plt
+
 from abc import ABC, abstractmethod
 from utilities import checkType, printErrorAndExit
 from pwlSource import InputGenerator
@@ -49,7 +49,7 @@ class Manager:
         then new unique ID is given.  
         """
 
-        checkType([(clock, Clock)])
+        checkType([(clock, Clock), (plot, bool)])
 
         temp = Machine(self.__env, clock, nsl, ol, plot, blockID)
         self.__components.append(temp)
