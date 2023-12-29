@@ -67,8 +67,6 @@ Feature: Each of the specified file types can have a header line which can conta
                     ...
             time should be convertible to a float.
             input should be convertible to integer.
-            
-```python
 
 A sample txt file, csv file, and xslx file are shown below (Note headers are not required) :
 
@@ -96,7 +94,7 @@ Look at Tests\\Test.txt, Tests\\Test.csv, Tests\\Tests.xslx for more information
             3.1	 4
             4.1	 5
 
-
+```python
 from blocks import Manager, Clock
 
 manager = Manager()
