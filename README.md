@@ -33,7 +33,7 @@ Furthermore, the input must be of the format:
 
 Feature: Each of the specified file types can have a header line which can contain anything, the program will automatically skip it / ignore it.
 
-For txt files, the format should be as follows: 
+        For txt files, the format should be as follows: 
             <time> <input>
             <time> <input>
             ...
