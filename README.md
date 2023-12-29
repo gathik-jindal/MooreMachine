@@ -1,7 +1,3 @@
-# MooreMachine
-
-Making a simple Moore Machine
-
 # Moore Machine in Python
 
 This project implements a Moore Machine in Python. A Moore Machine is a finite state machine where the outputs depend only on the current state.
