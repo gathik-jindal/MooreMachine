@@ -55,6 +55,17 @@ class Manager:
         self.__components.append(temp)
         return temp
 
+    def addClock(self, blockID=None):
+        """
+        Adds a clock to this class. 
+        blockID is the id of this machine. If None, 
+        then new unique ID is given.  
+        """
+
+        temp = Clock()
+        self.__components.append(temp)
+        return temp
+    
     def addInput(self, filePath:str, blockID=None):
         """
         Adds an input block to this class.
@@ -510,9 +521,10 @@ if __name__ == "__main__":
 
     #Creating a manager class and adding all the blocks to it.
     manager = Manager()
+    clk=manager.addClock()
     i = manager.addInput("Tests\\Test.txt", "input")
-    m1 = manager.addMachine(Clock(), 1, 1, True, "m1")
-    m2 = manager.addMachine(Clock(), 1, 1, True, "m2")
+    m1 = manager.addMachine(clk, 1, 1, True, "m1")
+    m2 = manager.addMachine(clk, 1, 1, True, "m2")
     o = manager.addOutput("output")
 
     #Making all the connections
