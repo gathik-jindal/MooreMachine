@@ -23,9 +23,10 @@ if __name__ == "__main__":
 
     #Creating a manager class and adding all the blocks to it.
     manager = Manager()
+    clk=manager.addClock()
     i = manager.addInput("Tests\\Test.txt", "input")
-    m1 = manager.addMachine(Clock(), 1, 1, True, "m1")
-    m2 = manager.addMachine(Clock(), 1, 1, True, "m2")
+    m1 = manager.addMachine(clk, 1, 1, True, "m1")
+    m2 = manager.addMachine(clk, 1, 1, True, "m2")
     o = manager.addOutput("output")
 
     #Making all the connections
