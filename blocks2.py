@@ -36,7 +36,6 @@ class Manager:
 
         self.__env = simpy.Environment()
         self.__components = []
-        self.__scope=ScopeDump()
 
     def addMachine(self, clock, nsl, ol, blockID=None):
         """
