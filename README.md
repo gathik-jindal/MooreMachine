@@ -112,6 +112,12 @@ m2 = manager.addMachine(Clock(), 1, 1, True, "m2")
 o = manager.addOutput("output")
 
 #Making all the connections
+#Note : To make a connection so that the output of block x goes to the input of block y, write : y <= x
+#Note : Input block only has an output wire. It is compulsory to connect the output of the input block to another block. 
+#Note : Machine block has both input and output wire. It is compulsory to connect the input of the machine block to some other block.
+#Note : Output block has an input wire. It is compulsory to connect the input of the output block to some other block.
+#Note : It is not compulsory to have an output block. It is also not compulsory to connect the output of a machine block to anything.
+
 m1 <= i #i is an input to m1.
 m2 <= m1 #m1's output is an input to m2.
 o <= m2 #m2's output is an input to o.
