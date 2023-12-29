@@ -102,6 +102,7 @@ manager = Manager()
 #Inputs are of the format : fileName:str, blockID:str(preferable)
 i = manager.addInput("Tests\\Test.txt", "input")
 #Machines are of the format : Clock object:Clock, NSl object:NSL, OL object:OL, whether or not to plot the machine:bool, blockID:str(preferable)
+#Note: Clock, NSL, and OL are not yet implemented
 m1 = manager.addMachine(Clock(), 1, 1, True, "m1")
 m2 = manager.addMachine(Clock(), 1, 1, True, "m2")
 #Outputs are of the format : blockID:str(preferable)
