@@ -61,7 +61,6 @@ Feature: Each of the specified file types can have a header line which can conta
             Column:  A         B
                     <time>   <input>
                     <time>   <input>
-                    <time>   <input>
                     ...
             time should be convertible to a float.
             input should be convertible to integer.
