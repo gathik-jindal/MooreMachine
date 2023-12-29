@@ -30,8 +30,8 @@ In order to install this project, download the zip file from above and extract i
 
 ## Usage
 
-The following code specifies a sample way to create and run the Moore Machine. It consists of 2 machines m1 and m2.
-The input is received from the text file and the final output is stored in the object o. 
+The following code specifies a sample way to create and run the Moore Machine. It is also present in the file main.py.
+It consists of 2 machines m1 and m2. The input is received from the text file and the final output is stored in the object o. 
 
 ```python
 from blocks import Manager, Clock
