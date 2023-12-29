@@ -57,7 +57,7 @@ Feature: Each of the specified file types can have a header line which can conta
             <time>,<input>
             ...
             time should be convertible to float.
-            input should be convertible to integer
+            input should be convertible to integer.
 
         For xlsx files, the format should be as follows:
         Input format is expected in the file as follows:    
@@ -66,12 +66,15 @@ Feature: Each of the specified file types can have a header line which can conta
                     <time>   <input>
                     <time>   <input>
                     ...
-            time should be convertible to a float
-            input should be convertible to integer
+            time should be convertible to a float.
+            input should be convertible to integer.
             
 ```python
 
 A sample txt file, csv file, and xslx file are shown below (Note headers are not required) :
+
+Look at Tests\\Test.txt, Tests\\Test.csv, Tests\\Tests.xslx for more information.
+
     Txt File: 
         Time Input
         1 1
