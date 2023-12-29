@@ -34,12 +34,11 @@ Furthermore, the input must be of the format:
 Feature: Each of the specified file types can have a header line which can contain anything, the program will automatically skip it / ignore it.
 
 For txt files, the format should be as follows: 
-            Input format that is expected in the file as follows:
             <time> <input>
             <time> <input>
             ...
             time should be convertible to float.
-            input should be convertible to integer
+            input should be convertible to integer.
             
         For csv files, the format should be as follows:
             It assumes that the newline was set to "" while creating the file.
