@@ -28,7 +28,68 @@ In order to install this project, download the zip file from above and extract i
 
 The following code specifies a sample way to create and run the Moore Machine. It is also present in the file main.py.
 It consists of 2 machines m1 and m2. The input is received from the text file and the final output is stored in the object o. 
+The input can be from any type of file that has the extension .txt, .csv, and .xslx. 
+Furthermore, the input must be of the format:
 
+Feature: Each of the specified file types can have a header line which can contain anything, the program will automatically skip it / ignore it.
+
+For txt files, the format should be as follows: 
+
+            Input format that is expected in the file as follows:
+            
+            <time> <input>
+            
+            <time> <input>
+            
+            ...
+
+            time should be convertible to float.
+
+            input should be convertible to integer
+            
+        For csv files, the format should be as follows:
+            
+            It assumes that the newline was set to "" while creating the file 
+
+            A sample creation in python:
+
+                ```python
+                import csv
+                with open("Test.csv", "w", newline='') as file:
+                    csw=csv.writer(file)
+                    for i in range(5):
+                        csw.writerow([i+0.1,i+1])
+                ```
+                
+            Input format that is expected in the file as follows:
+            
+            <time>,<input>
+            
+            <time>,<input>
+            
+            ...
+
+            time should be convertible to float.
+            
+            input should be convertible to integer
+
+        For xlsx files, the format should be as follows:
+
+            Input format is expected in the file as follows:
+            
+            Column:  A         B
+            
+                    <time>   <input>
+                    
+                    <time>   <input>
+                    
+                    <time>   <input>
+                    
+                    ...
+                    
+            time should be convertible to a float
+            
+            input should be convertible to integer
 ```python
 from blocks import Manager, Clock
 
