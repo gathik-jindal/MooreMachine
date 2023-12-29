@@ -33,7 +33,7 @@ In order to install this project, download the zip file from above and extract i
 The following code specifies a sample way to create and run the Moore Machine. It consists of 2 machines m1 and m2.
 The input is received from the text file and the final output is stored in the object o. 
 
-'''python
+```python
 from blocks import Manager, Clock
 
 manager = Manager()
@@ -49,7 +49,7 @@ o <= m2 #m2's output is an input to o.
 
 #Running all the blocks.
 manager.run(until = 40)
-'''
+```
 
 ## License
 It is an open-source project. 
