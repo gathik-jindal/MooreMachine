@@ -37,7 +37,7 @@ class Manager:
         self.__env = simpy.Environment()
         self.__components = []
 
-    def addMachine(self, clock, nsl, ol, blockID=None):
+    def addMachine(self, clock, nsl, ol, plot=False, blockID=None):
         """
         Adds a moore machine to this class. 
         clock must be of type Clock.
@@ -49,7 +49,7 @@ class Manager:
 
         checkType([(clock, Clock)])
 
-        temp = Machine(self.__env, clock, nsl, ol, blockID)
+        temp = Machine(self.__env, clock, nsl, ol, plot, blockID)
         self.__components.append(temp)
         return temp
 
@@ -64,7 +64,7 @@ class Manager:
         
         inputList = InputGenerator(filePath).getInput()["Inputs"]
 
-        temp = Input(inputList, self.__env, blockID)
+        temp = Input(inputList, self.__env, False, blockID)
         self.__components.append(temp)
         return temp
     
@@ -75,7 +75,7 @@ class Manager:
         then new unique ID is given. 
         """
 
-        temp = Output(self.__env, blockID)
+        temp = Output(self.__env, True, blockID)
         self.__components.append(temp)
         return temp
     
@@ -97,7 +97,7 @@ class Manager:
                 printErrorAndExit(f"{i} is not connected.")
         
         self.__env.run(until=until)
-        dump = Block.run()
+        dump = Block.dumpAll()
         print(dump)
 
 class ScopeDump():
@@ -147,7 +147,7 @@ class Block(ABC):
     __dumpList=[]
     __dump={}
 
-    def __init__(self, env, blockID = None):
+    def __init__(self, env, plot, blockID = None):
         """
         env is the simpy environment.  
         blockID is the id of this input block. If None, 
@@ -156,6 +156,9 @@ class Block(ABC):
         
         self._env = env
         self._scopeDump = ScopeDump()
+        print(plot)
+        if plot==True:
+            Block.__dumpList.append(self)
         
         self._blockID = Block.__uniqueID(blockID)
 
@@ -214,10 +217,14 @@ class Block(ABC):
         return self._scopeDump.getValues()
         
     @staticmethod
-    def run():
-        for i in __dumpList:
-            __dump.update(i._scopeDump)
-        return __dump
+    def dumpAll():
+        """
+        Returns all the values to be plotted
+        """
+        
+        for i in Block.__dumpList:
+            Block.__dump.update(i.getScopeDump())
+        return Block.__dump
 
 class HasInputConnections(Block):
     """
@@ -229,14 +236,14 @@ class HasInputConnections(Block):
     Block b1 must be of type HasOutputConnections. 
     """
     
-    def __init__(self, env, blockID=None):
+    def __init__(self, env, plot, blockID=None):
         """
         env is the simpy environment.  
         blockID is the id of this input block. If None, 
         then new unique ID is given.
         """
         
-        super().__init__(env, blockID)
+        super().__init__(env, plot, blockID)
     
         self._isConnected = False
         self._connectedID = None
@@ -275,14 +282,14 @@ class HasOutputConnections(Block):
     are the only ones that have an output connection wire. 
     """
     
-    def __init__(self, env, blockID=None):
+    def __init__(self, env, plot, blockID=None):
         """
         env is the simpy environment.  
         blockID is the id of this input block. If None, 
         then new unique ID is given.
         """
 
-        super().__init__(env, blockID)
+        super().__init__(env, plot, blockID)
 
         self.defineFanOut()
     
@@ -312,7 +319,7 @@ class Machine(HasInputConnections, HasOutputConnections):
     This represents the Moore Machine.
     """
     
-    def __init__(self, env, clock, nsl, ol, blockID=None):
+    def __init__(self, env, clock, nsl, ol, plot=False, blockID=None):
         """
         env must be a simpy environment.
         clock must be of type Clock.
@@ -322,7 +329,7 @@ class Machine(HasInputConnections, HasOutputConnections):
         then new unique ID is given.
         """
         
-        super().__init__(env, blockID)
+        super().__init__(env, plot, blockID)
         self.defineFanOut()
 
         self._clock = clock
@@ -345,7 +352,7 @@ class Machine(HasInputConnections, HasOutputConnections):
         while True:
             yield self._input[self._connectedID].get()
             
-            self._scopeDump.add("Input", self._env.now, self._input[0])
+            self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self._input[0])
 
             tempout = self._input[0] + 1
             yield self._env.timeout(0.6)
@@ -355,7 +362,7 @@ class Machine(HasInputConnections, HasOutputConnections):
             for i in range(1, self._fanOutCount + 1):
                 self._output[i].put(True)
             
-            self._scopeDump.add("NS", self._env.now, self._output[0])
+            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self._output[0])
     
     def __runNSLp(self):
         """
@@ -401,7 +408,7 @@ class Input(HasOutputConnections):
     This represents the Input Block.
     """
     
-    def __init__(self, inputList:list, env, blockID=None):
+    def __init__(self, inputList:list, env, plot=False, blockID=None):
         """
         inputList must be a list that contains the input changes at the time intervals.
         env is the simpy environment.
@@ -409,7 +416,7 @@ class Input(HasOutputConnections):
         then new unique ID is given.
         """
         
-        super().__init__(env, blockID)
+        super().__init__(env, plot, blockID)
         self._input = inputList
     
     def __str__(self):
@@ -440,7 +447,7 @@ class Input(HasOutputConnections):
             for i in range(1,self._fanOutCount+1):
                 self._output[i].put(True)
 
-            self._scopeDump.add("Input", self._env.now, self._output[0])
+            self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self._output[0])
 
     def run(self):
         """
@@ -457,12 +464,12 @@ class Output(HasInputConnections):
     then new unique ID is given.
     """
 
-    def __init__(self, env, blockID=None):
+    def __init__(self, env, plot=True, blockID=None):
         """
         env is a simpy environment.
         """
         
-        super().__init__(env, blockID)
+        super().__init__(env, plot, blockID)
     
     def __str__(self):
         """
@@ -478,7 +485,7 @@ class Output(HasInputConnections):
         
         while True:
             yield self._input[self._connectedID].get()
-            self._scopeDump.add("Output", self._env.now, self._input[0])
+            self._scopeDump.add(f"Final Output from {self.getBlockID()}", self._env.now, self._input[0])
     
     def run(self):
         """
@@ -497,9 +504,9 @@ if __name__ == "__main__":
 
     #Creating a manager class and adding all the blocks to it.
     manager = Manager()
-    i = manager.addInput("Tests\\Test.txt", "input 1")
-    m1 = manager.addMachine(Clock(), 1, 1, "m1")
-    m2 = manager.addMachine(Clock(), 1, 1, "m2")
+    i = manager.addInput("Tests\\Test.txt", "input")
+    m1 = manager.addMachine(Clock(), 1, 1, True, "m1")
+    m2 = manager.addMachine(Clock(), 1, 1, True, "m2")
     o = manager.addOutput("output")
 
     #Making all the connections
@@ -509,7 +516,3 @@ if __name__ == "__main__":
 
     #Running all the blocks.
     manager.run(until = 40)
-    print("InputBlock:", i.getScopeDump())
-    print("Machine M1:", m1.getScopeDump())
-    print("Machine M2:", m2.getScopeDump())
-    print("OutputBlock:", o.getScopeDump())
