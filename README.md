@@ -99,9 +99,12 @@ It consists of 2 machines m1 and m2. The input is received from the text file an
 from blocks import Manager, Clock
 
 manager = Manager()
+#Inputs are of the format : fileName:str, blockID:str(preferable)
 i = manager.addInput("Tests\\Test.txt", "input")
+#Machines are of the format : Clock object:Clock, NSl object:NSL, OL object:OL, whether or not to plot the machine:bool, blockID:str(preferable)
 m1 = manager.addMachine(Clock(), 1, 1, True, "m1")
 m2 = manager.addMachine(Clock(), 1, 1, True, "m2")
+#Outputs are of the format : blockID:str(preferable)
 o = manager.addOutput("output")
 
 #Making all the connections
