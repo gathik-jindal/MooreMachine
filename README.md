@@ -90,10 +90,10 @@ A sample txt file, csv file, and xslx file are shown below (Note headers are not
     Column: A    B
             Time Input
             0.1  1
-            1.1	 2
-            2.1	 3
-            3.1	 4
-            4.1	 5
+            1.1  2
+            2.1  3
+            3.1  4
+            4.1  5
 
 ```python
 from blocks import Manager, Clock
