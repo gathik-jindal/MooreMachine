@@ -111,7 +111,7 @@ class ScopeDump():
         """
 
         self.__values = {}
-    
+
     def add(self, classification:str, time:float, value:int):
         """
         classification must be of type string and must specify
@@ -142,6 +142,8 @@ class Block(ABC):
     """
 
     __uniqueIDlist = []
+    __dumpList=[]
+    __dump={}
 
     def __init__(self, env, blockID = None):
         """
@@ -208,6 +210,12 @@ class Block(ABC):
         """
 
         return self._scopeDump.getValues()
+        
+    @staticmethod
+    def run():
+        for i in __dumpList:
+            __dump.update(i._scopeDump)
+        ##########
 
 class HasInputConnections(Block):
     """
