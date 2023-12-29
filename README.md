@@ -45,11 +45,11 @@ Feature: Each of the specified file types can have a header line which can conta
             A sample creation in python:
 
 ```python
-                import csv
-                with open("Test.csv", "w", newline='') as file:
-                    csw=csv.writer(file)
-                    for i in range(5):
-                        csw.writerow([i+0.1,i+1])
+        import csv
+        with open("Test.csv", "w", newline='') as file:
+            csw=csv.writer(file)
+            for i in range(5):
+            csw.writerow([i+0.1,i+1])
 ```
                 
             Input format that is expected in the file as follows:            
