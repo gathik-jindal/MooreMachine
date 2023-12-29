@@ -68,23 +68,24 @@ Feature: Each of the specified file types can have a header line which can conta
             time should be convertible to a float.
             input should be convertible to integer.
 
-A sample txt file, csv file, and xslx file are shown below (Note headers are not required) :
-
 Look at Tests\\Test.txt, Tests\\Test.csv, Tests\\Tests.xslx for more information.
 
+A sample txt file, csv file, and xslx file are shown below (Note headers are not required) :
+
     Txt File: 
-        Time Input
-        1 1
-        6 3
-        9 5
-        16 8
+            Time Input
+            0.1 1
+            1.1 2
+            2.1 3
+            3.1 4
+            4.1 5
     CSV File:
-        time,inputs
-        0.1,1
-        1.1,2
-        2.1,3
-        3.1,4
-        4.1,5
+            time,inputs
+            0.1,1
+            1.1,2
+            2.1,3
+            3.1,4
+            4.1,5
     XSLX File:
     Column: A    B
             Time Input
