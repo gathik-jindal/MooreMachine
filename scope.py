@@ -9,9 +9,10 @@ One can download matplotlib by
 @version: 1.0
 """
 
+from utilities import checkType, printErrorAndExit
 from matplotlib import pyplot as plt
 import sys
-
+import numpy as np
 
 class Plotter:
 
@@ -29,33 +30,42 @@ class Plotter:
         """
         plots the wave forms in a single window that are supplied in form of a dict.
         """
+        
+        checkType([(inputs, dict), (name, str)])
 
-        if (inputs == None or not (isinstance(inputs, dict))):
-            self.__printErrorAndExit(f"{inputs} is not of type dict.")
-        elif (name == None or not (isinstance(name, str))):
-            self.__printErrorAndExit(f"{name} is not of type str.")
-
-        self.__addNewFigure(name)
-
-        n_rows = len(inputs)
-        n_cols = 1
-
-        plt.title('Waveforms')
-        counter = 1
+        maxTime = 0
+        
         for key in inputs:
-            x_axis = [y[0] for y in inputs[key]]
-            y_axis = [y[1] for y in inputs[key]]
-            x_ticks = range(0, int(x_axis[-1]) + 1, 1)
+            time = [x[0] for x in inputs[key]]
 
-            plt.subplot(n_rows, n_cols, counter)
+            maxTime = int(max(maxTime, max(time) + 1))
+        
+        counter = 0
+        
+        ticks = np.linspace(0, maxTime, maxTime + 1)
+
+        for key in inputs:
+            
+            if(counter == 0):
+                fig, axs = plt.subplots(5, 1, figsize=(8, 7), sharex = True)
+                fig.suptitle(name)
+
+            time = [x[0] for x in inputs[key]]
+            value = [y[1] for y in inputs[key]]
+
+            # Plot data on each subplot
+            axs[counter].step(time, value, where = "mid")
+            axs[counter].grid(True)
+            axs[counter].set_ylabel(key)
+            axs[counter].set_yticks(value)
+            axs[counter].set_yticklabels([f"{x}" for x in value])
+            axs[counter].tick_params(axis='y', rotation=90)
+            axs[counter].set_xticks(ticks)
+            axs[counter].set_xticklabels([f"{int(x)}" for x in ticks])
+            fig.tight_layout()
+
             counter += 1
-            plt.step(x_axis, y_axis, where='post')
-            plt.ylabel(key)
-            plt.xticks(x_ticks)
-            plt.grid(True)
-
-        plt.xlabel('Time (units)')
-        plt.tight_layout()
+            counter %= 5
 
     def show(self):
         """
