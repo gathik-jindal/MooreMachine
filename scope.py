@@ -50,9 +50,7 @@ class Plotter:
             
             if(counter == 0):
                 numPlots += 1
-                # fig, axs = plt.subplots(min(5, len(inputs) - done), 1, figsize=(8, 7.5), num = name + " " + str(numPlots))
-                # fig, axs = plt.subplots(len(inputs) - done, 1, figsize=(8, 7.5), num = name + " " + str(numPlots))
-                fig, axs = plt.subplots(len(inputs) - done, 1, figsize=(8, 7.5), num = name)
+                fig, axs = plt.subplots(min(5, len(inputs) - done), 1, figsize=(8, 7.5), num = name + " " + str(numPlots))
 
                 if(len(inputs) - done == 1):
                     axs = [axs, None]
@@ -85,7 +83,7 @@ class Plotter:
 
             counter += 1
             done += 1
-            # counter %= 5
+            counter %= 5
 
     def show(self):
         """
