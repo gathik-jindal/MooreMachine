@@ -44,12 +44,14 @@ class Plotter:
         
         counter = 0
         done = 0
+        numPlots = 0
         ticks = range(0, maxTime, 1)
 
         for key in inputs:
             
             if(counter == 0):
-                fig, axs = plt.subplots(min(5, len(inputs) - done), 1, figsize=(8, 7), sharex = True)
+                numPlots += 1
+                fig, axs = plt.subplots(min(5, len(inputs) - done), 1, figsize=(8, 7), sharex = True, num = name + " " + str(numPlots))
 
                 if(len(inputs) - done == 1):
                     axs = [axs, None]
@@ -59,7 +61,7 @@ class Plotter:
             time = [x[0] for x in inputs[key]]
             value = [y[1] for y in inputs[key]]
 
-            if(time[0] != 0):
+            if(not(0 in time)):
                 time.insert(0, 0)
                 value.insert(0, 0)
             
