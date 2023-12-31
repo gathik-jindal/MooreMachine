@@ -5,26 +5,17 @@ One can download matplotlib by
     pip install matplotlib
 
 @author: Abhirath, Aryan, Gathik
-@date: 17/12/2023
+@date: 31/12/2023
 @version: 1.0
 """
 
 from utilities import checkType, printErrorAndExit
 from matplotlib import pyplot as plt
-import sys
-import numpy as np
 
 class Plotter:
 
     def __init__(self):
         pass
-
-    def __addNewFigure(self, name: str):
-        """
-        This function creates a new figure
-        """
-
-        plt.figure(name)
 
     def plot(self, inputs: dict, name: str):
         """
@@ -32,6 +23,17 @@ class Plotter:
         """
         
         checkType([(inputs, dict), (name, str)])
+
+        for key in inputs:
+            checkType([(key, str), (inputs[key], list)])
+
+            for value in inputs[key]:
+                checkType([(value, tuple)])
+
+                if(len(value) == 2):
+                    checkType([(value[0], (int, float)), (value[1], int)])
+                else:
+                    printErrorAndExit(f"{value} in {inputs[key]} in {inputs} is not of length 2.")
 
         maxTime = 0
         
@@ -41,18 +43,26 @@ class Plotter:
             maxTime = int(max(maxTime, max(time) + 1))
         
         counter = 0
-        
-        ticks = np.linspace(0, maxTime, maxTime + 1)
+        done = 0
+        ticks = range(0, maxTime, 1)
 
         for key in inputs:
             
             if(counter == 0):
-                fig, axs = plt.subplots(5, 1, figsize=(8, 7), sharex = True)
+                fig, axs = plt.subplots(min(5, len(inputs) - done), 1, figsize=(8, 7), sharex = True)
+
+                if(len(inputs) - done == 1):
+                    axs = [axs, None]
+                
                 fig.suptitle(name)
 
             time = [x[0] for x in inputs[key]]
             value = [y[1] for y in inputs[key]]
 
+            if(time[0] != 0):
+                time.insert(0, 0)
+                value.insert(0, 0)
+            
             # Plot data on each subplot
             axs[counter].step(time, value, where = "mid")
             axs[counter].grid(True)
@@ -60,11 +70,14 @@ class Plotter:
             axs[counter].set_yticks(value)
             axs[counter].set_yticklabels([f"{x}" for x in value])
             axs[counter].tick_params(axis='y', rotation=90)
+            axs[counter].set_ylim(bottom=0.0)
             axs[counter].set_xticks(ticks)
             axs[counter].set_xticklabels([f"{int(x)}" for x in ticks])
+            axs[counter].set_xlim(left=0.0)
             fig.tight_layout()
 
             counter += 1
+            done += 1
             counter %= 5
 
     def show(self):
@@ -73,15 +86,6 @@ class Plotter:
         """
 
         plt.show()
-
-    def __printErrorAndExit(self, message: str):
-        """
-        This function prints the error message specified by message and exits. 
-        """
-
-        print(message)
-        sys.exit(1)
-
 
 if __name__ == "__main__":
     import pwlSource
@@ -108,6 +112,8 @@ if __name__ == "__main__":
 
     # Remember to call this method at the end in order to show all the plots
     plot.show()
+
+    
 
     # Incorrect ways to use the class
     # plot.plot(None, "Wrong")
