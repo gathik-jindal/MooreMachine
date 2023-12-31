@@ -18,12 +18,16 @@ if __name__ == "__main__":
     i = manager.addInput("Tests\\Test.txt", "input")
     m1 = manager.addMachine(clk, 1, 1, True, "m1")
     m2 = manager.addMachine(clk, 1, 1, True, "m2")
+    m3 = manager.addMachine(clk, 1, 1, True, "m3")
+    m4 = manager.addMachine(clk, 1, 1, True, "m4")
     o = manager.addOutput("output")
 
     #Making all the connections
     m1 <= i
     m2 <= m1
-    o <= m2
+    m3 <= m2
+    m4 <= m3
+    o <= m4
 
     #Running all the blocks.
     manager.run(until = 40)
