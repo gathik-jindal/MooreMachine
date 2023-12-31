@@ -5,6 +5,7 @@ and also combine two buses.
 """
 
 import sys
+from utilities import printErrorAndExit, checkType
 
 class Bus:
     def __init__(self, number:int):
@@ -13,10 +14,10 @@ class Bus:
         Number represents the bus value. 
         """
 
-        self.__checkType(number, int)
+        checkType([(number, int)])
 
         if(number < 0):
-            self.__printErrorAndExit(f"{number} is not greater than or equal to 0.")
+            printErrorAndExit(f"{number} is not greater than or equal to 0.")
 
         self.__number = number
 
@@ -60,9 +61,9 @@ class Bus:
             return Bus(int("0b"+temp, 2))
 
         except IndexError:
-            self.__printErrorAndExit(f"{sliced} is not a valid index.")
+            printErrorAndExit(f"{sliced} is not a valid index.")
         except TypeError:
-            self.__printErrorAndExit(f"{sliced} is not of valid type.")
+            printErrorAndExit(f"{sliced} is not of valid type.")
         
     def __add__(self, other):
         """
@@ -70,7 +71,7 @@ class Bus:
         other must be of Bus type. 
         """
 
-        self.__checkType(other, Bus)
+        checkType([(other, Bus)])
         return Bus(self.__number + other.__number)
 
     def iadd(self, other):
@@ -79,30 +80,8 @@ class Bus:
         other must be of Bus type. 
         """
 
-        self.__checkType(other, Bus)
+        checkType([(other, Bus)])
         self.__number = self.__number + other.__number
-
-    def __checkType(self, value, classType):
-        """
-        Checks if value is of type classType. 
-        If not, then throws error. Otherwise, returns True. 
-        """
-
-        try:
-            if(value == None or classType == None or not isinstance(value, classType)):
-                raise ValueError(f"{value} is not of type {classType}")
-        except ValueError as e:
-            self.__printErrorAndExit(e)
-        
-        return True
-
-    def __printErrorAndExit(self, message:str):
-        """
-        This function prints the error message specified by message and exits. 
-        """
-
-        print(message)
-        sys.exit(1)
 
 if __name__ == "__main__":
     bus = Bus(22)
