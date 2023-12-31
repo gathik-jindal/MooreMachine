@@ -39,19 +39,18 @@ class Plotter:
         
         for key in inputs:
             time = [x[0] for x in inputs[key]]
-
             maxTime = int(max(maxTime, max(time) + 1))
         
         counter = 0
         done = 0
         numPlots = 0
-        ticks = range(0, maxTime, 1)
+        ticks = range(0, maxTime + 1, 1)
 
         for key in inputs:
             
             if(counter == 0):
                 numPlots += 1
-                fig, axs = plt.subplots(min(5, len(inputs) - done), 1, figsize=(8, 7), sharex = True, num = name + " " + str(numPlots))
+                fig, axs = plt.subplots(min(5, len(inputs) - done), 1, figsize=(8, 7.5), num = name + " " + str(numPlots))
 
                 if(len(inputs) - done == 1):
                     axs = [axs, None]
@@ -62,11 +61,14 @@ class Plotter:
             value = [y[1] for y in inputs[key]]
 
             if(not(0 in time)):
-                time.insert(0, 0)
                 value.insert(0, 0)
-            
+                time.insert(0, 0)
+            if(not(maxTime in time)):
+                value.insert(len(value), value[time.index((max(time)))])
+                time.insert(len(time), maxTime)
+
             # Plot data on each subplot
-            axs[counter].step(time, value, where = "mid")
+            axs[counter].step(time, value, where = "post")
             axs[counter].grid(True)
             axs[counter].set_ylabel(key)
             axs[counter].set_yticks(value)
@@ -76,6 +78,7 @@ class Plotter:
             axs[counter].set_xticks(ticks)
             axs[counter].set_xticklabels([f"{int(x)}" for x in ticks])
             axs[counter].set_xlim(left=0.0)
+            axs[counter].sharex(axs[0])
             fig.tight_layout()
 
             counter += 1
