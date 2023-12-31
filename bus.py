@@ -4,7 +4,6 @@ It allows one to get specific inputs from the bus
 and also combine two buses. 
 """
 
-import sys
 from utilities import printErrorAndExit, checkType
 
 class Bus:

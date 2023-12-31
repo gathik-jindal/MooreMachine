@@ -10,7 +10,6 @@ One can install openpyxl by the following method:
 @version: 1.0
 """
 
-import sys
 from utilities import checkType, printErrorAndExit
 
 class InputGenerator:
