@@ -5,8 +5,8 @@ It requires you to download simpy which can be done by
 pip install simpy
 
 @author: Abhirath, Aryan, Gathik
-@date: 27/12/2023
-@version: 1.0
+@date: 4/1/2023
+@version: 2.0
 """
 
 from abc import ABC, abstractmethod
@@ -16,7 +16,7 @@ from scope import Plotter
 import simpy
 import uuid
 
-class Manager: 
+class pydig: 
     """
     This class is used for adding your moore machines, input block, and output block.
     The manner in which the connections should occur is 
@@ -30,7 +30,7 @@ class Manager:
     This class does not perform the connections. See the classes Input, Machine, or Output for connecting purposes. 
     """
 
-    def __init__(self, name="Manager"):
+    def __init__(self, name="pydig"):
         """
         Creates a new simpy environment.
         """
@@ -39,7 +39,7 @@ class Manager:
         self.__components = []
         self.__name=name
 
-    def addMachine(self, clock, nsl, ol, plot=False, blockID=None):
+    def moore(self, plot=False, blockID=None, clk = None, nsl=None, ol=None):
         """
         Adds a moore machine to this class. 
         clock must be of type Clock.
@@ -49,13 +49,13 @@ class Manager:
         then new unique ID is given.  
         """
 
-        checkType([(clock, Clock), (plot, bool)])
+        checkType([(plot, bool)])
 
-        temp = Machine(self.__env, clock, nsl, ol, plot, blockID)
+        temp = Machine(self.__env, clk, nsl, ol, plot, blockID)
         self.__components.append(temp)
         return temp
 
-    def addClock(self, blockID=None):
+    def clock(self, blockID=None):
         """
         Adds a clock to this class. 
         blockID is the id of this machine. If None, 
@@ -65,7 +65,7 @@ class Manager:
         temp = Clock()
         return temp
     
-    def addInput(self, filePath:str, blockID=None):
+    def source(self, filePath:str, blockID=None):
         """
         Adds an input block to this class.
         filePath must be a valid filePath of type
@@ -80,7 +80,7 @@ class Manager:
         self.__components.append(temp)
         return temp
     
-    def addOutput(self, blockID=None):
+    def output(self, blockID=None):
         """
         Adds an output block to this class.
         blockID is the id of this input block. If None, 
@@ -113,6 +113,7 @@ class Manager:
         print(dump)
 
         plot=Plotter()
+
         plot.plot(dump, f"Plot of {self.__name}")
         plot.show()
 
@@ -165,7 +166,7 @@ class Block(ABC):
 
     def __init__(self, env, plot, blockID = None):
         """
-        env is the simpy environment.  
+        env is the simpy environment.
         blockID is the id of this input block. If None, 
         then new unique ID is given.
         """
@@ -191,15 +192,18 @@ class Block(ABC):
             blockID = uuid.uuid4()
         
         Block.__uniqueIDlist.append(blockID)
+
         return blockID
-        
-        
-    def getBlockID(self):
+
+    @staticmethod
+    def dumpAll():
         """
-        Returns the block ID of the current block.
+        Returns all the values to be plotted
         """
         
-        return self._blockID
+        for i in Block.__dumpList:
+            Block.__dump.update(i.getScopeDump())
+        return Block.__dump
     
     @abstractmethod
     def __str__(self):
@@ -225,22 +229,19 @@ class Block(ABC):
         
         pass
     
+    def getBlockID(self):
+        """
+        Returns the block ID of the current block.
+        """
+        
+        return self._blockID
+    
     def getScopeDump(self):
         """
         Returns the scope dump values for this block.
         """
 
         return self._scopeDump.getValues()
-        
-    @staticmethod
-    def dumpAll():
-        """
-        Returns all the values to be plotted
-        """
-        
-        for i in Block.__dumpList:
-            Block.__dump.update(i.getScopeDump())
-        return Block.__dump
 
 class HasInputConnections(Block):
     """
@@ -263,8 +264,7 @@ class HasInputConnections(Block):
     
         self._isConnected = False
         self._connectedID = None
-        self._input = None
-    
+        
     def __le__(self, other):
         """
         other must be of type HasOutputConnections. 
@@ -272,7 +272,7 @@ class HasInputConnections(Block):
         If the inputs of self are already connected, then error is generated.
         """
         
-        if(self._isConnected):
+        if(self.isConnectedToInput()):
             printErrorAndExit(self, " is already connected.")
 
         checkType([(other, (HasOutputConnections))])
@@ -280,16 +280,29 @@ class HasInputConnections(Block):
         self._input = other._output
         self._connectedID = other.addFanout()
         self._isConnected = True
-        
+
         return True
 
-    def isConnected(self):
+    def isConnectedToInput(self):
         """
-        Returns true if this block is connected.
+        Returns true if this block is connected to input.
         False otherwise.
         """
-        
         return self._isConnected
+    
+    @abstractmethod
+    def isConnected(self):
+        """
+        Returns true if this block is connected to everything.
+        False otherwise.
+        """
+        pass
+
+    def input(self, left=None, right=None):
+        """
+        Returns the instance of this class for connection purposes.
+        """
+        return self
 
 class HasOutputConnections(Block):
     """
@@ -328,6 +341,21 @@ class HasOutputConnections(Block):
         self._output[-1].put(True)
         return self._fanOutCount
 
+    def __gt__(self, other):
+        """
+        Makes it possible to do the following connection:
+        
+        object1.output > object2.input
+        """
+        
+        return other <= self
+
+    def output(self, left = None, right = None):
+        """
+        Returns the instance of this class for connection purposes.
+        """
+        return self
+
 class Machine(HasInputConnections, HasOutputConnections):
     """
     A machine is both a HasInputConnections block and a HasOutputConnections block.
@@ -347,9 +375,9 @@ class Machine(HasInputConnections, HasOutputConnections):
         super().__init__(env, plot, blockID)
         self.defineFanOut()
 
-        self._clock = clock
-        self._NSL = nsl
-        self._OL = ol
+        self.clk = clock
+        self.nsl = nsl
+        self.ol = ol
         self._Pchange = simpy.Store(self._env)
     
     def __str__(self):
@@ -416,6 +444,11 @@ class Machine(HasInputConnections, HasOutputConnections):
         """
         
         self._env.process(self.__runNSLi())
+    
+    def isConnected(self):
+
+        return self.clk != None and self.nsl != None and self.ol != None and self.isConnectedToInput()
+        return False
 
 class Input(HasOutputConnections):
     """
@@ -508,31 +541,57 @@ class Output(HasInputConnections):
         """
         
         self._env.process(self.__give()) 
+    
+    def isConnected(self):
+        return self.isConnectedToInput()
 
-class Clock:
+class Clock(HasOutputConnections):
     """
     TODO: Create a clock.
     """
-    pass
+
+    def __init__(self, env=None, plot=False, blockID=None):
+        super().__init__(env, plot, blockID)
+    
+    def output(self):
+        """
+        Returns this object for connection purposes.
+        """
+        return self
+
+    def __le__(self, other):
+        pass
+
+    def __str__(self):
+        return "hi"
+
+    def run(self):
+        return "no"
 
 if __name__ == "__main__":
 
-    #Creating a manager class and adding all the blocks to it.
-    manager = Manager()
-    clk=manager.addClock()
-    i = manager.addInput("Tests\\Test.txt", "input")
-    m1 = manager.addMachine(clk, 1, 1, True, "m1")
-    m2 = manager.addMachine(clk, 1, 1, True, "m2")
-    m3 = manager.addMachine(clk, 1, 1, True, "m3")
-    m4 = manager.addMachine(clk, 1, 1, True, "m4")
-    o = manager.addOutput("output")
+    #Creating a pydig class and adding all the blocks to it.
+    pydig = pydig()
+    clk = pydig.clock()
+    i = pydig.source("Tests\\Test.txt", "input")
+    m1 = pydig.moore(plot = True, blockID = "m1")
+    m2 = pydig.moore(plot = True, blockID = "m2")
+    o = pydig.output(blockID = "out")
 
+    print(i, m1, m2, o, sep = "\n")
+
+    m1.nsl = 1
+    m1.ol = 2
+    m2.nsl = 3
+    m2.ol = 4
+    m1.clk = clk.output()
+    m2.clk = clk.output()
+    
     #Making all the connections
-    m1 <= i
-    m2 <= m1
-    m3 <= m2
-    m4 <= m3
-    o <= m4
+
+    i.output() > m1.input()
+    m1.output() > m2.input()
+    m2.output() > o.input()
 
     #Running all the blocks.
-    manager.run(until = 40)
+    pydig.run(until = 40)

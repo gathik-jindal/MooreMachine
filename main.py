@@ -8,22 +8,44 @@ pip install simpy
 @date: 27/12/2023
 @version: 1.0
 """
-from blocks import Manager
+from blocks import pydig
+
+def NSL1(i, ps):
+    return 0
+
+def NSL2(i, ps):
+    return 0
+
+def OL1(ps):
+    return 0
+
+def OL2(ps):
+    return 0
 
 if __name__ == "__main__":
 
-    #Creating a manager class and adding all the blocks to it.
-    manager = Manager()
-    clk=manager.addClock()
-    i = manager.addInput("Tests\\Test.txt", "input")
-    m1 = manager.addMachine(clk, 1, 1, True, "m1")
-    m2 = manager.addMachine(clk, 1, 1, True, "m2")
-    o = manager.addOutput("output")
+    #Creating a pydig class and adding all the blocks to it.
+    pydig = pydig()
+    clk = pydig.clock()
+    i = pydig.source("Tests\\Test.txt", "input")
+    m1 = pydig.moore(plot = True, blockID = "m1")
+    m2 = pydig.moore(plot = True, blockID = "m2")
+    o = pydig.output(blockID = "out")
 
+    print(i, m1, m2, o, sep = "\n")
+
+    m1.nsl = NSL1
+    m1.ol = OL1
+    m2.nsl = NSL2
+    m2.ol = OL2
+    m1.clk = clk.output()
+    m2.clk = clk.output()
+    
     #Making all the connections
-    m1 <= i
-    m2 <= m1
-    o <= m2
+
+    i.output() > m1.input()
+    m1.output() > m2.input()
+    m2.output() > o.input()
 
     #Running all the blocks.
-    manager.run(until = 40)
+    pydig.run(until = 40)
