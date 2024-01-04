@@ -570,6 +570,18 @@ class Clock(HasOutputConnections):
 
 if __name__ == "__main__":
 
+    def NSL1(i, ps):
+        return 0
+
+    def NSL2(i, ps):
+        return 0
+
+    def OL1(ps):
+        return 0
+
+    def OL2(ps):
+        return 0
+
     #Creating a pydig class and adding all the blocks to it.
     pydig = pydig()
     clk = pydig.clock()
@@ -580,13 +592,13 @@ if __name__ == "__main__":
 
     print(i, m1, m2, o, sep = "\n")
 
-    m1.nsl = 1
-    m1.ol = 2
-    m2.nsl = 3
-    m2.ol = 4
+    m1.nsl = NSL1
+    m1.ol = OL1
+    m2.nsl = NSL2
+    m2.ol = OL2
     m1.clk = clk.output()
     m2.clk = clk.output()
-    
+        
     #Making all the connections
 
     i.output() > m1.input()
