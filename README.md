@@ -95,32 +95,53 @@ The following code specifies a sample way to create and run the Moore Machine. I
 It consists of 2 machines m1 and m2. The input is received from the text file and the final output is stored in the object o.
 
 ```python
-from blocks import Manager, Clock
+"""
+This class is used for creating all the blocks.
+It requires you to download simpy which can be done by
 
-manager = Manager()
+pip install simpy
 
-#Inputs are of the format : fileName:str, blockID:str(preferable)
-i = manager.addInput("Tests\\Test.txt", "input")
+@author: Abhirath, Aryan, Gathik
+@date: 27/12/2023
+@version: 1.0
+"""
+from blocks import pydig
 
-#Machines are of the format : Clock object:Clock, NSl object:NSL, OL object:OL, whether or not to plot the machine:bool, blockID:str(preferable)
-#Note: Clock, NSL, and OL are not yet implemented
-m1 = manager.addMachine(Clock(), 1, 1, True, "m1")
-m2 = manager.addMachine(Clock(), 1, 1, True, "m2")
+def NSL1(i, ps):
+    return 0
 
-#Outputs are of the format : blockID:str(preferable)
-o = manager.addOutput("output")
+def NSL2(i, ps):
+    return 0
 
+def OL1(ps):
+    return 0
+
+def OL2(ps):
+    return 0
+
+#Creating a pydig class and adding all the blocks to it.
+pydig = pydig()
+clk = pydig.clock()
+i = pydig.source("Tests\\Test.txt", "input")
+m1 = pydig.moore(plot = True, blockID = "m1")
+m2 = pydig.moore(plot = True, blockID = "m2")
+o = pydig.output(blockID = "out")
+
+print(i, m1, m2, o, sep = "\n")
+
+m1.nsl = NSL1
+m1.ol = OL1
+m2.nsl = NSL2
+m2.ol = OL2
+m1.clk = clk.output()
+m2.clk = clk.output()
+    
 #Making all the connections
-#Note : To make a connection so that the output of block x goes to the input of block y, write : y <= x
-#Note : Input block only has an output wire. It is compulsory to connect the output of the input block to another block. 
-#Note : Machine block has both input and output wire. It is compulsory to connect the input of the machine block to some other block.
-#Note : Output block has an input wire. It is compulsory to connect the input of the output block to some other block.
-#Note : It is not compulsory to have an output block. It is also not compulsory to connect the output of a machine block to anything.
 
-m1 <= i #i is an input to m1.
-m2 <= m1 #m1's output is an input to m2.
-o <= m2 #m2's output is an input to o.
+i.output() > m1.input()
+m1.output() > m2.input()
+m2.output() > o.input()
 
 #Running all the blocks.
-manager.run(until = 40)
+pydig.run(until = 40)
 ```
