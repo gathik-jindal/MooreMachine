@@ -95,16 +95,6 @@ The following code specifies a sample way to create and run the Moore Machine. I
 It consists of 2 machines m1 and m2. The input is received from the text file and the final output is stored in the object o.
 
 ```python
-"""
-This class is used for creating all the blocks.
-It requires you to download simpy which can be done by
-
-pip install simpy
-
-@author: Abhirath, Aryan, Gathik
-@date: 27/12/2023
-@version: 1.0
-"""
 from blocks import pydig
 
 def NSL1(i, ps):
