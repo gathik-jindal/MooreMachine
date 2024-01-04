@@ -8,7 +8,6 @@ This project implements a Moore Machine in Python. A Moore Machine is a finite s
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Usage](#usage)
-- [License](#license)
 
 ## Introduction
 A Moore Machine is a type of finite state machine (FSM) named after the American engineer and computer scientist Edward F. Moore. In a Moore Machine, the outputs are associated with states rather than transitions. This means that the output of the system is determined solely by the current state, not by the input or the transition taken.
@@ -125,6 +124,3 @@ o <= m2 #m2's output is an input to o.
 #Running all the blocks.
 manager.run(until = 40)
 ```
-
-## License
-It is an open source project. 
