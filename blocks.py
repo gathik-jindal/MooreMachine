@@ -177,7 +177,20 @@ class Block(ABC):
             Block.__dumpList.append(self)
         
         self._blockID = Block.__uniqueID(blockID)
+    
+    def getBlockID(self):
+        """
+        Returns the block ID of the current block.
+        """
+        
+        return self._blockID
+    
+    def getScopeDump(self):
+        """
+        Returns the scope dump values for this block.
+        """
 
+        return self._scopeDump.getValues()
 
     @staticmethod
     def __uniqueID(blockID):
@@ -227,20 +240,6 @@ class Block(ABC):
         """
         
         pass
-    
-    def getBlockID(self):
-        """
-        Returns the block ID of the current block.
-        """
-        
-        return self._blockID
-    
-    def getScopeDump(self):
-        """
-        Returns the scope dump values for this block.
-        """
-
-        return self._scopeDump.getValues()
 
 class HasInputConnections(Block):
     """
@@ -329,8 +328,8 @@ class HasOutputConnections(Block):
         """
         
         self._fanOutCount = 0
-        self._output = [0]
-    
+        self._output = [0] # here the first element is the value itself, and the rest of the elements will be the simpy.Store() objects for the other machines connected to it
+
     def addFanout(self):
         """
         Adds an output wire to this block. 
@@ -394,18 +393,24 @@ class Machine(HasInputConnections, HasOutputConnections):
         while True:
             yield self._input[self._connectedID].get()
             
+            # adding the inputs to scopedump
             self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self._input[0])
 
+            # running the NSL
             tempout = self._input[0] + 1
             yield self._env.timeout(0.6)
             
+            # updating the output
             self._output[0] = tempout
 
+            # triggering events for the connected machines
             for i in range(1, self._fanOutCount + 1):
                 self._output[i].put(True)
             
+            # adding next state to scopedump
             self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self._output[0])
     
+    # not in use as of now
     def __runNSLp(self):
         """
         Runs the next state logic if the present state changed. 
@@ -418,6 +423,7 @@ class Machine(HasInputConnections, HasOutputConnections):
             
             yield self._env.timeout(0.5)
             
+            # wrong code, need to change
             self._output[1] = self._input[1] + 1
             self._output[0].put(True)
     
