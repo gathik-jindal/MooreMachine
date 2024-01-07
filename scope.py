@@ -22,8 +22,8 @@ class Plotter:
         plots the wave forms in a single window that are supplied in form of a dict.
         """
         
+        # checking if data provided is correct
         checkType([(inputs, dict), (name, str)])
-
         for key in inputs:
             checkType([(key, str), (inputs[key], list)])
 
@@ -35,17 +35,17 @@ class Plotter:
                 else:
                     printErrorAndExit(f"{value} in {inputs[key]} in {inputs} is not of length 2.")
 
+        # calculating max time
         maxTime = 0
-        
         for key in inputs:
             time = [x[0] for x in inputs[key]]
             maxTime = int(max(maxTime, max(time) + 1))
         
+        # finally plotting
         counter = 0
         done = 0
         numPlots = 0
         ticks = range(0, maxTime + 1, 1)
-
         for key in inputs:
             
             if(counter == 0):
