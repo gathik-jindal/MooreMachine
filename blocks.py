@@ -62,8 +62,7 @@ class pydig:
         then new unique ID is given.  
         """
 
-        temp = Clock()
-        return temp
+        return Clock()
     
     def source(self, filePath:str, blockID=None):
         """
@@ -448,7 +447,6 @@ class Machine(HasInputConnections, HasOutputConnections):
     def isConnected(self):
 
         return self.clk != None and self.nsl != None and self.ol != None and self.isConnectedToInput()
-        return False
 
 class Input(HasOutputConnections):
     """
@@ -563,10 +561,10 @@ class Clock(HasOutputConnections):
         pass
 
     def __str__(self):
-        return "hi"
+        return "hi" # redundant function for now
 
     def run(self):
-        return "no"
+        return "no" # redundant function for now
 
 if __name__ == "__main__":
 
