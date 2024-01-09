@@ -10,7 +10,7 @@ pip install simpy
 """
 
 from abc import ABC, abstractmethod
-from utilities import checkType, printErrorAndExit, fillEmptyTimeSlots
+from utilities import checkType, printErrorAndExit
 from pwlSource import InputGenerator
 from scope import Plotter
 import simpy
@@ -109,8 +109,12 @@ class pydig:
         
         self.__env.run(until=until)
         dump = Block.dumpAll()
+
+        from utilities import fillEmptyTimeSlots, dumpVars
         dump = fillEmptyTimeSlots(dump)
         print(dump)
+
+        dumpVars(dump)
 
         plot=Plotter()
 

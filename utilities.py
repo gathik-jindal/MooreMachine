@@ -29,6 +29,17 @@ def fillEmptyTimeSlots(dic:dict):
     """
 
     keysOfDict = dic.keys()
+    maxTime = 0
+
+    for x in keysOfDict:
+        time, values = list(map(list, zip(*dic[x])))
+
+        from math import ceil
+        time = [ceil(x) for x in time]
+
+        time.append(maxTime)
+        maxTime = max(time)
+
     for x in keysOfDict:
         timeCounter = 0
         prevVal = 0
@@ -45,6 +56,43 @@ def fillEmptyTimeSlots(dic:dict):
             prevVal = values[index]
             index += 1
         
+        while (timeCounter <= maxTime):
+            time.insert(index, timeCounter)
+            values.insert(index, prevVal)
+
+            timeCounter += 1
+            index += 1
+        
         dic[x] = [*zip(time, values)]
     
     return dic
+
+def dumpVars(dic:dict):
+    """
+    This functions dumps all the variables in a csv file.
+
+    If a value changed in a decimal time like 0.6, it is reflected on the 1st second.
+
+    TODO: add funcitonality for having decimal changes for more exact change.
+    """
+
+    keysOfDict = dic.keys()
+    maxTime = 0
+
+    for x in keysOfDict:
+        time, values = list(map(list, zip(*dic[x])))
+        time.append(maxTime)
+        maxTime = max(time)
+
+    import csv
+    with open("output\\dumpVars.csv", "w", newline='') as file:
+        csw=csv.writer(file)
+
+        header = list(keysOfDict)
+        header.insert(0, 'Time')
+        csw.writerow(header)
+
+        for i in range(maxTime):
+            row = [dic[key][i][1] for key in keysOfDict]
+            row.insert(0, i)
+            csw.writerow(row)
