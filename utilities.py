@@ -1,6 +1,6 @@
 import sys
 
-def checkType(checkList):
+def checkType(checkList:list):
     """
     checkList must be a list of the form
     [(arg1, type1), (arg2, type2), (arg3, type3), ..., (argN, typeN)]
