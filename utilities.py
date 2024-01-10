@@ -70,7 +70,7 @@ def fillEmptyTimeSlots(dic:dict):
 def dumpVars(dic:dict):
     """
     This functions dumps all the variables in a csv file.
-
+    If the folder is not present then it is created automatically during runtime.
     If a value changed in a decimal time like 0.6, it is reflected on the 1st second.
 
     TODO: add funcitonality for having decimal changes for more exact change.
@@ -84,7 +84,11 @@ def dumpVars(dic:dict):
         time.append(maxTime)
         maxTime = max(time)
 
-    import csv
+    import csv, os
+
+    if not os.path.exists("output"):
+        os.makedirs("output")
+
     with open("output\\dumpVars.csv", "w", newline='') as file:
         csw=csv.writer(file)
 

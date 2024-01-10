@@ -24,7 +24,7 @@ def OL2(ps):
 
 if __name__ == "__main__":
 
-    #Creating a pydig class and adding all the blocks to it.
+    # Creating a pydig class and adding all the blocks to it.
     pydig = pd()
     clk = pydig.clock()
     i = pydig.source("Tests\\Test.txt", "input")
@@ -34,6 +34,7 @@ if __name__ == "__main__":
 
     print(i, m1, m2, o, sep = "\n")
 
+    # Assigning the different components
     m1.nsl = NSL1
     m1.ol = OL1
     m2.nsl = NSL2
@@ -41,11 +42,13 @@ if __name__ == "__main__":
     m1.clk = clk.output()
     m2.clk = clk.output()
     
-    #Making all the connections
-
+    # Making all the connections
     i.output() > m1.input()
     m1.output() > m2.input()
     m2.output() > o.input()
 
-    #Running all the blocks.
+    # Creating dump
+    pydig.dumpVars()
+
+    # Running all the blocks.
     pydig.run(until = 40)

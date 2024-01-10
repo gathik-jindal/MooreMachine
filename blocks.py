@@ -38,6 +38,7 @@ class pydig:
         self.__env = simpy.Environment()
         self.__components = []
         self.__name=name
+        self.__dump = False
 
     def moore(self, plot=False, blockID=None, clk = None, nsl=None, ol=None):
         """
@@ -114,12 +115,21 @@ class pydig:
         dump = fillEmptyTimeSlots(dump)
         print(dump)
 
-        dumpVars(dump)
+        if self.__dump:
+            dumpVars(dump)
 
         plot=Plotter()
 
         plot.plot(dump, f"Plot of {self.__name}")
         plot.show()
+    
+    def dumpVars(self):
+        """
+        This function / method is used only when you want to dump all the variables in a (csv) file.
+        Currently there is no option and all the variables are dumped in a csv file located in the output folder
+        which is created during runtime if not present.
+        """
+        self.__dump = True
 
 class ScopeDump():
     """
@@ -577,6 +587,7 @@ class Clock(HasOutputConnections):
     def run(self):
         return "no" # redundant function for now
 
+
 if __name__ == "__main__":
 
     def NSL1(i, ps):
@@ -591,7 +602,7 @@ if __name__ == "__main__":
     def OL2(ps):
         return 0
 
-    #Creating a pydig class and adding all the blocks to it.
+    # Creating a pydig class and adding all the blocks to it.
     pydig = pydig()
     clk = pydig.clock()
     i = pydig.source("Tests\\Test.txt", "input")
@@ -601,18 +612,21 @@ if __name__ == "__main__":
 
     print(i, m1, m2, o, sep = "\n")
 
+    # Assigning the different components
     m1.nsl = NSL1
     m1.ol = OL1
     m2.nsl = NSL2
     m2.ol = OL2
     m1.clk = clk.output()
     m2.clk = clk.output()
-        
-    #Making all the connections
-
+    
+    # Making all the connections
     i.output() > m1.input()
     m1.output() > m2.input()
     m2.output() > o.input()
 
-    #Running all the blocks.
+    # Creating dump
+    pydig.dumpVars()
+
+    # Running all the blocks.
     pydig.run(until = 40)
