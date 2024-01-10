@@ -56,7 +56,7 @@ class pydig:
         self.__components.append(temp)
         return temp
 
-    def clock(self, plot=False, blockID=None, timePeriod=1.2, onTime = 0.6):
+    def clock(self, plot=True, blockID=None, timePeriod=1.2, onTime = 0.6):
         """
         Adds a clock to this class. 
         @param blockID : the id of this machine. If None, then new unique ID is given.  

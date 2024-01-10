@@ -82,7 +82,7 @@ def dumpVars(dic:dict):
     for x in keysOfDict:
         time, values = list(map(list, zip(*dic[x])))
         time.append(maxTime)
-        maxTime = max(time)
+        maxTime = int(max(time))
 
     import csv, os
 

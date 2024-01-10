@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     # Creating a pydig class and adding all the blocks to it.
     pydig = pd()
-    clk = pydig.clock()
+    clk = pydig.clock(blockID= "clk1")
     i = pydig.source("Tests\\Test.txt", "input")
     m1 = pydig.moore(plot = True, blockID = "m1")
     m2 = pydig.moore(plot = True, blockID = "m2")
