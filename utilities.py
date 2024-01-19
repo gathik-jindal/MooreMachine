@@ -7,6 +7,8 @@ def checkType(checkList):
     Returns true if all the types specified are correct and none of the
     arguments are None.
     Throws an Error and exits otherwise.
+
+    TODO: Convert checkList to an *args type.
     """
 
     for arg in checkList:
