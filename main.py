@@ -8,6 +8,7 @@ pip install simpy
 @date: 27/12/2023
 @version: 1.0
 """
+
 from blocks import pydig as pd
 
 def NSL1(i, ps):
@@ -26,7 +27,7 @@ if __name__ == "__main__":
 
     # Creating a pydig class and adding all the blocks to it.
     pydig = pd()
-    clk = pydig.clock()
+    clk = pydig.clock(blockID= "clk1")
     i = pydig.source("Tests\\Test.txt", "input")
     m1 = pydig.moore(plot = True, blockID = "m1")
     m2 = pydig.moore(plot = True, blockID = "m2")
@@ -51,4 +52,4 @@ if __name__ == "__main__":
     pydig.dumpVars()
 
     # Running all the blocks.
-    pydig.run(until = 40)
+    pydig.run(until = 21)
