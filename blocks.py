@@ -289,6 +289,9 @@ class HasInputConnections(Block):
         The output of other goes into the input of self.
         If the inputs of self are already connected, then error is generated.
         """
+        if(isinstance(self, Machine) and isinstance(other, Clock)):
+            self.clk = other.output()
+            return
         
         if(self.isConnectedToInput()):
             printErrorAndExit(self, " is already connected.")
@@ -511,6 +514,9 @@ class Machine(HasInputConnections, HasOutputConnections):
 
         return self.clk != None and self.nsl != None and self.ol != None and self.isConnectedToInput()
 
+    def clock(self):
+        return self
+    
 class Input(HasOnlyOutputConnections):
     """
     An input is a HasOutputConnections block.
