@@ -279,7 +279,10 @@ class HasInputConnections(Block):
         """
         
         super().__init__(env, plot, blockID)
-    
+
+        self._input = []
+        self._inputSizes = []
+        self._inputCount = 0
         self._isConnected = False
         self._connectedID = None
         self._clockID = None
@@ -300,12 +303,25 @@ class HasInputConnections(Block):
 
         checkType([(other, (HasOutputConnections))])
 
-        self._input = other._output
+        self._input.append(other._output)
+        self._inputSizes.append((other.getLeft(), other.getRight(), other.getWidth()))
+        self._inputCount += 1
         self._connectedID = other.addFanout()
         self._isConnected = True
 
         return True
 
+    def getInputCount(self):
+        return self._inputCount
+
+    def getInputVal(self):
+        ans = 0
+        factor = 1
+        for i in range(self._inputCount):
+            ans += self._input[i][0] * factor
+            factor = factor * (10 ** self._inputSize[i][2])
+        return ans
+    
     def isConnectedToInput(self):
         """
         Returns true if this block is connected to input.
