@@ -39,7 +39,7 @@ class pydig:
         self.__name=name
         self.__dump = False
 
-    def moore(self, plot=False, blockID=None, clk=None, nsl=None, ol=None):
+    def moore(self, plot=False, blockID=None, nsl=None, ol=None):
         """
         Adds a moore machine to this class. 
         @param plot : boolean value whether to plot this moore machine or not
@@ -52,7 +52,7 @@ class pydig:
 
         checkType([(plot, bool)])
 
-        temp = Machine(self.__env, clk, nsl, ol, plot, blockID)
+        temp = Machine(self.__env, nsl, ol, plot, blockID)
         self.__components.append(temp)
         return temp
 
@@ -282,6 +282,7 @@ class HasInputConnections(Block):
     
         self._isConnected = False
         self._connectedID = None
+        self._clockID = None
         
     def __le__(self, other):
         """
@@ -290,8 +291,9 @@ class HasInputConnections(Block):
         If the inputs of self are already connected, then error is generated.
         """
         if(isinstance(self, Machine) and isinstance(other, Clock)):
-            self.clk = other.output()
-            return
+            self.clk = other._output
+            self._clockID = other.addFanout()
+            return True
         
         if(self.isConnectedToInput()):
             printErrorAndExit(self, " is already connected.")
@@ -421,7 +423,7 @@ class Machine(HasInputConnections, HasOutputConnections):
     This represents the Moore Machine.
     """
     
-    def __init__(self, env, clock, nsl, ol, plot=False, blockID=None):
+    def __init__(self, env, nsl, ol, plot=False, blockID=None):
         """
         env must be a simpy environment.
         clock must be of type Clock.
@@ -432,12 +434,13 @@ class Machine(HasInputConnections, HasOutputConnections):
         """
         
         super().__init__(env, plot, blockID)
-        
-        self.clk = clock
+
         self.nsl = nsl
         self.ol = ol
+        self.presentState = 0
         self._Pchange = simpy.Store(self._env)
-    
+        self._Pchange.put(False)
+
     def __str__(self):
         """
         Returns a string representation of this machine.
@@ -445,7 +448,7 @@ class Machine(HasInputConnections, HasOutputConnections):
         
         return f"Machine ID {self._blockID}"
     
-    def __runNSLi(self):
+    def __runNSL(self):
         """
         Runs the next state logic if the input to this machine changed.
         """
@@ -457,15 +460,11 @@ class Machine(HasInputConnections, HasOutputConnections):
             self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self._input[0])
 
             # running the NSL
-            tempout = self._input[0] + 1
-            yield self._env.timeout(0.5)
+            tempout = self.nsl(self.presentState, self._input[0])
+            yield self._env.timeout(0.1)
             
             # updating the output
             self._output[0] = tempout
-
-            # triggering events for the connected machines
-            for i in range(1, self._fanOutCount + 1):
-                self._output[i].put(True)
             
             # adding next state to scopedump
             self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self._output[0])
@@ -479,21 +478,31 @@ class Machine(HasInputConnections, HasOutputConnections):
         while True:
             yield self._Pchange.get()
             
-            print("recalculate at ", self._env.now, "using", self._input[1])
+            tempout = self.nsl(self.presentState, self._input[0])
+            yield self._env.timeout(0.1)
             
-            yield self._env.timeout(0.5)
-            
-            # wrong code, need to change
-            self._output[1] = self._input[1] + 1
-            self._output[0].put(True)
-    
+            self._output[0] = tempout
+            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self._output[0])
+
     def __runReg(self):
         """
         Registers run based on clock.
         TODO: Make it run based on clock.
         """
-        
-        pass
+        while True:
+            yield self.clk[self._clockID].get()
+
+            self.presentState = self._output[0]
+            
+            yield self._env.timeout(0.1)
+
+            # triggering events for the connected machines
+            for i in range(1, self._fanOutCount + 1):
+                self._output[i].put(True)
+
+            self._Pchange.put(True)
+            
+            self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self._output[0])
 
     def __runOL(self):
         """
@@ -508,7 +517,9 @@ class Machine(HasInputConnections, HasOutputConnections):
         Runs this block.
         """
         
-        self._env.process(self.__runNSLi())
+        self._env.process(self.__runNSL())
+        self._env.process(self.__runReg())
+        self._env.process(self.__runNSLp())
     
     def isConnected(self):
 
@@ -588,11 +599,21 @@ class Clock(HasOnlyOutputConnections):
             yield self._env.timeout((1-self._output[0])*(self.__timePeriod - self.__onTime)+self._output[0]*(self.__onTime))
 
             self._output[0] = 1 - self._output[0]
-        
-            for i in range(1,self._fanOutCount+1):
-                self._output[i].put(True)
+
+            if(self._output[0]):
+                for i in range(1,self._fanOutCount+1):
+                    self._output[i].put(True)
 
             self._scopeDump.add(f"Clock {self.getBlockID()}", self._env.now, self._output[0])
+
+    def addFanout(self):
+        """
+        Adds an output wire to this block. 
+        """
+        self._fanOutCount += 1
+        self._output.append(simpy.Store(self._env))
+        self._output[-1].put(True)
+        return self._fanOutCount
 
 class Output(HasInputConnections):
     """

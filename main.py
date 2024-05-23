@@ -12,10 +12,10 @@ pip install simpy
 from blocks import pydig as pd
 
 def NSL1(i, ps):
-    return 0
+    return (i + ps) % 10
 
 def NSL2(i, ps):
-    return 0
+    return (i + ps) % 10
 
 def OL1(ps):
     return 0
@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     # Creating a pydig class and adding all the blocks to it.
     pydig = pd()
-    clk = pydig.clock(blockID= "clk1")
+    clk = pydig.clock(blockID= "clk1", timePeriod = 1.4, onTime = 0.7)
     i = pydig.source("Tests\\Test.txt", "input")
     m1 = pydig.moore(plot = True, blockID = "m1")
     m2 = pydig.moore(plot = True, blockID = "m2")
