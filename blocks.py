@@ -11,6 +11,7 @@ pip install simpy
 
 from abc import ABC, abstractmethod
 from utilities import checkType, printErrorAndExit
+from utilities import fillEmptyTimeSlots, dumpVars
 import simpy
 import uuid
 from pwlSource import InputGenerator
@@ -115,7 +116,6 @@ class pydig:
         self.__env.run(until=until)
         dump = Block.dumpAll()
 
-        from utilities import fillEmptyTimeSlots, dumpVars
         dump = fillEmptyTimeSlots(dump)
         print(dump)
 
@@ -438,6 +438,7 @@ class Machine(HasInputConnections, HasOutputConnections):
         self.nsl = nsl
         self.ol = ol
         self.presentState = 0
+        self.nextState = 0
         self._Pchange = simpy.Store(self._env)
         self._Pchange.put(False)
 
@@ -463,11 +464,9 @@ class Machine(HasInputConnections, HasOutputConnections):
             tempout = self.nsl(self.presentState, self._input[0])
             yield self._env.timeout(0.1)
             
-            # updating the output
-            self._output[0] = tempout
-            
-            # adding next state to scopedump
-            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self._output[0])
+            # updating the next State
+            self.nextState = tempout
+            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.nextState)
     
     # not in use as of now
     def __runNSLp(self):
@@ -478,11 +477,13 @@ class Machine(HasInputConnections, HasOutputConnections):
         while True:
             yield self._Pchange.get()
             
+            # running the NSL
             tempout = self.nsl(self.presentState, self._input[0])
             yield self._env.timeout(0.1)
             
-            self._output[0] = tempout
-            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self._output[0])
+            # updating the output
+            self.nextState = tempout
+            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.nextState)
 
     def __runReg(self):
         """
@@ -491,26 +492,27 @@ class Machine(HasInputConnections, HasOutputConnections):
         """
         while True:
             yield self.clk[self._clockID].get()
-
-            self.presentState = self._output[0]
-            
+            if self.presentState == self.nextState:
+                continue
             yield self._env.timeout(0.1)
-
-            # triggering events for the connected machines
-            for i in range(1, self._fanOutCount + 1):
-                self._output[i].put(True)
-
+            self.presentState = self.nextState
+            self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.presentState)
             self._Pchange.put(True)
-            
-            self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self._output[0])
+            self._env.process(self.__runOL())
 
     def __runOL(self):
         """
         Output logic runs when the output value is changed.
         TODO: Make it run based on output logic. 
         """
-        
-        pass
+        temp = self.ol(self.presentState)
+        yield self._env.timeout(0.1) 
+        self._output[0] = temp
+        self._scopeDump.add(f"output of {self.getBlockID()}", self._env.now, self._output[0])
+        # triggering events for the connected machines
+        for i in range(1, self._fanOutCount + 1):
+            self._output[i].put(True)
+
     
     def run(self):
         """
