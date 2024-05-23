@@ -438,6 +438,7 @@ class Machine(HasInputConnections, HasOutputConnections):
         self.nsl = nsl
         self.ol = ol
         self.presentState = 0
+        self.nextState = 0
         self._Pchange = simpy.Store(self._env)
         self._Pchange.put(False)
 
@@ -464,10 +465,10 @@ class Machine(HasInputConnections, HasOutputConnections):
             yield self._env.timeout(0.1)
             
             # updating the output
-            self._output[0] = tempout
+            self.nextState = tempout
             
             # adding next state to scopedump
-            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self._output[0])
+            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.nextState)
     
     # not in use as of now
     def __runNSLp(self):
@@ -478,11 +479,14 @@ class Machine(HasInputConnections, HasOutputConnections):
         while True:
             yield self._Pchange.get()
             
+            if(self.getBlockID() == "m1"):
+                print("Called at", self._env.now)
+
             tempout = self.nsl(self.presentState, self._input[0])
             yield self._env.timeout(0.1)
             
-            self._output[0] = tempout
-            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self._output[0])
+            self.nextState = tempout
+            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.nextState)
 
     def __runReg(self):
         """
@@ -492,25 +496,38 @@ class Machine(HasInputConnections, HasOutputConnections):
         while True:
             yield self.clk[self._clockID].get()
 
-            self.presentState = self._output[0]
+            self.presentState = self.nextState
             
             yield self._env.timeout(0.1)
 
-            # triggering events for the connected machines
-            for i in range(1, self._fanOutCount + 1):
-                self._output[i].put(True)
+            # # triggering events for the connected machines
+            # for i in range(1, self._fanOutCount + 1):
+            #     self._output[i].put(True)
 
             self._Pchange.put(True)
             
-            self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self._output[0])
+            if(self.getBlockID() == "m1"):
+                print("Changed at ", self._env.now)
+
+            self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.presentState)
 
     def __runOL(self):
         """
         Output logic runs when the output value is changed.
         TODO: Make it run based on output logic. 
         """
-        
-        pass
+        while True:
+            yield self._Pchange.get()
+            
+            tempout = self.ol(self.presentState)
+            yield self._env.timeout(0.1)
+            
+            self._output[0] = tempout
+            # triggering events for the connected machines
+            for i in range(1, self._fanOutCount + 1):
+                self._output[i].put(True)
+
+            self._scopeDump.add(f"OL of {self.getBlockID()}", self._env.now, self._output[0])
     
     def run(self):
         """
@@ -520,6 +537,7 @@ class Machine(HasInputConnections, HasOutputConnections):
         self._env.process(self.__runNSL())
         self._env.process(self.__runReg())
         self._env.process(self.__runNSLp())
+        self._env.process(self.__runOL())
     
     def isConnected(self):
 
