@@ -44,7 +44,6 @@ class pydig:
         Adds a moore machine to this class. 
         @param plot : boolean value whether to plot this moore machine or not
         @para blockID : the id of this machine. If None, then new unique ID is given.  
-        @param clk : a clock object that is ot type Clock
         @param nsl : next state logic function
         @param ol : output logic function
         @return : the moore machine instance. 
