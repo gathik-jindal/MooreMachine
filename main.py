@@ -11,17 +11,17 @@ pip install simpy
 
 from blocks import pydig as pd
 
-def NSL1(i, ps):
-    return (i + ps) % 10
+def NSL1(ps, i):
+    return (i ^ ps)
 
-def NSL2(i, ps):
-    return (i + ps) % 10
+def NSL2(ps, i):
+    return (i | ps)
 
 def OL1(ps):
-    return 0
+    return (ps + 2) % 4
 
 def OL2(ps):
-    return 0
+    return (ps & 5)
 
 if __name__ == "__main__":
 

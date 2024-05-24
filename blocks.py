@@ -17,7 +17,8 @@ import uuid
 from pwlSource import InputGenerator
 from scope import Plotter
 
-class pydig: 
+
+class pydig:
     """
     This class is used for adding your moore machines, input block, and output block.
     The manner in which the connections should occur is 
@@ -37,7 +38,7 @@ class pydig:
 
         self.__env = simpy.Environment()
         self.__components = []
-        self.__name=name
+        self.__name = name
         self.__dump = False
 
     def moore(self, plot=False, blockID=None, nsl=None, ol=None):
@@ -45,7 +46,6 @@ class pydig:
         Adds a moore machine to this class. 
         @param plot : boolean value whether to plot this moore machine or not
         @para blockID : the id of this machine. If None, then new unique ID is given.  
-        @param clk : a clock object that is ot type Clock
         @param nsl : next state logic function
         @param ol : output logic function
         @return : the moore machine instance. 
@@ -57,7 +57,7 @@ class pydig:
         self.__components.append(temp)
         return temp
 
-    def clock(self, plot=True, blockID=None, timePeriod=1.2, onTime = 0.6):
+    def clock(self, plot=True, blockID=None, timePeriod=1.2, onTime=0.6):
         """
         Adds a clock to this class. 
         @param blockID : the id of this machine. If None, then new unique ID is given.  
@@ -66,26 +66,27 @@ class pydig:
         @return : the clock instance
         """
 
-        checkType([(plot, bool), (timePeriod, (int, float)), (onTime, (int, float))])
+        checkType([(plot, bool), (timePeriod, (int, float)),
+                  (onTime, (int, float))])
 
         temp = Clock(self.__env, plot, blockID, timePeriod, onTime)
         self.__components.append(temp)
         return temp
-    
-    def source(self, filePath:str, blockID=None):
+
+    def source(self, filePath: str, blockID=None):
         """
         Adds an input block to this class.
         @param filePath : must be a valid filePath of type ".txt", ".csv", or ".xslx" to an input source.  
         @param blockID : the id of this input block. If None, then new unique ID is given. 
         @return : the source instance.
         """
-        
+
         inputList = InputGenerator(filePath).getInput()["Inputs"]
 
         temp = Input(inputList, self.__env, False, blockID)
         self.__components.append(temp)
         return temp
-    
+
     def output(self, blockID=None):
         """
         Adds an output block to this class.
@@ -96,8 +97,8 @@ class pydig:
         temp = Output(self.__env, True, blockID)
         self.__components.append(temp)
         return temp
-    
-    def run(self, until:int):
+
+    def run(self, until: int):
         """
         Runs each of the blocks that are added to this class for "until" time units. 
         If any block is not connected to an input source, then error is thrown.
@@ -108,11 +109,11 @@ class pydig:
         checkType([(until, int)])
 
         for i in self.__components:
-            if(isinstance(i, HasOnlyOutputConnections) or i.isConnected()):
+            if (isinstance(i, HasOnlyOutputConnections) or i.isConnected()):
                 i.run()
             else:
                 printErrorAndExit(f"{i} is not connected.")
-        
+
         self.__env.run(until=until)
         dump = Block.dumpAll()
 
@@ -122,11 +123,11 @@ class pydig:
         if self.__dump:
             dumpVars(dump)
 
-        plot=Plotter()
+        plot = Plotter()
 
         plot.plot(dump, f"Plot of {self.__name}")
         plot.show()
-    
+
     def dumpVars(self):
         """
         This method is used only when you want to dump all the variables in a (csv) file.
@@ -135,6 +136,7 @@ class pydig:
         @return : None
         """
         self.__dump = True
+
 
 class ScopeDump():
     """
@@ -150,7 +152,7 @@ class ScopeDump():
 
         self.__values = {}
 
-    def add(self, classification:str, time:float, value:int):
+    def add(self, classification: str, time: float, value: int):
         """
         classification must be of type string and must specify
         what the value (time, value) represents. 
@@ -158,20 +160,21 @@ class ScopeDump():
         value represents the value of the bus at this point.
         Adds (time, float) to classification.
         """
-        
+
         checkType([(classification, str), (time, (float, int)), (value, int)])
 
-        if(classification in self.__values):
+        if (classification in self.__values):
             self.__values[classification].append((time, value))
         else:
             self.__values[classification] = [(time, value)]
-    
+
     def getValues(self):
         """
         Returns all the values added to this class.
         """
 
         return dict(self.__values)
+
 
 class Block(ABC):
     """
@@ -180,31 +183,31 @@ class Block(ABC):
     """
 
     __uniqueIDlist = []
-    __dumpList=[]
-    __dump={}
+    __dumpList = []
+    __dump = {}
 
-    def __init__(self, env, plot, blockID = None):
+    def __init__(self, env, plot, blockID=None):
         """
         env is the simpy environment.
         blockID is the id of this input block. If None, 
         then new unique ID is given.
         """
-        
+
         self._env = env
         self._scopeDump = ScopeDump()
-        
-        if plot==True:
+
+        if plot == True:
             Block.__dumpList.append(self)
-        
+
         self._blockID = Block.__uniqueID(blockID)
-    
+
     def getBlockID(self):
         """
         Returns the block ID of the current block.
         """
-        
+
         return self._blockID
-    
+
     def getScopeDump(self):
         """
         Returns the scope dump values for this block.
@@ -218,11 +221,12 @@ class Block(ABC):
         Creates a unique ID for each block
         """
 
-        if(blockID != None and blockID in Block.__uniqueIDlist):
-            printErrorAndExit(f"{blockID} has already been used as an ID for another block.")
-        elif(blockID == None):
+        if (blockID != None and blockID in Block.__uniqueIDlist):
+            printErrorAndExit(
+                f"{blockID} has already been used as an ID for another block.")
+        elif (blockID == None):
             blockID = uuid.uuid4()
-        
+
         Block.__uniqueIDlist.append(blockID)
 
         return blockID
@@ -232,25 +236,25 @@ class Block(ABC):
         """
         Returns all the values to be plotted
         """
-        
+
         for i in Block.__dumpList:
             Block.__dump.update(i.getScopeDump())
         return Block.__dump
-    
+
     @abstractmethod
     def __str__(self):
         """
         Should return a string representation of the block.
         """
-        
+
         pass
-    
+
     @abstractmethod
     def __le__(self, other):
         """
         Should allow for connections between blocks.
         """
-        
+
         pass
 
     @abstractmethod
@@ -258,8 +262,9 @@ class Block(ABC):
         """
         Should specify how to run this block.
         """
-        
+
         pass
+
 
 class HasInputConnections(Block):
     """
@@ -270,14 +275,14 @@ class HasInputConnections(Block):
     output of b1 goes to the input of b2, write: "b2 <= b1".
     Block b1 must be of type HasOutputConnections. 
     """
-    
+
     def __init__(self, env, plot, blockID=None):
         """
         env is the simpy environment.  
         blockID is the id of this input block. If None, 
         then new unique ID is given.
         """
-        
+
         super().__init__(env, plot, blockID)
 
         self._input = []
@@ -286,25 +291,26 @@ class HasInputConnections(Block):
         self._isConnected = False
         self._connectedID = None
         self._clockID = None
-        
+
     def __le__(self, other):
         """
         other must be of type HasOutputConnections. 
         The output of other goes into the input of self.
         If the inputs of self are already connected, then error is generated.
         """
-        if(isinstance(self, Machine) and isinstance(other, Clock)):
+        if (isinstance(self, Machine) and isinstance(other, Clock)):
             self.clk = other._output
             self._clockID = other.addFanout()
             return True
-        
-        if(self.isConnectedToInput()):
+
+        if (self.isConnectedToInput()):
             printErrorAndExit(self, " is already connected.")
 
         checkType([(other, (HasOutputConnections))])
 
         self._input.append(other._output)
-        self._inputSizes.append((other.getLeft(), other.getRight(), other.getWidth()))
+        self._inputSizes.append(
+            (other.getLeft(), other.getRight(), other.getWidth()))
         self._inputCount += 1
         self._connectedID = other.addFanout()
         self._isConnected = True
@@ -321,14 +327,14 @@ class HasInputConnections(Block):
             ans += self._input[i][0] * factor
             factor = factor * (10 ** self._inputSize[i][2])
         return ans
-    
+
     def isConnectedToInput(self):
         """
         Returns true if this block is connected to input.
         False otherwise.
         """
         return self._isConnected
-    
+
     @abstractmethod
     def isConnected(self):
         """
@@ -343,13 +349,14 @@ class HasInputConnections(Block):
         """
         return self
 
+
 class HasOutputConnections(Block):
     """
     A HasOutputConnections block is a block that has output connection wires. 
     Thus only Machine and Input are functional blocks because they
     are the only ones that have an output connection wire. 
     """
-    
+
     def __init__(self, env, plot, blockID=None):
         """
         env is the simpy environment.  
@@ -360,16 +367,17 @@ class HasOutputConnections(Block):
         super().__init__(env, plot, blockID)
 
         self.defineFanOut()
-    
+
     def defineFanOut(self):
         """
         Defines the fan out variables.
         Fan out represents the blocks which
         are connected to this block.
         """
-        
+
         self._fanOutCount = 0
-        self._output = [0] # here the first element is the value itself, and the rest of the elements will be the simpy.Store() objects for the other machines connected to it
+        # here the first element is the value itself, and the rest of the elements will be the simpy.Store() objects for the other machines connected to it
+        self._output = [0]
 
     def addFanout(self):
         """
@@ -383,24 +391,25 @@ class HasOutputConnections(Block):
     def __gt__(self, other):
         """
         Makes it possible to do the following connection:
-        
+
         object1.output > object2.input
         """
-        
+
         return other <= self
 
-    def output(self, left = None, right = None):
+    def output(self, left=None, right=None):
         """
         Returns the instance of this class for connection purposes.
         """
         return self
+
 
 class HasOnlyOutputConnections(HasOutputConnections):
     """
     Class used by only those classes that only have output connections.
     These classes don't take any input.
     """
-    
+
     def __init__(self, env, plot, blockID):
         """
         env is the simpy environment.
@@ -409,14 +418,14 @@ class HasOnlyOutputConnections(HasOutputConnections):
         then new unique ID is given.
         """
         super().__init__(env, plot, blockID)
-    
+
     def __le__(self, other):
         """
         We are not allowed to connect anything that goes into the input block.
         """
 
         printErrorAndExit(f"Cannot connect {self} to {other}.")
-    
+
     @abstractmethod
     def _go(self):
         """
@@ -429,16 +438,16 @@ class HasOnlyOutputConnections(HasOutputConnections):
         """
         Runs this block.
         """
-        
+
         self._env.process(self._go())
-    
+
 
 class Machine(HasInputConnections, HasOutputConnections):
     """
     A machine is both a HasInputConnections block and a HasOutputConnections block.
     This represents the Moore Machine.
     """
-    
+
     def __init__(self, env, nsl, ol, plot=False, blockID=None):
         """
         env must be a simpy environment.
@@ -448,7 +457,7 @@ class Machine(HasInputConnections, HasOutputConnections):
         blockID is the id of this input block. If None, 
         then new unique ID is given.
         """
-        
+
         super().__init__(env, plot, blockID)
 
         self.nsl = nsl
@@ -462,44 +471,50 @@ class Machine(HasInputConnections, HasOutputConnections):
         """
         Returns a string representation of this machine.
         """
-        
+
         return f"Machine ID {self._blockID}"
-    
+
     def __runNSL(self):
         """
         Runs the next state logic if the input to this machine changed.
         """
-        
+
         while True:
             yield self._input[self._connectedID].get()
-            
+
             # adding the inputs to scopedump
-            self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self._input[0])
+            self._scopeDump.add(
+                f"Input to {self.getBlockID()}", self._env.now, self._input[0])
 
             # running the NSL
             tempout = self.nsl(self.presentState, self._input[0])
             yield self._env.timeout(0.1)
-            
+
             # updating the next State
             self.nextState = tempout
-            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.nextState)
-    
+            self._scopeDump.add(
+                f"NS of {self.getBlockID()}", self._env.now, self.nextState)
+
     # not in use as of now
     def __runNSLp(self):
         """
         Runs the next state logic if the present state changed. 
         """
-        
+
         while True:
             yield self._Pchange.get()
-            
+
+            if (self.getBlockID() == "m1"):
+                print("Called at", self._env.now)
+
             # running the NSL
             tempout = self.nsl(self.presentState, self._input[0])
             yield self._env.timeout(0.1)
-            
+
             # updating the output
             self.nextState = tempout
-            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.nextState)
+            self._scopeDump.add(
+                f"NS of {self.getBlockID()}", self._env.now, self.nextState)
 
     def __runReg(self):
         """
@@ -512,7 +527,12 @@ class Machine(HasInputConnections, HasOutputConnections):
                 continue
             yield self._env.timeout(0.1)
             self.presentState = self.nextState
-            self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.presentState)
+
+            if (self.getBlockID() == "m1"):
+                print("Changed at ", self._env.now)
+
+            self._scopeDump.add(
+                f"PS of {self.getBlockID()}", self._env.now, self.presentState)
             self._Pchange.put(True)
             self._env.process(self.__runOL())
 
@@ -522,86 +542,91 @@ class Machine(HasInputConnections, HasOutputConnections):
         TODO: Make it run based on output logic. 
         """
         temp = self.ol(self.presentState)
-        yield self._env.timeout(0.1) 
+        yield self._env.timeout(0.1)
         self._output[0] = temp
-        self._scopeDump.add(f"output of {self.getBlockID()}", self._env.now, self._output[0])
+        self._scopeDump.add(
+            f"output of {self.getBlockID()}", self._env.now, self._output[0])
         # triggering events for the connected machines
         for i in range(1, self._fanOutCount + 1):
             self._output[i].put(True)
 
-    
     def run(self):
         """
         Runs this block.
         """
-        
+
         self._env.process(self.__runNSL())
         self._env.process(self.__runReg())
         self._env.process(self.__runNSLp())
-    
+        self._env.process(self.__runOL())
+
     def isConnected(self):
 
         return self.clk != None and self.nsl != None and self.ol != None and self.isConnectedToInput()
 
     def clock(self):
         return self
-    
+
+
 class Input(HasOnlyOutputConnections):
     """
     An input is a HasOutputConnections block.
     This represents the Input Block.
     """
-    
-    def __init__(self, inputList:list, env, plot=False, blockID=None):
+
+    def __init__(self, inputList: list, env, plot=False, blockID=None):
         """
         inputList must be a list that contains the input changes at the time intervals.
         env is the simpy environment.
         blockID is the id of this input block. If None, 
         then new unique ID is given.
         """
-        
+
         super().__init__(env, plot, blockID)
         self._input = inputList
-    
+
     def __str__(self):
         """
         Returns the string representation of this input block.
         """
-        
+
         return f"Input ID {self._blockID}"
-    
+
     def _go(self):
         """
         Runs the input at every change in input value specified by inputList.
         """
-        
+
         for i in self._input:
 
             yield self._env.timeout(i[0]-self._env.now)
-            
-            self._output[0]=i[1]
-            
-            for i in range(1,self._fanOutCount+1):
+
+            self._output[0] = i[1]
+
+            for i in range(1, self._fanOutCount+1):
                 self._output[i].put(True)
 
-            self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self._output[0])
+            self._scopeDump.add(
+                f"Input to {self.getBlockID()}", self._env.now, self._output[0])
+
 
 class Clock(HasOnlyOutputConnections):
     """
     TODO: Create a clock.
     """
 
-    def __init__(self, env, plot=True, blockID=None, timePeriod = 1.2, onTime = 0.6):
+    def __init__(self, env, plot=True, blockID=None, timePeriod=1.2, onTime=0.6):
         super().__init__(env, plot, blockID)
 
-        checkType([(timePeriod,(int, float)), (onTime, (int, float))])
+        checkType([(timePeriod, (int, float)), (onTime, (int, float))])
 
-        if(timePeriod < onTime):
-            printErrorAndExit(f"Clock {self} cannot have timePeriod = {timePeriod} less than onTime = {onTime}.")
+        if (timePeriod < onTime):
+            printErrorAndExit(f"Clock {self} cannot have timePeriod = {
+                              timePeriod} less than onTime = {onTime}.")
 
         self.__timePeriod = timePeriod
         self.__onTime = onTime
-        self._output[0]=0
+        self._output[0] = 0
 
     def output(self):
         """
@@ -618,11 +643,12 @@ class Clock(HasOnlyOutputConnections):
 
             self._output[0] = 1 - self._output[0]
 
-            if(self._output[0]):
-                for i in range(1,self._fanOutCount+1):
+            if (self._output[0]):
+                for i in range(1, self._fanOutCount+1):
                     self._output[i].put(True)
 
-            self._scopeDump.add(f"Clock {self.getBlockID()}", self._env.now, self._output[0])
+            self._scopeDump.add(
+                f"Clock {self.getBlockID()}", self._env.now, self._output[0])
 
     def addFanout(self):
         """
@@ -632,6 +658,7 @@ class Clock(HasOnlyOutputConnections):
         self._output.append(simpy.Store(self._env))
         self._output[-1].put(True)
         return self._fanOutCount
+
 
 class Output(HasInputConnections):
     """
@@ -645,34 +672,36 @@ class Output(HasInputConnections):
         """
         env is a simpy environment.
         """
-        
+
         super().__init__(env, plot, blockID)
-    
+
     def __str__(self):
         """
         Returns a string representation of the output block.
         """
-        
+
         return f"Output ID {self._blockID}"
-        
+
     def __give(self):
         """
         Adds the output value to this class every time there is a change in it.
         """
-        
+
         while True:
             yield self._input[self._connectedID].get()
-            self._scopeDump.add(f"Final Output from {self.getBlockID()}", self._env.now, self._input[0])
-    
+            self._scopeDump.add(f"Final Output from {
+                                self.getBlockID()}", self._env.now, self._input[0])
+
     def run(self):
         """
         Runs the output block
         """
-        
-        self._env.process(self.__give()) 
-    
+
+        self._env.process(self.__give())
+
     def isConnected(self):
-        return self.isConnectedToInput() 
+        return self.isConnectedToInput()
+
 
 if __name__ == "__main__":
     def NSL1(i, ps):
@@ -691,11 +720,11 @@ if __name__ == "__main__":
     pydig = pydig()
     clk = pydig.clock()
     i = pydig.source("Tests\\Test.txt", "input")
-    m1 = pydig.moore(plot = True, blockID = "m1")
-    m2 = pydig.moore(plot = True, blockID = "m2")
-    o = pydig.output(blockID = "out")
+    m1 = pydig.moore(plot=True, blockID="m1")
+    m2 = pydig.moore(plot=True, blockID="m2")
+    o = pydig.output(blockID="out")
 
-    print(i, m1, m2, o, sep = "\n")
+    print(i, m1, m2, o, sep="\n")
 
     # Assigning the different components
     m1.nsl = NSL1
@@ -704,7 +733,7 @@ if __name__ == "__main__":
     m2.ol = OL2
     m1.clk = clk.output()
     m2.clk = clk.output()
-    
+
     # Making all the connections
     i.output() > m1.input()
     m1.output() > m2.input()
@@ -714,4 +743,4 @@ if __name__ == "__main__":
     pydig.dumpVars()
 
     # Running all the blocks.
-    pydig.run(until = 21)
+    pydig.run(until=21)
