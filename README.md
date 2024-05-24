@@ -127,13 +127,13 @@ m1.nsl = NSL1
 m1.ol = OL1
 m2.nsl = NSL2
 m2.ol = OL2
-m1.clk = clk.output()
-m2.clk = clk.output()
 
 # Making all the connections
 i.output() > m1.input()
 m1.output() > m2.input()
 m2.output() > o.input()
+clk.output() > m1.clk()
+clk.output() > m2.clk()
 
 # Creating dump
 pydig.dumpVars()
