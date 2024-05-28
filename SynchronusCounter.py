@@ -3,15 +3,15 @@ from utilities import checkType
 
 class SynchronusCounter:
 
-    def __init__(self, pydig:pd, modValue:int, asyncReset:str, timePeriod:float = 1, onTime:float = 0.5):
-        checkType([(pydig, pd), (modValue, int), (asyncReset, str), (timePeriod, (int, float)), (onTime, (int, float))])
+    def __init__(self, pydig:pd, modValue:int, asyncReset:str, clock:pd.clock):
+        checkType([(pydig, pd), (modValue, int), (asyncReset, str), (clock, pd.clock)])
 
         self.__modValue = modValue
 
         self.__i = pydig.source(asyncReset, "Async Reset")
         self.__m = pydig.moore(plot = True, blockID = f"Mod {modValue} Counter") 
         self.__o = pydig.output(plot = False, blockID = "Final Output")
-        self.__clk = pydig.clock(blockID= "", timePeriod = timePeriod, onTime = onTime)
+        self.__clk = clock
         
         self.__m.nsl = self.nsl
         self.__m.ol = self.ol
@@ -34,7 +34,8 @@ class SynchronusCounter:
 if __name__ == "__main__":
 
     pydig = pd()
-    SynchronusCounter(pydig, 6, "Tests\\SyncCounter.csv")
-
+    clock = pydig.clock(blockID = "", timePeriod = 1, onTime = 0.5)
+    output1 = SynchronusCounter(pydig, 2 , "Tests\\SyncCounter.csv", clock).getOutput()
+    
     pydig.dumpVars()
     pydig.run(until = 30)
