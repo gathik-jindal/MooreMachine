@@ -85,15 +85,15 @@ class pydig:
         temp = Input(inputList, self.__env, False, blockID)
         self.__components.append(temp)
         return temp
-    
-    def output(self, blockID=None):
+
+    def output(self, plot = True, blockID=None):
         """
         Adds an output block to this class.
         @param blockID : the id of this input block. If None, then new unique ID is given.
         @return : the output object
         """
 
-        temp = Output(self.__env, True, blockID)
+        temp = Output(self.__env, plot, blockID)
         self.__components.append(temp)
         return temp
     
