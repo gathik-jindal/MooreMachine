@@ -25,9 +25,7 @@ class SynchronusCounter:
     def nsl(self, ps, i):
         if(i == 1):
             return 0
-        elif(ps + 1 == self.__modValue):
-            return 0
-        return ps + 1
+        return (ps + 1) % self.__modValue
     
     def ol(self, ps):
         return ps
