@@ -36,9 +36,6 @@ class EnabledMod2CounterWithTC:
     
     def getMachine(self):
         return self.__m
-    
-    def getOutput(self):
-        return self.__m
 
 class EnabledMod4CounterWithTC:
 
