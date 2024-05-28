@@ -1,10 +1,11 @@
 from blocks import pydig as pd
+from blocks import Clock as Clock
 from utilities import checkType
 
 class SynchronusCounter:
 
-    def __init__(self, pydig:pd, modValue:int, asyncReset:str, clock:pd.clock):
-        checkType([(pydig, pd), (modValue, int), (asyncReset, str), (clock, pd.clock)])
+    def __init__(self, pydig:pd, modValue:int, asyncReset:str, clock:Clock):
+        checkType([(pydig, pd), (modValue, int), (asyncReset, str), (clock, Clock)])
 
         self.__modValue = modValue
 
@@ -35,7 +36,7 @@ if __name__ == "__main__":
 
     pydig = pd()
     clock = pydig.clock(blockID = "", timePeriod = 1, onTime = 0.5)
-    output1 = SynchronusCounter(pydig, 2 , "Tests\\SyncCounter.csv", clock).getOutput()
-    
+    output1 = SynchronusCounter(pydig, 6 , "Tests\\SyncCounter.csv", clock).getOutput()
+
     pydig.dumpVars()
     pydig.run(until = 30)
