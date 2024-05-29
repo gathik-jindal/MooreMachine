@@ -246,15 +246,14 @@ class Block(ABC):
 
         return blockID
 
-    @staticmethod
-    def dumpAll():
-        """
-        Returns all the values to be plotted
-        """
-        
-        for i in Block.__dumpList:
-            Block.__dump.update(i.getScopeDump())
-        return Block.__dump
+    def plot(self):
+    """
+    plots the values that are associated to the block that has
+    called this method.
+    """
+
+        if self.__plot:
+            Block.plotter.plot(self.getScopeDump(), f"Plot of {self._blockID}")
     
     @abstractmethod
     def __str__(self):
@@ -290,7 +289,7 @@ class HasInputConnections(Block):
     Block b1 must be of type HasOutputConnections. 
     """
     
-    def __init__(self, env, plot, blockID=None):
+    def __init__(self, env, plot, blockID):
         """
         env is the simpy environment.  
         plot is a boolean value whether to plot this block or not. 
@@ -386,7 +385,7 @@ class HasOutputConnections(Block):
     are the only ones that have an output connection wire. 
     """
     
-    def __init__(self, env, maxOutSize, plot, blockID=None):
+    def __init__(self, env, maxOutSize, plot, blockID):
         """
         env is the simpy environment.  
         blockID is the id of this input block. If None, 
@@ -493,7 +492,7 @@ class Machine(HasInputConnections, HasOutputConnections):
     This represents the Moore Machine.
     """
     
-    def __init__(self, env, maxOutSize, nsl, ol, plot=False, blockID=None, startingState = 0):
+    def __init__(self, env, maxOutSize, nsl, ol, plot, blockID, startingState = 0):
         """
         env must be a simpy environment.
         clock must be of type Clock.
@@ -608,7 +607,7 @@ class Input(HasOnlyOutputConnections):
     This represents the Input Block.
     """
     
-    def __init__(self, inputList:list, env, plot=False, blockID=None):
+    def __init__(self, inputList:list, env, plot, blockID):
         """
         inputList must be a list that contains the input changes at the time intervals.
         env is the simpy environment.
@@ -651,7 +650,7 @@ class Clock(HasOnlyOutputConnections):
     TODO: Create a clock.
     """
 
-    def __init__(self, env, maxOutSize, plot=True, blockID=None, timePeriod = 1.2, onTime = 0.6):
+    def __init__(self, env, maxOutSize, plot, blockID, timePeriod = 1.2, onTime = 0.6):
         super().__init__(env, maxOutSize, plot, blockID)
 
         checkType([(timePeriod,(int, float)), (onTime, (int, float))])
@@ -701,7 +700,7 @@ class Output(HasInputConnections):
     then new unique ID is given.
     """
 
-    def __init__(self, env, plot=True, blockID=None):
+    def __init__(self, env, plot, blockID):
         """
         env is a simpy environment.
         """
