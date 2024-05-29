@@ -117,18 +117,19 @@ class pydig:
                 printErrorAndExit(f"{i} is not connected.")
         
         self.__env.run(until=until)
-        dump = Block.dumpAll()
-
-        dump = fillEmptyTimeSlots(dump)
-        print(dump)
-
-        if self.__dump:
-            dumpVars(dump)
-
-        plot=Plotter()
-
         plot.plot(dump, f"Plot of {self.__name}")
         plot.show()
+        # plotting the plots
+        for i in self.__components:
+            i.plot()
+        
+        Block.plotter.show()
+
+        if self.__dump:
+            self.accumalateDump()
+
+            from utilities import dumpVars
+            dumpVars(Plotter.fillEmptyTimeSlots(self.__timeValues, self.__data))
     
     def dumpVars(self):
         """
@@ -138,6 +139,26 @@ class pydig:
         @return : None
         """
         self.__dump = True
+    
+    def accumalateDump(self):
+        """
+        This method accumalates the data from all blocks/components and creates a dump-able for them.
+
+        this has no return value.
+        """
+
+        self.__data = {}
+        self.__timeValues = set()
+
+        for i in self.__components:
+            vals = i.getScopeDump()
+            self.__data.update(vals)
+
+            discreteTimeValues = set(y[0] for x in vals for y in vals[x])
+            self.__timeValues.update(discreteTimeValues)
+        
+        self.__timeValues.update([0, max(self.__timeValues) + 1])
+        self.__timeValues = list(sorted(self.__timeValues))
 
 class ScopeDump():
     """
