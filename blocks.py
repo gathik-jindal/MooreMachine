@@ -204,24 +204,18 @@ class Block(ABC):
     """
 
     __uniqueIDlist = []
-    __dumpList=[]
-    __dump={}
+    plotter = Plotter()
 
-    def __init__(self, env, plot, blockID = None):
+    def __init__(self, env:simpy.Environment, plot:bool, blockID:str):
         """
         env is the simpy environment.
-        plot is a boolean value specifying whether to plot this object or not
-        blockID is the id of this input block. If None, 
-        then new unique ID is given.
+        blockID is the id of this input block, It serves as a name for this block.
         """
         
         self._env = env
         self._scopeDump = ScopeDump()
-        
-        if plot==True:
-            Block.__dumpList.append(self)
-        
-        self._blockID = Block.__uniqueID(blockID)
+        self.__plot = plot
+        self._blockID = blockID
     
     def getBlockID(self):
         """
