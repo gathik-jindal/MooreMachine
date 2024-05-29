@@ -11,7 +11,6 @@ pip install simpy
 
 from abc import ABC, abstractmethod
 from utilities import checkType, printErrorAndExit
-from utilities import fillEmptyTimeSlots, dumpVars
 import simpy
 import uuid
 from pwlSource import InputGenerator
@@ -117,8 +116,7 @@ class pydig:
                 printErrorAndExit(f"{i} is not connected.")
         
         self.__env.run(until=until)
-        plot.plot(dump, f"Plot of {self.__name}")
-        plot.show()
+
         # plotting the plots
         for i in self.__components:
             i.plot()
@@ -247,10 +245,10 @@ class Block(ABC):
         return blockID
 
     def plot(self):
-    """
-    plots the values that are associated to the block that has
-    called this method.
-    """
+        """
+        plots the values that are associated to the block that has
+        called this method.
+        """
 
         if self.__plot:
             Block.plotter.plot(self.getScopeDump(), f"Plot of {self._blockID}")
