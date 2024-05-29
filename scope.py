@@ -45,12 +45,12 @@ class Plotter:
         counter = 0
         done = 0
         numPlots = 0
-        ticks = range(0, maxTime + 1, 1)
-        for key in inputs:
-            
+        ticks = range(0, maxTime + 1)
+        
+        for key in inputs:    
             if(counter == 0):
                 numPlots += 1
-                fig, axs = plt.subplots(min(5, len(inputs) - done), 1, figsize=(8, 7.5), num = name + " " + str(numPlots))
+                fig, axs = plt.subplots(min(5, len(inputs) - done), 1, figsize=(8, 7.5), num = name + " #" + str(numPlots))
 
                 if(len(inputs) - done == 1):
                     axs = [axs, None]
@@ -70,15 +70,19 @@ class Plotter:
             # Plot data on each subplot
             axs[counter].step(time, value, where = "post")
             axs[counter].grid(True)
+
+            # formatting plots
+            value = set(value)
             axs[counter].set_ylabel(key)
-            axs[counter].set_yticks(value)
-            axs[counter].set_yticklabels([f"{x}" for x in value])
-            axs[counter].tick_params(axis='y', rotation=90)
+            axs[counter].set_yticks(range(0, max(value)+1))
+            axs[counter].set_yticklabels([f"{x}" for x in range(0, max(value)+1)])
             axs[counter].set_ylim(bottom=0.0)
+
             axs[counter].set_xticks(ticks)
             axs[counter].set_xticklabels([f"{int(x)}" for x in ticks])
             axs[counter].set_xlim(left=0.0)
             axs[counter].sharex(axs[0])
+            
             fig.tight_layout()
 
             counter += 1
@@ -91,6 +95,45 @@ class Plotter:
         """
 
         plt.show()
+
+    @staticmethod
+    def fillEmptyTimeSlots(timeValues:list, data:dict):
+        """
+        This functions makes sure that every element(list) in the dictionary has a value for every time unit.
+        All the missing values are filled with the previous value.
+
+        @return : a dictionary with the same keys but with the missing values filled.
+        """
+
+        timeCorresValues = [[] for x in timeValues]
+        headerFields = []
+
+        for i in data:
+            headerFields.append(i)
+            prevValue = 0 # the value of the previous time unit (for now zero)
+            timePointer = 0
+
+            for j in range(len(data[i])):
+                if (timeValues[timePointer] < data[i][j][0]):
+                    while (timeValues[timePointer] < data[i][j][0]):
+                        timeCorresValues[timePointer].append(prevValue)
+                        timePointer += 1
+                    
+                timeCorresValues[timePointer].append(data[i][j][1])
+                timePointer += 1
+                prevValue = data[i][j][1]
+            
+            while (timePointer < len(timeValues)):
+                timeCorresValues[timePointer].append(prevValue)
+                timePointer += 1
+        
+        # creating the dictionary
+        finalData = {}
+        
+        for i in range(len(headerFields)):
+            finalData[headerFields[i]] = [(timeValues[x], timeCorresValues[x][i]) for x in range(len(timeValues))]
+
+        return finalData
 
 if __name__ == "__main__":
     import pwlSource
