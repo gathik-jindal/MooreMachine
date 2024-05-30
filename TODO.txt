@@ -1,8 +1,6 @@
-1) in blocks.py we need to make blockID a required argument and plot a default argument.
-2) In some place blockID is a required parameter and in some places its not, need to fix all this scrambling
-3) in utilities.py we need to move the dumpvars into a new file or do something about it.
-4) why is scopeDump and env not a private attribute in blocks?
-5) have a strong urge to push blocks to new file, or atleast move everything else to new files.
-6) why isn't pydig in its own file!
-7) Remove __uniqueID because now blockID is a required parameter.
-8) need to have custom error messages for the checkType utility function.
+1) in utilities.py we need to move the dumpvars into a new file or do something about it.
+3) have a strong urge to push blocks to new file, or atleast move everything else to new files.
+4) why isn't pydig in its own file!
+5) need to have custom error messages for the checkType utility function.
+6) Debugging
+7) add new parameters
