@@ -67,8 +67,7 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = Combinatorics(func, self.__env, blockID, delay,
-                             maxOutSize, plot, state, maxOutSize)  # add into gathik
+        temp = Combinatorics(func, self.__env, blockID, delay, maxOutSize, plot, state)  # add into gathik
         self.__components.append(temp)
         return temp
 
@@ -858,7 +857,7 @@ class Combinatorics(HasInputConnections, HasOutputConnections):
 
     def run(self):
 
-        self._env.process(self.go())  # check if __ or _
+        self._env.process(self.go())
 
 
 if __name__ == "__main__":
