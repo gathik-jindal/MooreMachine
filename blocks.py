@@ -67,7 +67,7 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = Combinatorics(func, self.__env, blockID, delay, maxOutSize, plot, state)  # add into gathik
+        temp = Combinatorics(func, self.__env, blockID, maxOutSize, delay, plot, state)  # add into gathik
         self.__components.append(temp)
         return temp
 
@@ -93,8 +93,7 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = Machine(self.__env, maxOutSize, nsl, ol,
-                       plot, blockID, startingState)
+        temp = Machine(self.__env, maxOutSize, nsl, ol, plot, blockID, startingState)
         self.__components.append(temp)
         return temp
 
@@ -194,8 +193,7 @@ class pydig:
         # Generating csv file
         if self.__dump:
             self.__accumalateDump()
-            dumpVars(Plotter.fillEmptyTimeSlots(
-                self.__timeValues, self.__data))
+            dumpVars(Plotter.fillEmptyTimeSlots(self.__timeValues, self.__data))
 
     def generateCSV(self):
         """
@@ -563,7 +561,7 @@ class Machine(HasInputConnections, HasOutputConnections):
 
         HasInputConnections.__init__(self, env, plot, blockID)
         HasOutputConnections.__init__(self, env, maxOutSize, plot, blockID)
-        self.resetState()
+        self.resetState()####
         self.nsl = nsl
         self.ol = ol
         self.presentState = startingState
@@ -819,12 +817,13 @@ class Combinatorics(HasInputConnections, HasOutputConnections):
     @param state: the initial state of the block.
     """
 
-    def __init__(self, func, env: simpy.Environment, blockID: str, delay: int = 0.1, plot: bool = False, **kwargs):
+    def __init__(self, func, env, blockID, maxOutSize, delay = 0.1, plot = False, **kwargs):
 
-        checkType([(env, simpy.Environment), (blockID, str),
-                  (delay, float), (plot, bool)])
+        checkType([(env, simpy.Environment), (maxOutSize, int), (blockID, str), (delay, float), (plot, bool)])
 
-        super().__init__(env, plot, blockID)
+        HasInputConnections.__init__(self, env, plot, blockID)
+        HasOutputConnections.__init__(self, env, maxOutSize, plot, blockID)
+        self.resetState()####
         self.__func = func
         self.__delay = delay
         self.__state = kwargs.get("state", 0)
@@ -836,21 +835,19 @@ class Combinatorics(HasInputConnections, HasOutputConnections):
         """
 
         while True:
-            yield self._output[self._connectedID].get()
+            yield self._trigger.get()
 
-            self.__state = self._input[0]
-            self.state = self.__func(self.__state)
+            self.__state = self.getInputVal()
+            self.__state = self.__func(self.__state)
 
             if self.__plot:
-                self._scopeDump.add(
-                    f"{self.blockID} input", self.env.now, self._input[0])
+                self._scopeDump.add(f"{self.blockID} input", self.env.now, self.getInputVal())
 
             yield self._env.timeout(self.__delay)
-            self._output[0] = self.state
+            self._output[0] = self.__state
 
             if self.__plot:
-                self._scopeDump.add(
-                    f"{self.blockID} output", self.env.now, self._output[0])
+                self._scopeDump.add(f"{self.blockID} output", self.env.now, self._output[0])
 
             for i in self._output:
                 self._output[i].put(True)
@@ -858,9 +855,14 @@ class Combinatorics(HasInputConnections, HasOutputConnections):
     def run(self):
 
         self._env.process(self.go())
+        self.runTriggers()
 
 
 if __name__ == "__main__":
+    
+    #Testing purpose won't work
+
+    
     def NSL1(i, ps):
         return 0
 
