@@ -48,7 +48,7 @@ class pydig:
         return f"{blockType} {self.__count}"
         
         
-    def combinatorics(self, maxOutSize, plot = False, blockID = None, func = lambda: 0, state = 0):
+    def combinatorics(self, maxOutSize, plot = False, blockID = None, func = lambda: 0, delay = 0, state = 0):
         """
         Adds a combinatorics block to this class. 
         @param maxOutSize : the maximum number of parallel output wires
