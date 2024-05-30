@@ -38,7 +38,7 @@ class pydig:
         self.__name=name
         self.__dump = False
 
-    def moore(self, maxOutSize, plot=True, blockID=None, nsl=None, ol=None, startingState = 0):
+    def moore(self, maxOutSize, plot = False, blockID = "MooreMachine", nsl=None, ol=None, startingState = 0):
         """
         Adds a moore machine to this class. 
         @param maxOutSize : the maximum number of output wires
