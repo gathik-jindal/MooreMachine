@@ -50,7 +50,7 @@ class pydig:
     def combinatorics(self, maxOutSize, plot = False, blockID = None, func = lambda: return 0, state = 0):
         """
         Adds a combinatorics block to this class. 
-        @param maxOutSize : the maximum number of output wires
+        @param maxOutSize : the maximum number of parallel output wires
         @param plot : boolean value whether to plot this moore machine or not
         @para blockID : the id of this machine. If None, then new unique ID is given.  
         @param function : inner gate logic
@@ -58,7 +58,7 @@ class pydig:
         @return : a combinatorics instance. 
         """
         
-        checkType([(plot, bool)])
+        checkType([(plot, bool), (maxOutSize, int)])
         self.__count += 1
         if(blockID == None):
             blockID = self.__makeUniqueID("Combi")
@@ -68,7 +68,7 @@ class pydig:
             blockID = id  
  
         self.__uniqueIDlist.append(blockID)               
-        temp = Combinatorics(maxOutSize, func, self.__env, blockID, delay, maxOutSize, plot, state)  ######## add into gathik
+        temp = Combinatorics( func, self.__env, blockID, delay, maxOutSize, plot, state, maxOutSize)  ######## add into gathik
         self.__components.append(temp)
         return temp        
 
