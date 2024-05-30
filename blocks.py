@@ -166,7 +166,7 @@ class pydig:
 
         # Generating csv file
         if self.__dump:
-            self.accumalateDump()
+            self.__accumalateDump()
             dumpVars(Plotter.fillEmptyTimeSlots(self.__timeValues, self.__data))
     
     def generateCSV(self):
