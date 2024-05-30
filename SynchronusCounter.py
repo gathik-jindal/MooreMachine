@@ -8,7 +8,7 @@ class SynchronusCounter:
         checkType([(pydig, pd), (modValue, int), (syncReset, str), (clock, Clock)])
 
         self.__modValue = modValue
-        self.__i = pydig.source(syncReset, "Async Reset")
+        self.__i = pydig.source(syncReset, True, "Async Reset")
         self.__m = pydig.moore(plot = True, maxOutSize = self.__bitCount(modValue), blockID = f"Mod {modValue} Counter") 
         self.__o = pydig.output(plot = False, blockID = "Final Output")
         self.__clk = clock
