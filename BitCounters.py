@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
     m1.output(1, 3) > o.input()
     m2.output(1, 3) > o.input()
-    pydig.dumpVars()
+    pydig.generateCSV()
 
     # Running all the blocks.
     pydig.run(until = 30)
