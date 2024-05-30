@@ -20,7 +20,7 @@ class SynchronusCounter:
         self.__clk.output() > self.__m.clock()
         self.__m.output() > self.__o.input() ####### make combinatorics
 
-    def __bitcount(self, num):
+    def __bitCount(self, num):
         a = 0
         while(num):
             a+=1
