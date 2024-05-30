@@ -39,13 +39,41 @@ class pydig:
         self.__count = 0
         self.__name=name
         self.__dump = False
+        
 
     def __makeUniqueID(self, blockType):
-            while (f"{blockType} {self.__count}" in self.__uniqueIDlist):        
-                self.__count += 1
-            return f"{blockType} {self.__count}"
+        while (f"{blockType} {self.__count}" in self.__uniqueIDlist):        
+            self.__count += 1
+        return f"{blockType} {self.__count}"
+        
+        
+    def combinatorics(self, maxOutSize, plot = False, blockID = None, func = lambda: return 0, state = 0):
+        """
+        Adds a combinatorics block to this class. 
+        @param maxOutSize : the maximum number of output wires
+        @param plot : boolean value whether to plot this moore machine or not
+        @para blockID : the id of this machine. If None, then new unique ID is given.  
+        @param function : inner gate logic
+        @param startingState : the starting state of the moore machine
+        @return : a combinatorics instance. 
+        """
+        
+        checkType([(plot, bool)])
+        self.__count += 1
+        if(blockID == None):
+            blockID = self.__makeUniqueID("Combi")
+        elif blockID in self.__uniqueIDlist:
+            id =  self.__makeUniqueID("Combi")
+            print(f"{blockID} is already used so changing to {id}")
+            blockID = id  
+ 
+        self.__uniqueIDlist.append(blockID)               
+        temp = Combinatorics(func, self.__env, blockID, delay, maxOutSize, plot, state) 
+        self.__components.append(temp)
+        return temp        
 
-    def moore(self, maxOutSize, plot = False, blockID = None, nsl=None, ol=None, startingState = 0):
+        
+    def moore(self, maxOutSize, plot = False, blockID = None, nsl= lambda: return 0, ol= lambda: return 0, startingState = 0):
         """
         Adds a moore machine to this class. 
         @param maxOutSize : the maximum number of output wires
