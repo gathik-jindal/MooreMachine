@@ -3,4 +3,3 @@
 4) why isn't pydig in its own file!
 5) need to have custom error messages for the checkType utility function.
 6) Debugging
-7) add new parameters to SynchronusCounter and BitCounter
