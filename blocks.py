@@ -10,7 +10,7 @@ pip install simpy
 """
 
 from abc import ABC, abstractmethod
-from utilities import checkType, printErrorAndExit
+from utilities import checkType, printErrorAndExit, dumpVars
 import simpy
 import uuid
 from pwlSource import InputGenerator
@@ -33,12 +33,19 @@ class pydig:
         @param name : the name of this object. 
         """
 
+        self.__uniqueIDlist = []
         self.__env = simpy.Environment()
         self.__components = []
+        self.__count = 0
         self.__name=name
         self.__dump = False
 
-    def moore(self, maxOutSize, plot = False, blockID = "MooreMachine", nsl=None, ol=None, startingState = 0):
+    def __makeUniqueID(self, blockType):
+            while (f"{blockType} {self.__count}" in self.__uniqueIDlist):        
+                self.__count += 1
+            return f"{blockType} {self.__count}"
+
+    def moore(self, maxOutSize, plot = False, blockID = None, nsl=None, ol=None, startingState = 0):
         """
         Adds a moore machine to this class. 
         @param maxOutSize : the maximum number of output wires
@@ -49,14 +56,22 @@ class pydig:
         @param startingState : the starting state of the moore machine
         @return : the moore machine instance. 
         """
-
         checkType([(plot, bool), (startingState, int)])
-
+        
+        self.__count += 1
+        if(blockID == None):
+            blockID = self.__makeUniqueID("Moore")
+        elif blockID in self.__uniqueIDlist:
+            id =  self.__makeUniqueID("Moore")
+            print(f"{blockID} is already used so changing to {id}")
+            blockID = id  
+ 
+        self.__uniqueIDlist.append(blockID)               
         temp = Machine(self.__env, maxOutSize, nsl, ol, plot, blockID, startingState) 
         self.__components.append(temp)
         return temp
 
-    def clock(self, plot=True, blockID=None, timePeriod=1.2, onTime = 0.6):
+    def clock(self, plot=False, blockID=None, timePeriod=1.2, onTime = 0.6):
         """
         Adds a clock to this class. 
         @param plot : boolean value whether to plot this clock or not
@@ -67,12 +82,21 @@ class pydig:
         """
 
         checkType([(plot, bool), (timePeriod, (int, float)), (onTime, (int, float))])
-
-        temp = Clock(self.__env, 1, plot, blockID, timePeriod, onTime) ########
+        
+        self.__count += 1
+        if(blockID == None):
+            blockID = self.__makeUniqueID("Clock")
+        elif blockID in self.__uniqueIDlist:
+            id =  self.__makeUniqueID("Clock")
+            print(f"{blockID} is already used so changing to {id}")
+            blockID = id  
+ 
+        self.__uniqueIDlist.append(blockID)    
+        temp = Clock(self.__env, 1, plot, blockID, timePeriod, onTime)
         self.__components.append(temp)
         return temp
     
-    def source(self, filePath:str, plot = True, blockID=None):
+    def source(self, filePath:str, plot = False, blockID=None):
         """
         Adds an input block to this class.
         @param filePath : must be a valid filePath of type ".txt", ".csv", or ".xslx" to an input source.  
@@ -82,7 +106,15 @@ class pydig:
         """
         
         inputList = InputGenerator(filePath).getInput()["Inputs"]
-
+        self.__count += 1
+        if(blockID == None):
+            blockID = self.__makeUniqueID("Source")
+        elif blockID in self.__uniqueIDlist:
+            id =  self.__makeUniqueID("Source")
+            print(f"{blockID} is already used so changing to {id}")
+            blockID = id  
+ 
+        self.__uniqueIDlist.append(blockID)    
         temp = Input(inputList, self.__env, plot, blockID)
         self.__components.append(temp)
         return temp
@@ -94,7 +126,15 @@ class pydig:
         @param blockID : the id of this input block. If None, then new unique ID is given.
         @return : the output object
         """
-
+        self.__count += 1
+        if(blockID == None):
+            blockID = self.__makeUniqueID("Output")
+        elif blockID in self.__uniqueIDlist:
+            id =  self.__makeUniqueID("Output")
+            print(f"{blockID} is already used so changing to {id}")
+            blockID = id  
+ 
+        self.__uniqueIDlist.append(blockID)    
         temp = Output(self.__env, plot, blockID)
         self.__components.append(temp)
         return temp
@@ -123,10 +163,10 @@ class pydig:
         
         Block.plotter.show()
 
+
+        # Generating csv file
         if self.__dump:
             self.accumalateDump()
-
-            from utilities import dumpVars
             dumpVars(Plotter.fillEmptyTimeSlots(self.__timeValues, self.__data))
     
     def dumpVars(self):
@@ -201,7 +241,6 @@ class Block(ABC):
     It includes some abstract methods that should be implemented by its subclasses.
     """
 
-    __uniqueIDlist = []
     plotter = Plotter()
 
     def __init__(self, env:simpy.Environment, plot:bool, blockID:str):
@@ -228,21 +267,6 @@ class Block(ABC):
         """
 
         return self._scopeDump.getValues()
-
-    @staticmethod
-    def __uniqueID(blockID):
-        """
-        Creates a unique ID for each block
-        """
-
-        if(blockID != None and blockID in Block.__uniqueIDlist):
-            printErrorAndExit(f"{blockID} has already been used as an ID for another block.")
-        elif(blockID == None):
-            blockID = uuid.uuid4()
-        
-        Block.__uniqueIDlist.append(blockID)
-
-        return blockID
 
     def plot(self):
         """
