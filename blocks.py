@@ -169,7 +169,7 @@ class pydig:
             self.accumalateDump()
             dumpVars(Plotter.fillEmptyTimeSlots(self.__timeValues, self.__data))
     
-    def dumpVars(self):
+    def generateCSV(self):
         """
         This method is used only when you want to dump all the variables in a (csv) file.
         Currently there is no option and all the variables are dumped in a csv file located in the output folder
@@ -178,7 +178,7 @@ class pydig:
         """
         self.__dump = True
     
-    def accumalateDump(self):
+    def __accumalateDump(self):
         """
         This method accumalates the data from all blocks/components and creates a dump-able for them.
 
@@ -793,7 +793,7 @@ if __name__ == "__main__":
     m2.output() > o.input()
 
     # Creating dump
-    pydig.dumpVars()
+    pydig.generateCSV()
 
     # Running all the blocks.
     pydig.run(until = 21)
