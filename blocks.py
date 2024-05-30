@@ -271,7 +271,7 @@ class Block(ABC):
 
     plotter = Plotter()
 
-    def __init__(self, env:simpy.Environment, plot:bool, blockID:str):
+    def __init__(self, env, plot, blockID):
         """
         env is the simpy environment.
         blockID is the id of this input block, It serves as a name for this block.
@@ -347,7 +347,7 @@ class HasInputConnections(Block):
         then new unique ID is given.
         """
         
-        super().__init__(env, plot, blockID)
+        Block.__init__(self, env, plot, blockID)
 
         self._trigger = simpy.Store(self._env)
         self._input = []
