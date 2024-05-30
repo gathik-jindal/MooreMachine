@@ -799,9 +799,9 @@ class Combinatorics(HasInputConnections, HasOutputConnections):
     @param state: the initial state of the block.
     """
 
-    def __init__(self, func: function, env: simpy.Environment, blockID: str, delay: int = 0.1, plot: bool = False, **kwargs):
+    def __init__(self, func, env: simpy.Environment, blockID: str, delay: int = 0.1, plot: bool = False, **kwargs):
         
-        checkType([(func, function), (env, simpy.Environment), (blockID, str), (delay, float), (plot, bool)])
+        checkType([(env, simpy.Environment), (blockID, str), (delay, float), (plot, bool)])
 
         super().__init__(env, plot, blockID)
         self.__func = func
