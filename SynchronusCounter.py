@@ -4,13 +4,12 @@ from utilities import checkType
 
 class SynchronusCounter:
 
-    def __init__(self, pydig:pd, modValue:int, asyncReset:str, clock:Clock):
-        checkType([(pydig, pd), (modValue, int), (asyncReset, str), (clock, Clock)])
+    def __init__(self, pydig:pd, modValue:int, syncReset:str, clock:Clock):
+        checkType([(pydig, pd), (modValue, int), (syncReset, str), (clock, Clock)])
 
         self.__modValue = modValue
-
-        self.__i = pydig.source(asyncReset, "Async Reset")
-        self.__m = pydig.moore(plot = True, blockID = f"Mod {modValue} Counter") 
+        self.__i = pydig.source(syncReset, "Async Reset")
+        self.__m = pydig.moore(plot = True, maxOutSize = self.__bitCount(modValue), blockID = f"Mod {modValue} Counter") 
         self.__o = pydig.output(plot = False, blockID = "Final Output")
         self.__clk = clock
         
@@ -19,8 +18,15 @@ class SynchronusCounter:
 
         self.__i.output() > self.__m.input()
         self.__clk.output() > self.__m.clock()
-        self.__m.output() > self.__o.input()
-        
+        self.__m.output() > self.__o.input() ####### make combinatorics
+
+    def __bitcount(self, num):
+        a = 0
+        while(num):
+            a+=1
+            num = num >> 1
+        return a
+    
     def nsl(self, ps, i):
         if(i == 1):
             return 0
@@ -37,6 +43,7 @@ if __name__ == "__main__":
     pydig = pd()
     clock = pydig.clock(blockID = "", timePeriod = 1, onTime = 0.5)
     output1 = SynchronusCounter(pydig, 6 , "Tests\\SyncCounter.csv", clock).getOutput()
-
-    pydig.dumpVars()
+    print(output1)
+    
+    pydig.generateCSV()
     pydig.run(until = 30)
