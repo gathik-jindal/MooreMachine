@@ -71,7 +71,7 @@ class pydig:
         self.__components.append(temp)
         return temp
 
-    def combinatorics(self, combObj):
+    def combinatoricsFromObject(self, combObj):
 
         checkType([(combObj, Combinatorics)])
 
