@@ -16,7 +16,7 @@ class SynchronusCounter(Comb):
         Comb.__init__(self, func = lambda x : x, env = pydig.getEnv(), blockID = f"Mod {modValue} Counter {SynchronusCounter.__counter}", 
                 maxOutSize = maxOutSize, delay = 0, plot = plot, state = 0)
         
-        o = pydig.combinatorics(self)
+        o = pydig.combinatoricsFromObject(self)
         i = pydig.source(filePath = syncReset, plot = False, blockID = f"Sync Reset {SynchronusCounter.__counter}")
         m = pydig.moore(plot = False, maxOutSize = maxOutSize, blockID = f"Moore {SynchronusCounter.__counter}")
         clk = clock
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     pydig = pd()
     clock = pydig.clock(blockID = "", plot = False, timePeriod = 1, onTime = 0.5)
-    output1 = SynchronusCounter(pydig, 6 , "Tests\\SyncCounter.csv", clock)
+    output1 = SynchronusCounter(pydig, 6 , "Tests\\SyncCounter.csv", clock, plot = True)
     
     pydig.generateCSV()
     pydig.run(until = 30)
