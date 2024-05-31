@@ -3,3 +3,4 @@
 3) need to have custom error messages for the checkType utility function.
 4) Debugging
 5) Fix comments for all files
+6) Put clock in moore machine plot

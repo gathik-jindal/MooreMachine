@@ -1,24 +1,24 @@
 from blocks import pydig as pd
-from blocks import Clock as Clock, Combinatorics as Comb
+from blocks import Clock as Clock, Combinatorics as Comb, HasOutputConnections as HOC
 from utilities import checkType
 
-class FreezeCounter(Comb):
+class SynchronousCounter(Comb):
 
     __counter = 0
 
-    def __init__(self, pydig:pd, modValue:int, syncReset:str, clock:Clock, plot:bool = True):
+    def __init__(self, pydig:pd, modValue:int, syncReset:HOC, clock:Clock, plot:bool = True):
         
-        checkType([(pydig, pd), (modValue, int), (syncReset, str), (clock, Clock), (plot, bool)])
-        maxOutSize = FreezeCounter.__bitCount(modValue)
+        checkType([(pydig, pd), (modValue, int), (syncReset, HOC), (clock, Clock), (plot, bool)])
+        maxOutSize = SynchronousCounter.__bitCount(modValue)
         self.__modValue = modValue
-        FreezeCounter.__counter += 1
+        SynchronousCounter.__counter += 1
 
-        Comb.__init__(self, func = lambda x : x, env = pydig.getEnv(), blockID = f"Mod {modValue} Freeze Counter {FreezeCounter.__counter}", 
+        Comb.__init__(self, func = lambda x : x, env = pydig.getEnv(), blockID = f"Mod {modValue} Counter {SynchronousCounter.__counter}", 
                 maxOutSize = maxOutSize, delay = 0, plot = plot, state = 0)
         
         o = pydig.combinatoricsFromObject(self)
-        i = pydig.source(filePath = syncReset, plot = False, blockID = f"Sync Reset {FreezeCounter.__counter}")
-        m = pydig.moore(plot = False, maxOutSize = maxOutSize, blockID = f"Moore {FreezeCounter.__counter}")
+        i = syncReset
+        m = pydig.moore(plot = False, maxOutSize = maxOutSize, blockID = f"Moore {SynchronousCounter.__counter}")
         clk = clock
         
         m.nsl = self.__nsl
@@ -38,7 +38,7 @@ class FreezeCounter(Comb):
     
     def __nsl(self, ps, i):
         if(i == 1):
-            return ps
+            return 0
         return (ps + 1) % self.__modValue
     
     def __ol(self, ps):
@@ -49,7 +49,8 @@ if __name__ == "__main__":
 
     pydig = pd()
     clock = pydig.clock(blockID = "", plot = False, timePeriod = 1, onTime = 0.5)
-    output1 = FreezeCounter(pydig, 6 , "Tests\\FreezeCounter.csv", clock, plot = True)
+    i = pydig.source(filePath = "Tests\\SyncCounter.csv", plot = False, blockID = f"Sync Reset")
+    output1 = SynchronousCounter(pydig, 6 , i, clock, plot = True)
     
     pydig.generateCSV()
     pydig.run(until = 30)

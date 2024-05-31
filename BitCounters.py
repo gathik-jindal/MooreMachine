@@ -140,7 +140,7 @@ if __name__ == "__main__":
     pydig = pd()
     clock = pydig.clock(blockID = "", plot = False, timePeriod = 1, onTime = 0.5)
     input1 = pydig.source(filePath = "Tests\\BitCounter.csv", plot = False, blockID = "Input")
-    output1 = Enabled3BitCounterWithTC(pydig , input1, clock, plot = True)
+    output1 = Enabled4BitCounterWithTC(pydig , input1, clock, plot = True)
     
     pydig.generateCSV()
     pydig.run(until = 60)
