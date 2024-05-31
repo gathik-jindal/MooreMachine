@@ -17,6 +17,8 @@ from pwlSource import InputGenerator
 from scope import Plotter
 
 
+timeout = 0.1
+
 class pydig:
     """
     This class is used for adding your moore machines, input block, and output block.
@@ -606,7 +608,7 @@ class Machine(HasInputConnections, HasOutputConnections):
 
             # running the NSL
             tempout = self.nsl(self.presentState, self.getInputVal())
-            yield self._env.timeout(0.1)
+            yield self._env.timeout(timeout)
 
             # updating the next State
             self.nextState = tempout
@@ -624,7 +626,7 @@ class Machine(HasInputConnections, HasOutputConnections):
 
             # running the NSL
             tempout = self.nsl(self.presentState, self.getInputVal())
-            yield self._env.timeout(0.1)
+            yield self._env.timeout(timeout)
 
             # updating the output
             self.nextState = tempout
@@ -640,7 +642,7 @@ class Machine(HasInputConnections, HasOutputConnections):
             yield self.clk[self._clockID].get()
             if self.presentState == self.nextState:
                 continue
-            yield self._env.timeout(0.1)
+            yield self._env.timeout(timeout)
             self.presentState = self.nextState
             self._scopeDump.add(
                 f"PS of {self.getBlockID()}", self._env.now, self.presentState)
@@ -653,7 +655,7 @@ class Machine(HasInputConnections, HasOutputConnections):
         TODO: Make it run based on output logic. 
         """
         temp = self.ol(self.presentState)
-        yield self._env.timeout(0.1)
+        yield self._env.timeout(timeout)
         self._output[0] = temp
         self._scopeDump.add(
             f"output of {self.getBlockID()}", self._env.now, self._output[0])
@@ -833,7 +835,7 @@ class Combinatorics(HasInputConnections, HasOutputConnections):
     @param state: the initial state of the block.
     """
 
-    def __init__(self, func, env, blockID, maxOutSize, delay = 0.1, plot = False, **kwargs):
+    def __init__(self, func, env, blockID, maxOutSize, delay = timeout, plot = False, **kwargs):
 
         checkType([(env, simpy.Environment), (maxOutSize, int), (blockID, str), (delay, (float, int)), (plot, bool)])
 
