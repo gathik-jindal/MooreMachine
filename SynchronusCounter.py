@@ -1,49 +1,55 @@
 from blocks import pydig as pd
-from blocks import Clock as Clock
+from blocks import Clock as Clock, Combinatorics as Comb
 from utilities import checkType
 
-class SynchronusCounter:
+class SynchronusCounter(Comb):
 
-    def __init__(self, pydig:pd, modValue:int, syncReset:str, clock:Clock):
-        checkType([(pydig, pd), (modValue, int), (syncReset, str), (clock, Clock)])
+    __counter = 0
 
-        self.__modValue = modValue
-        self.__i = pydig.source(syncReset, True, "Async Reset")
-        self.__m = pydig.moore(plot = True, maxOutSize = self.__bitCount(modValue), blockID = f"Mod {modValue} Counter") 
-        self.__o = pydig.output(plot = False, blockID = "Final Output")
-        self.__clk = clock
+    def __init__(self, pydig:pd, modValue:int, syncReset:str, clock:Clock, plot:bool = True):
         
-        self.__m.nsl = self.nsl
-        self.__m.ol = self.ol
+        checkType([(pydig, pd), (modValue, int), (syncReset, str), (clock, Clock), (plot, bool)])
+        maxOutSize = SynchronusCounter.__bitCount(modValue)
+        self.__modValue = modValue
+        SynchronusCounter.__counter += 1
 
-        self.__i.output() > self.__m.input()
-        self.__clk.output() > self.__m.clock()
-        self.__m.output() > self.__o.input() ####### make combinatorics
+        Comb.__init__(self, func = lambda x : x, env = pydig.getEnv(), blockID = f"Mod {modValue} Counter {SynchronusCounter.__counter}", 
+                maxOutSize = maxOutSize, delay = 0, plot = plot, state = 0)
+        
+        o = pydig.combinatorics(self)
+        i = pydig.source(filePath = syncReset, plot = False, blockID = f"Sync Reset {SynchronusCounter.__counter}")
+        m = pydig.moore(plot = False, maxOutSize = maxOutSize, blockID = f"Moore {SynchronusCounter.__counter}")
+        clk = clock
+        
+        m.nsl = self.__nsl
+        m.ol = self.__ol
 
-    def __bitCount(self, num):
+        i.output() > m.input()
+        clk.output() > m.clock()
+        m.output() > o.input()
+    
+    @staticmethod
+    def __bitCount(num):
         a = 0
         while(num):
             a+=1
             num = num >> 1
         return a
     
-    def nsl(self, ps, i):
+    def __nsl(self, ps, i):
         if(i == 1):
             return 0
         return (ps + 1) % self.__modValue
     
-    def ol(self, ps):
+    def __ol(self, ps):
         return ps
 
-    def getOutput(self):
-        return self.__o
 
 if __name__ == "__main__":
 
     pydig = pd()
-    clock = pydig.clock(blockID = "", timePeriod = 1, onTime = 0.5)
-    output1 = SynchronusCounter(pydig, 6 , "Tests\\SyncCounter.csv", clock).getOutput()
-    print(output1)
+    clock = pydig.clock(blockID = "", plot = False, timePeriod = 1, onTime = 0.5)
+    output1 = SynchronusCounter(pydig, 6 , "Tests\\SyncCounter.csv", clock)
     
     pydig.generateCSV()
     pydig.run(until = 30)

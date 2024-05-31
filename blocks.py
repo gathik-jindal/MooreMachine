@@ -46,7 +46,7 @@ class pydig:
             self.__count += 1
         return f"{blockType} {self.__count}"
 
-    def combinatorics(self, maxOutSize, plot=False, blockID=None, func=lambda: 0, delay=0, state=0):
+    def combinatorics(self, maxOutSize, plot=False, blockID=None, func=lambda x: x, delay=0, state=0):
         """
         Adds a combinatorics block to this class. 
         @param maxOutSize : the maximum number of parallel output wires
@@ -67,11 +67,24 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = Combinatorics(func, self.__env, blockID, maxOutSize, delay, plot, state)  # add into gathik
+        temp = Combinatorics(func, self.__env, blockID, maxOutSize, delay, plot, state = state)  # add into gathik
         self.__components.append(temp)
         return temp
 
-    def moore(self, maxOutSize, plot=False, blockID=None, nsl=lambda: 0, ol=lambda: 0, startingState=0):
+    def combinatorics(self, combObj):
+
+        checkType([(combObj, Combinatorics)])
+
+        if combObj._blockID in self.__uniqueIDlist:
+            id = self.__makeUniqueID("Combi")
+            print(f"{combObj._blockID} is already used so changing to {id}")
+            combObj._blockID = id
+
+        self.__uniqueIDlist.append(combObj._blockID)
+        self.__components.append(combObj)
+        return combObj
+    
+    def moore(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState=0):
         """
         Adds a moore machine to this class. 
         @param maxOutSize : the maximum number of output wires
@@ -194,6 +207,9 @@ class pydig:
         if self.__dump:
             self.__accumalateDump()
             dumpVars(Plotter.fillEmptyTimeSlots(self.__timeValues, self.__data))
+
+    def getEnv(self):
+        return self.__env
 
     def generateCSV(self):
         """
@@ -819,7 +835,7 @@ class Combinatorics(HasInputConnections, HasOutputConnections):
 
     def __init__(self, func, env, blockID, maxOutSize, delay = 0.1, plot = False, **kwargs):
 
-        checkType([(env, simpy.Environment), (maxOutSize, int), (blockID, str), (delay, float), (plot, bool)])
+        checkType([(env, simpy.Environment), (maxOutSize, int), (blockID, str), (delay, (float, int)), (plot, bool)])
 
         HasInputConnections.__init__(self, env, plot, blockID)
         HasOutputConnections.__init__(self, env, maxOutSize, plot, blockID)
@@ -827,6 +843,7 @@ class Combinatorics(HasInputConnections, HasOutputConnections):
         self.__func = func
         self.__delay = delay
         self.__state = kwargs.get("state", 0)
+
         checkType([(self.__state, int)])
 
     def go(self):
@@ -840,23 +857,28 @@ class Combinatorics(HasInputConnections, HasOutputConnections):
             self.__state = self.getInputVal()
             self.__state = self.__func(self.__state)
 
-            if self.__plot:
-                self._scopeDump.add(f"{self.blockID} input", self.env.now, self.getInputVal())
-
             yield self._env.timeout(self.__delay)
             self._output[0] = self.__state
 
-            if self.__plot:
-                self._scopeDump.add(f"{self.blockID} output", self.env.now, self._output[0])
+            self._scopeDump.add(f"{self._blockID} output", self._env.now, self._output[0])
 
-            for i in self._output:
+            for i in range(1, self._fanOutCount+1):
                 self._output[i].put(True)
+
+    def __str__(self):
+        """
+        Should return a string representation of the block.
+        """
+
+        return f"Combinatorics ID {self._blockID}"
 
     def run(self):
 
         self._env.process(self.go())
         self.runTriggers()
 
+    def isConnected(self):
+        return self.isConnectedToInput()
 
 if __name__ == "__main__":
     
