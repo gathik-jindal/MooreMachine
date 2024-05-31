@@ -2,8 +2,6 @@
 
 This project implements a Moore Machine in Python. A Moore Machine is a finite state machine where the outputs depend only on the current state.
 
-### So far, the Moore Machine works by taking the input and increasing it by 1. The completed methods are pwl, input passing, and plotting. TODO: Clock, Bus, Actual Machine
-
 ## Table of Contents
 
 - [Introduction](#introduction)
