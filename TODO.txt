@@ -2,3 +2,4 @@
 2) in utilities.py we need to move the dumpvars into a new file or do something about it.
 3) need to have custom error messages for the checkType utility function.
 4) Debugging
+5) Fix comments for all files
