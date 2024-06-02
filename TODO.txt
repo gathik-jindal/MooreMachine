@@ -4,3 +4,4 @@
 4) Debugging
 5) Fix comments for all files
 6) Put clock in moore machine plot
+7) Change all use cases to use input objects
