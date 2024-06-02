@@ -299,7 +299,7 @@ class Block(ABC):
         self._scopeDump = ScopeDump()
         self.__plot = kwargs.get("plot", False)
         self._blockID = kwargs.get("blockID", 0)
-        super().__init__(**kwargs)
+        #super().__init__(**kwargs) ######################
 
     def getBlockID(self):
         """
@@ -702,7 +702,7 @@ class Input(HasOnlyOutputConnections):
         maxOutSize -= 2
         
         self._input = inputList
-        super().__init__(maxOutSize = maxOutsize, **kwargs)
+        super().__init__(maxOutSize = maxOutSize, **kwargs)
 
 
     def __str__(self):
@@ -746,7 +746,8 @@ class Clock(HasOnlyOutputConnections):
 
         self.__timePeriod = timePeriod
         self.__onTime = onTime
-        self._output[0] = 0
+        #self._output[0] = 0
+        
         super().__init__(**kwargs)
 
     def output(self, left=None, right=None):
@@ -770,16 +771,6 @@ class Clock(HasOnlyOutputConnections):
 
             self._scopeDump.add(
                 f"Clock {self.getBlockID()}", self._env.now, self._output[0])
-
-    def addFanout(self):
-        """
-        Adds an output wire to this block. 
-        """
-        self._fanOutCount += 1
-        self._output.append(simpy.Store(self._env))
-        self._output[-1].put(True)
-        return self._fanOutCount
-
 
 class Output(HasInputConnections):
     """
