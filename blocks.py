@@ -299,7 +299,6 @@ class Block(ABC):
         self._scopeDump = ScopeDump()
         self.__plot = kwargs.get("plot", False)
         self._blockID = kwargs.get("blockID", 0)
-        #super().__init__(**kwargs) ######################
 
     def getBlockID(self):
         """
@@ -746,7 +745,6 @@ class Clock(HasOnlyOutputConnections):
 
         self.__timePeriod = timePeriod
         self.__onTime = onTime
-        #self._output[0] = 0
         
         super().__init__(**kwargs)
 
