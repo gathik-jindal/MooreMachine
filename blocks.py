@@ -69,7 +69,7 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = Combinatorics(func, self.__env, blockID, maxOutSize, delay, plot, state = state)  # add into gathik
+        temp = Combinatorics(func = func, env = self.__env, blockID = blockID, maxOutSize = maxOutSize, delay = delay, plot = plot, state = state)  # add into gathik
         self.__components.append(temp)
         return temp
 
@@ -108,7 +108,7 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = Machine(self.__env, maxOutSize, nsl, ol, plot, blockID, startingState)
+        temp = Machine(env = self.__env, maxOutSize = maxOutSize, nsl = nsl, ol = ol, plot = plot, blockID = blockID, startingState = startingState)
         self.__components.append(temp)
         return temp
 
@@ -134,7 +134,7 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = Clock(self.__env, 1, plot, blockID, timePeriod, onTime)
+        temp = Clock(env = self.__env, maxOutSize = 1, plot = plot, blockID = blockID, timePeriod = timePeriod, onTime = onTime)
         self.__components.append(temp)
         return temp
 
@@ -157,7 +157,7 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = Input(inputList, self.__env, plot, blockID)
+        temp = Input(inputList = inputList, env = self.__env, plot = plot, blockID = blockID)
         self.__components.append(temp)
         return temp
 
@@ -177,7 +177,7 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = Output(self.__env, plot, blockID)
+        temp = Output(env = self.__env, plot = plot, blockID = blockID)
         self.__components.append(temp)
         return temp
 
@@ -289,16 +289,16 @@ class Block(ABC):
 
     plotter = Plotter()
 
-    def __init__(self, env, plot, blockID):
+    def __init__(self, **kwargs):
         """
         env is the simpy environment.
         blockID is the id of this input block, It serves as a name for this block.
         """
 
-        self._env = env
+        self._env = kwargs.get("env", None)
         self._scopeDump = ScopeDump()
-        self.__plot = plot
-        self._blockID = blockID
+        self.__plot = kwargs.get("plot", False)
+        self._blockID = kwargs.get("blockID", 0)
 
     def getBlockID(self):
         """
@@ -358,7 +358,7 @@ class HasInputConnections(Block):
     Block b1 must be of type HasOutputConnections. 
     """
 
-    def __init__(self, env, plot, blockID):
+    def __init__(self, **kwargs):
         """
         env is the simpy environment.  
         plot is a boolean value whether to plot this block or not. 
@@ -366,15 +366,14 @@ class HasInputConnections(Block):
         then new unique ID is given.
         """
 
-        Block.__init__(self, env, plot, blockID)
-
-        self._trigger = simpy.Store(self._env)
+        self._trigger = simpy.Store(kwargs.get("env", None))
         self._input = []
         self._inputSizes = []
         self._inputCount = 0
         self._isConnected = False
         self._connectedID = []
         self._clockID = None
+        super().__init__(**kwargs)
 
     def __le__(self, other):
         """
@@ -458,18 +457,17 @@ class HasOutputConnections(Block):
     are the only ones that have an output connection wire. 
     """
 
-    def __init__(self, env, maxOutSize, plot, blockID):
+    def __init__(self, **kwargs):
         """
         env is the simpy environment.  
         blockID is the id of this input block. If None, 
         then new unique ID is given.
         """
-
-        super().__init__(env, plot, blockID)
-
+        maxOutSize = kwargs.get("maxOutSize", None)
         self._maxOutSize = maxOutSize
         self._state = (0, maxOutSize, maxOutSize)
         self.defineFanOut()
+        super().__init__(**kwargs)
 
     def resetState(self):
         self._state = (0, self._maxOutSize, self._maxOutSize)
@@ -529,14 +527,14 @@ class HasOnlyOutputConnections(HasOutputConnections):
     These classes don't take any input.
     """
 
-    def __init__(self, env, maxOutSize, plot, blockID):
+    def __init__(self, **kwargs):
         """
         env is the simpy environment.
         plot is a boolean variable which represents whether or not we should plot this class.
         blockID is the id of this input block. If None, 
         then new unique ID is given.
         """
-        super().__init__(env, maxOutSize, plot, blockID)
+        super().__init__(**kwargs)
 
     def __le__(self, other):
         """
@@ -567,7 +565,7 @@ class Machine(HasInputConnections, HasOutputConnections):
     This represents the Moore Machine.
     """
 
-    def __init__(self, env, maxOutSize, nsl, ol, plot, blockID, startingState=0):
+    def __init__(self, **kwargs):
         """
         env must be a simpy environment.
         clock must be of type Clock.
@@ -577,15 +575,14 @@ class Machine(HasInputConnections, HasOutputConnections):
         then new unique ID is given.
         """
 
-        HasInputConnections.__init__(self, env, plot, blockID)
-        HasOutputConnections.__init__(self, env, maxOutSize, plot, blockID)
-        self.resetState()####
-        self.nsl = nsl
-        self.ol = ol
+        self.nsl = kwargs.get("nsl")
+        self.ol = kwargs.get("ol")
+        startingState = kwargs.get("startingState", 0)
         self.presentState = startingState
         self.nextState = startingState
-        self._Pchange = simpy.Store(self._env)
+        self._Pchange = simpy.Store(kwargs.get("env", None))
         self._Pchange.put(False)
+        super().__init__(**kwargs)
 
     def __str__(self):
         """
@@ -687,20 +684,25 @@ class Input(HasOnlyOutputConnections):
     This represents the Input Block.
     """
 
-    def __init__(self, inputList: list, env, plot, blockID):
+    def __init__(self, **kwargs):
         """
         inputList must be a list that contains the input changes at the time intervals.
         env is the simpy environment.
         blockID is the id of this input block. If None, 
         then new unique ID is given.
         """
+        
+        inputList = kwargs.get("inputList", [(0,0)])
+        
         maxOutSize = 2
         for i in inputList:
             if (len(bin(i[1])) > maxOutSize):
                 maxOutSize = len(bin(i[1]))
         maxOutSize -= 2
-        super().__init__(env, maxOutSize, plot, blockID)
+        
         self._input = inputList
+        super().__init__(maxOutSize = maxOutSize, **kwargs)
+
 
     def __str__(self):
         """
@@ -732,18 +734,19 @@ class Clock(HasOnlyOutputConnections):
     TODO: Create a clock.
     """
 
-    def __init__(self, env, maxOutSize, plot, blockID, timePeriod=1.2, onTime=0.6):
-        super().__init__(env, maxOutSize, plot, blockID)
+    def __init__(self, **kwargs):
 
+        timePeriod = kwargs.get("timePeriod", 1.2)
+        onTime = kwargs.get("onTime", 0.6)
+        
         checkType([(timePeriod, (int, float)), (onTime, (int, float))])
-
         if (timePeriod < onTime):
-            printErrorAndExit(f"Clock {self} cannot have timePeriod = {
-                              timePeriod} less than onTime = {onTime}.")
+            printErrorAndExit(f"Clock {self} cannot have timePeriod = {timePeriod} less than onTime = {onTime}.")
 
         self.__timePeriod = timePeriod
         self.__onTime = onTime
-        self._output[0] = 0
+        
+        super().__init__(**kwargs)
 
     def output(self, left=None, right=None):
         """
@@ -767,16 +770,6 @@ class Clock(HasOnlyOutputConnections):
             self._scopeDump.add(
                 f"Clock {self.getBlockID()}", self._env.now, self._output[0])
 
-    def addFanout(self):
-        """
-        Adds an output wire to this block. 
-        """
-        self._fanOutCount += 1
-        self._output.append(simpy.Store(self._env))
-        self._output[-1].put(True)
-        return self._fanOutCount
-
-
 class Output(HasInputConnections):
     """
     An Output is a HasInputConnections block.
@@ -785,12 +778,12 @@ class Output(HasInputConnections):
     then new unique ID is given.
     """
 
-    def __init__(self, env, plot, blockID):
+    def __init__(self, **kwargs):
         """
         env is a simpy environment.
         """
 
-        super().__init__(env, plot, blockID)
+        super().__init__(**kwargs)
 
     def __str__(self):
         """
@@ -835,18 +828,17 @@ class Combinatorics(HasInputConnections, HasOutputConnections):
     @param state: the initial state of the block.
     """
 
-    def __init__(self, func, env, blockID, maxOutSize, delay = timeout, plot = False, **kwargs):
+    def __init__(self, **kwargs):
 
-        checkType([(env, simpy.Environment), (maxOutSize, int), (blockID, str), (delay, (float, int)), (plot, bool)])
+        func = kwargs.get("func", None)
+        delay = kwargs.get("delay", 0)
+        state = kwargs.get("state", 0)
+        checkType([(state, int), (delay, (float, int))])         
 
-        HasInputConnections.__init__(self, env, plot, blockID)
-        HasOutputConnections.__init__(self, env, maxOutSize, plot, blockID)
-        self.resetState()####
         self.__func = func
         self.__delay = delay
-        self.__state = kwargs.get("state", 0)
-
-        checkType([(self.__state, int)])
+        self.__state = state
+        super().__init__(**kwargs)
 
     def go(self):
         """
