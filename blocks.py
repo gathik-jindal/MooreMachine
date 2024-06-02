@@ -138,6 +138,32 @@ class pydig:
         self.__components.append(temp)
         return temp
 
+    def inputClock(self, plot=False, blockID=None, timePeriod=1.2, onTime=0.6):
+        """
+        Adds a clock to this class. 
+        @param plot : boolean value whether to plot this clock or not
+        @param blockID : the id of this clock. If None, then new unique ID is given.  
+        @param timePeriod : the time period of this clock.
+        @param onTime : the amount of time in each cycle that the clock shows high (1).
+        @return : the clock instance
+        """
+
+        checkType([(plot, bool), (timePeriod, (int, float)),
+                  (onTime, (int, float))])
+
+        self.__count += 1
+        if (blockID == None):
+            blockID = self.__makeUniqueID("Clock")
+        elif blockID in self.__uniqueIDlist:
+            id = self.__makeUniqueID("Clock")
+            print(f"{blockID} is already used so changing to {id}")
+            blockID = id
+
+        self.__uniqueIDlist.append(blockID)
+        temp = InputClock(env = self.__env, maxOutSize = 1, plot = plot, blockID = blockID, timePeriod = timePeriod, onTime = onTime)
+        self.__components.append(temp)
+        return temp
+
     def source(self, filePath: str, plot=False, blockID=None):
         """
         Adds an input block to this class.
@@ -381,7 +407,7 @@ class HasInputConnections(Block):
         The output of other goes into the input of self.
         If the inputs of self are already connected, then error is generated.
         """
-        if (isinstance(self, Machine) and isinstance(other, Clock)):
+        if (isinstance(self, Machine) and isinstance(other, Clock) and other.state == 0): # state 0 means clock, 1 means clock (but as input)
             self.clk = other._output
             self._clockID = other.addFanout()
             return True
@@ -738,6 +764,7 @@ class Clock(HasOnlyOutputConnections):
 
         timePeriod = kwargs.get("timePeriod", 1.2)
         onTime = kwargs.get("onTime", 0.6)
+        self.state = 0 # 0 for clock, 1 for clock as input
         
         checkType([(timePeriod, (int, float)), (onTime, (int, float))])
         if (timePeriod < onTime):
@@ -748,10 +775,11 @@ class Clock(HasOnlyOutputConnections):
         
         super().__init__(**kwargs)
 
-    def output(self, left=None, right=None):
+    def output(self, left=None, right=None, **kargs):
         """
         Returns this object for connection purposes.
         """
+        self.state = kargs.get("input", 0)
         return self
 
     def __str__(self):
@@ -763,7 +791,7 @@ class Clock(HasOnlyOutputConnections):
 
             self._output[0] = 1 - self._output[0]
 
-            if (self._output[0]):
+            if (self._output[0] + self.state):
                 for i in range(1, self._fanOutCount+1):
                     self._output[i].put(True)
 
