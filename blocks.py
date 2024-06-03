@@ -17,7 +17,7 @@ from pwlSource import InputGenerator
 from scope import Plotter
 
 
-timeout = 0.3
+timeout = 0.1
 
 class pydig:
     """
@@ -381,7 +381,7 @@ class HasInputConnections(Block):
         The output of other goes into the input of self.
         If the inputs of self are already connected, then error is generated.
         """
-        if (isinstance(self, Machine) and isinstance(other, Clock) and other.state == 0): # state 0 means clock, 1 means clock (but as input)
+        if (isinstance(self, Machine) and isinstance(other, Clock) and self._isClock == 0): # state 0 means clock, 1 means clock (but as input)
             self.clk = other._output
             self._clockID = other.addFanout()
             return True
@@ -676,6 +676,12 @@ class Machine(HasInputConnections, HasOutputConnections):
         return self.clk != None and self.nsl != None and self.ol != None and self.isConnectedToInput()
 
     def clock(self):
+        self._isClock = 1 # 1 for clock, 0 for clock as input and -1 for not being used
+        return self
+
+    # @override
+    def input(self, left=None, right=None):
+        self._isClock = 0 # 1 for clock, 0 for clock as input and -1 for not being used
         return self
 
 
@@ -739,7 +745,6 @@ class Clock(HasOnlyOutputConnections):
 
         timePeriod = kwargs.get("timePeriod", 1.2)
         onTime = kwargs.get("onTime", 0.6)
-        self.state = 0 # 0 for clock, 1 for clock as input
         
         checkType([(timePeriod, (int, float)), (onTime, (int, float))])
         if (timePeriod < onTime):
@@ -754,7 +759,6 @@ class Clock(HasOnlyOutputConnections):
         """
         Returns this object for connection purposes.
         """
-        self.state = kargs.get("input", 0)
         return self
 
     def __str__(self):
@@ -766,9 +770,8 @@ class Clock(HasOnlyOutputConnections):
 
             self._output[0] = 1 - self._output[0]
 
-            if (self._output[0] + self.state):
-                for i in range(1, self._fanOutCount+1):
-                    self._output[i].put(self._output[0])
+            for i in range(1, self._fanOutCount+1):
+                self._output[i].put(self._output[0])
 
             self._scopeDump.add(
                 f"Clock {self.getBlockID()}", self._env.now, self._output[0])
