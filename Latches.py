@@ -1,4 +1,4 @@
-from blocks import Combinatorics as Comb, HasOutputConnections as HOC
+from blocks import Combinatorics as Comb, HasOutputConnections as HOC, Clock
 from blocks import pydig as pd
 from utilities import checkType
 
@@ -34,8 +34,8 @@ class SRLatch(Comb):
 class DLatch(Comb):
     __counter = 0
 
-    def __init__(self, pydig:pd, CLK_D:HOC, plot:bool = True):
-        checkType([(pydig, pd), (CLK_D, HOC), (plot, bool)])
+    def __init__(self, pydig:pd, clk:Clock, D:HOC, plot:bool = True):
+        checkType([(pydig, pd), (clk, Clock), (D, HOC), (plot, bool)])
 
         DLatch.__counter += 1
 
@@ -43,16 +43,12 @@ class DLatch(Comb):
         o = pydig.combinatoricsFromObject(self)
         self.__o_not = pydig.combinatorics(maxOutSize = 1, plot = False, blockID = f"~Q: D Latch {DLatch.__counter}", func = lambda x : x, delay = 0)
 
-        clk = pydig.combinatorics(maxOutSize = 1, plot = False, blockID = f"Clock D {DLatch.__counter}", func = lambda x : (x >> 1 & 1), delay = 0)
-        D = pydig.combinatorics(maxOutSize = 1, plot = False, blockID = f"D D {DLatch.__counter}", func = lambda x : (x & 1), delay = 0)
         D_not = pydig.combinatorics(maxOutSize = 1, plot = False, blockID = f"D Not D {DLatch.__counter}", func = lambda x : (DLatch.__not(x)), delay = 0)
         R = pydig.combinatorics(maxOutSize = 1, plot = False, blockID = f"R D {DLatch.__counter}", func = lambda x : (x >> 1) & (x & 1), delay = 0)
         S = pydig.combinatorics(maxOutSize = 1, plot = False, blockID = f"S D {DLatch.__counter}", func = lambda x : (x >> 1) & (x & 1), delay = 0)
 
         SR = pydig.combinatorics(maxOutSize = 1, plot = False, blockID = f"SR D {DLatch.__counter}", func = lambda x : x, delay = 0)
         
-        CLK_D.output() > clk.input()
-        CLK_D.output() > D.input()
         D.output() > D_not.input()
 
         clk.output() > R.input()
@@ -79,7 +75,8 @@ if __name__ == "__main__":
 
     pydig = pd()
     i = pydig.source(filePath = "Tests\\DLatch.csv", plot = False, blockID = f"D Latch")
-    output1 = DLatch(pydig, i, plot = True)
+    clk = pydig.clock(plot = True, blockID = "Clock", timePeriod = 30, onTime = 15)
+    output1 = DLatch(pydig, clk, i, plot = True)
     
     pydig.generateCSV()
     pydig.run(until = 30)
