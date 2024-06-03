@@ -1,8 +1,5 @@
-1) need to change all inheritance to super
-2) in utilities.py we need to move the dumpvars into a new file or do something about it.
-3) need to have custom error messages for the checkType utility function.
-4) Debugging
-5) Fix comments for all files
-6) Put clock in moore machine plot
-7) Change all use cases to use input objects
-8) If output is 0, there is no line being drawn
+1) Put clock in moore machine plot
+2) Change all use cases to use input objects
+3) If output is 0, there is no line being drawn
+4) Fix comments for all files
+5) move stuff to new files

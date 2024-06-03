@@ -381,7 +381,7 @@ class HasInputConnections(Block):
         The output of other goes into the input of self.
         If the inputs of self are already connected, then error is generated.
         """
-        if (isinstance(self, Machine) and isinstance(other, Clock)):
+        if (isinstance(self, Machine) and isinstance(other, Clock) and self._isClock == 0): # state 0 means clock, 1 means clock (but as input)
             self.clk = other._output
             self._clockID = other.addFanout()
             return True
@@ -636,15 +636,16 @@ class Machine(HasInputConnections, HasOutputConnections):
         TODO: Make it run based on clock.
         """
         while True:
-            yield self.clk[self._clockID].get()
-            if self.presentState == self.nextState:
-                continue
-            yield self._env.timeout(timeout)
-            self.presentState = self.nextState
-            self._scopeDump.add(
-                f"PS of {self.getBlockID()}", self._env.now, self.presentState)
-            self._Pchange.put(True)
-            self._env.process(self.__runOL())
+            output = yield self.clk[self._clockID].get()
+            if (output):
+                if self.presentState == self.nextState:
+                    continue
+                yield self._env.timeout(timeout)
+                self.presentState = self.nextState
+                self._scopeDump.add(
+                    f"PS of {self.getBlockID()}", self._env.now, self.presentState)
+                self._Pchange.put(True)
+                self._env.process(self.__runOL())
 
     def __runOL(self):
         """
@@ -675,6 +676,12 @@ class Machine(HasInputConnections, HasOutputConnections):
         return self.clk != None and self.nsl != None and self.ol != None and self.isConnectedToInput()
 
     def clock(self):
+        self._isClock = 1 # 1 for clock, 0 for clock as input and -1 for not being used
+        return self
+
+    # @override
+    def input(self, left=None, right=None):
+        self._isClock = 0 # 1 for clock, 0 for clock as input and -1 for not being used
         return self
 
 
@@ -748,7 +755,7 @@ class Clock(HasOnlyOutputConnections):
         
         super().__init__(**kwargs)
 
-    def output(self, left=None, right=None):
+    def output(self, left=None, right=None, **kargs):
         """
         Returns this object for connection purposes.
         """
@@ -763,9 +770,8 @@ class Clock(HasOnlyOutputConnections):
 
             self._output[0] = 1 - self._output[0]
 
-            if (self._output[0]):
-                for i in range(1, self._fanOutCount+1):
-                    self._output[i].put(True)
+            for i in range(1, self._fanOutCount+1):
+                self._output[i].put(self._output[0])
 
             self._scopeDump.add(
                 f"Clock {self.getBlockID()}", self._env.now, self._output[0])
