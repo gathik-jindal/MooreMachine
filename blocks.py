@@ -662,15 +662,16 @@ class Machine(HasInputConnections, HasOutputConnections):
         TODO: Make it run based on clock.
         """
         while True:
-            yield self.clk[self._clockID].get()
-            if self.presentState == self.nextState:
-                continue
-            yield self._env.timeout(timeout)
-            self.presentState = self.nextState
-            self._scopeDump.add(
-                f"PS of {self.getBlockID()}", self._env.now, self.presentState)
-            self._Pchange.put(True)
-            self._env.process(self.__runOL())
+            output = yield self.clk[self._clockID].get()
+            if (output):
+                if self.presentState == self.nextState:
+                    continue
+                yield self._env.timeout(timeout)
+                self.presentState = self.nextState
+                self._scopeDump.add(
+                    f"PS of {self.getBlockID()}", self._env.now, self.presentState)
+                self._Pchange.put(True)
+                self._env.process(self.__runOL())
 
     def __runOL(self):
         """
@@ -793,7 +794,7 @@ class Clock(HasOnlyOutputConnections):
 
             if (self._output[0] + self.state):
                 for i in range(1, self._fanOutCount+1):
-                    self._output[i].put(True)
+                    self._output[i].put(self._output[0])
 
             self._scopeDump.add(
                 f"Clock {self.getBlockID()}", self._env.now, self._output[0])
