@@ -17,7 +17,7 @@ from pwlSource import InputGenerator
 from scope import Plotter
 
 
-timeout = 0.1
+timeout = 0.3
 
 class pydig:
     """
@@ -135,32 +135,6 @@ class pydig:
 
         self.__uniqueIDlist.append(blockID)
         temp = Clock(env = self.__env, maxOutSize = 1, plot = plot, blockID = blockID, timePeriod = timePeriod, onTime = onTime)
-        self.__components.append(temp)
-        return temp
-
-    def inputClock(self, plot=False, blockID=None, timePeriod=1.2, onTime=0.6):
-        """
-        Adds a clock to this class. 
-        @param plot : boolean value whether to plot this clock or not
-        @param blockID : the id of this clock. If None, then new unique ID is given.  
-        @param timePeriod : the time period of this clock.
-        @param onTime : the amount of time in each cycle that the clock shows high (1).
-        @return : the clock instance
-        """
-
-        checkType([(plot, bool), (timePeriod, (int, float)),
-                  (onTime, (int, float))])
-
-        self.__count += 1
-        if (blockID == None):
-            blockID = self.__makeUniqueID("Clock")
-        elif blockID in self.__uniqueIDlist:
-            id = self.__makeUniqueID("Clock")
-            print(f"{blockID} is already used so changing to {id}")
-            blockID = id
-
-        self.__uniqueIDlist.append(blockID)
-        temp = InputClock(env = self.__env, maxOutSize = 1, plot = plot, blockID = blockID, timePeriod = timePeriod, onTime = onTime)
         self.__components.append(temp)
         return temp
 
