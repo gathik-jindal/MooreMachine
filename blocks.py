@@ -381,7 +381,7 @@ class HasInputConnections(Block):
         The output of other goes into the input of self.
         If the inputs of self are already connected, then error is generated.
         """
-        if (isinstance(self, Machine) and isinstance(other, Clock) and self._isClock == 0): # state 0 means clock, 1 means clock (but as input)
+        if (isinstance(self, Machine) and isinstance(other, Clock) and self._isClock == 1): # state 0 means clock, 1 means clock (but as input)
             self.clk = other._output
             self._clockID = other.addFanout()
             return True
@@ -577,6 +577,7 @@ class Machine(HasInputConnections, HasOutputConnections):
 
         self.nsl = kwargs.get("nsl")
         self.ol = kwargs.get("ol")
+        self.clk = kwargs.get("clk", None)
         startingState = kwargs.get("startingState", 0)
         self.presentState = startingState
         self.nextState = startingState
@@ -672,14 +673,12 @@ class Machine(HasInputConnections, HasOutputConnections):
         self.runTriggers()
 
     def isConnected(self):
-
         return self.clk != None and self.nsl != None and self.ol != None and self.isConnectedToInput()
 
     def clock(self):
         self._isClock = 1 # 1 for clock, 0 for clock as input and -1 for not being used
         return self
 
-    # @override
     def input(self, left=None, right=None):
         self._isClock = 0 # 1 for clock, 0 for clock as input and -1 for not being used
         return self
