@@ -122,8 +122,7 @@ class InputGenerator:
                 csr = csv.reader(file)
                 return self.__returnProperInputs(csr)
         except IOError:
-            printErrorAndExit(
-                f"The file path {self.__filePath} does not exist.")
+            printErrorAndExit(f"The file path {self.__filePath} does not exist.")
         except ValueError as e:
             printErrorAndExit(e)
 
@@ -138,8 +137,7 @@ class InputGenerator:
                 lines = list(map(lambda x: x.split(" "), lines))
                 return self.__returnProperInputs(lines)
         except IOError:
-            printErrorAndExit(
-                f"The file path {self.__filePath} does not exist.")
+            printErrorAndExit(f"The file path {self.__filePath} does not exist.")
         except ValueError as e:
             printErrorAndExit(e)
 
@@ -155,8 +153,7 @@ class InputGenerator:
             sheet = wb.active
             return self.__returnProperInputs(sheet.values)
         except IOError:
-            printErrorAndExit(
-                f"The file path {self.__filePath} does not exist.")
+            printErrorAndExit(f"The file path {self.__filePath} does not exist.")
         except ValueError as e:
             printErrorAndExit(e)
 
@@ -179,11 +176,9 @@ class InputGenerator:
                         input_schedule.append((float(row[0]), int(row[1])))
                     except (ValueError, TypeError):
                         if (counter != 0):
-                            raise ValueError(f"Input Error: Inputs are not valid type. Check row {
-                                             counter + 1} of file {self.getFilePath()}.")
+                            raise ValueError(f"Input Error: Inputs are not valid type. Check row {counter + 1} of file {self.getFilePath()}.")
                 else:
-                    raise ValueError(f"Input Error: Corrupt input/Garbage input because row {
-                                     counter + 1} is not of length 2. Check file {self.getFilePath()}.")
+                    raise ValueError(f"Input Error: Corrupt input/Garbage input because row {counter + 1} is not of length 2. Check file {self.getFilePath()}.")
                 counter += 1
         except TypeError:
             raise ValueError(f"{iterable} cannot be iterated upon.")

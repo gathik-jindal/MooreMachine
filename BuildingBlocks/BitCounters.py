@@ -43,8 +43,7 @@ class Enabled1BitCounterWithTC(Comb):
         @param plot : a boolean value whether to plot this object or not
         """
 
-        checkType([(pydig, pd), (syncReset, HOC),
-                  (clock, Clock), (plot, bool)])
+        checkType([(pydig, pd), (syncReset, HOC), (clock, Clock), (plot, bool)])
 
         Enabled1BitCounterWithTC.__counter += 1
 
@@ -130,7 +129,7 @@ class Enabled2BitCounterWithTC(Comb):
         self.__c2 = Enabled1BitCounterWithTC(
             pydig, temp.output(), clock, plot=False)
 
-        Comb.__init__(self, func=lambda x: x, env=pydig.getEnv(), blockID=f"Enabled 2 Bit Counter {Enabled2BitCounterWithTC.__counter}", maxOutSize=2, delay=0, plot=plot, state=0)
+        super().__init__(func=lambda x: x, env=pydig.getEnv(), blockID=f"Enabled 2 Bit Counter {Enabled2BitCounterWithTC.__counter}", maxOutSize=2, delay=0, plot=plot, state=0)
         o = pydig.combinationalFromObject(self)
         self.__tc = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 2 Bit Counter TC{Enabled2BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
 
@@ -182,15 +181,14 @@ class Enabled3BitCounterWithTC(Comb):
 
         Enabled3BitCounterWithTC.__counter += 1
 
-        self.__c1 = Enabled1BitCounterWithTC(
-            pydig, syncReset, clock, plot=False)
+        self.__c1 = Enabled1BitCounterWithTC(pydig, syncReset, clock, plot=False)
 
         temp = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 3 Bit Counter And{Enabled3BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
 
         self.__c2 = Enabled2BitCounterWithTC(
             pydig, temp.output(), clock, plot=False)
 
-        Comb.__init__(self, func=lambda x: x, env=pydig.getEnv(), blockID=f"Enabled 3 Bit Counter {Enabled3BitCounterWithTC.__counter}", maxOutSize=3, delay=0, plot=plot, state=0)
+        super().__init__(func=lambda x: x, env=pydig.getEnv(), blockID=f"Enabled 3 Bit Counter {Enabled3BitCounterWithTC.__counter}", maxOutSize=3, delay=0, plot=plot, state=0)
         o = pydig.combinationalFromObject(self)
         self.__tc = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 3 Bit Counter TC{Enabled3BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
 
@@ -248,7 +246,7 @@ class Enabled4BitCounterWithTC(Comb):
 
         self.__c2 = Enabled2BitCounterWithTC( pydig, temp.output(), clock, plot=False)
 
-        Comb.__init__(self, func=lambda x: x, env=pydig.getEnv(), blockID=f"Enabled 4 Bit Counter {Enabled4BitCounterWithTC.__counter}", maxOutSize=4, delay=0, plot=plot, state=0)
+        super().__init__(func=lambda x: x, env=pydig.getEnv(), blockID=f"Enabled 4 Bit Counter {Enabled4BitCounterWithTC.__counter}", maxOutSize=4, delay=0, plot=plot, state=0)
         o = pydig.combinationalFromObject(self)
         self.__tc = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 4 Bit Counter TC{Enabled4BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
 

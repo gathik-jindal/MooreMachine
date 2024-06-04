@@ -38,8 +38,7 @@ class FreezeCounter(Comb):
         @param clock : the clock signal
         @param plot : boolean value whether to plot this moore machine or not
         """
-        checkType([(pydig, pd), (modValue, int),
-                  (freeze, HOC), (clock, Clock), (plot, bool)])
+        checkType([(pydig, pd), (modValue, int), (freeze, HOC), (clock, Clock), (plot, bool)])
         maxOutSize = FreezeCounter.__bitCount(modValue)
         self.__modValue = modValue
         FreezeCounter.__counter += 1

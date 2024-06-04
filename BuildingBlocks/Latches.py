@@ -79,7 +79,7 @@ class DLatch(Comb):
 
         DLatch.__counter += 1
 
-        Comb.__init__(self, func=lambda x: x, env=pydig.getEnv(), blockID=f"Q: D Latch {DLatch.__counter}", maxOutSize=1, delay=0, plot=plot)
+        super().__init__(func=lambda x: x, env=pydig.getEnv(), blockID=f"Q: D Latch {DLatch.__counter}", maxOutSize=1, delay=0, plot=plot)
         o = pydig.combinationalFromObject(self)
         self.__o_not = pydig.combinational(maxOutSize=1, plot=False, blockID=f"~Q: D Latch {DLatch.__counter}", func=lambda x: x, delay=0)
 
