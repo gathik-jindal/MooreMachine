@@ -381,9 +381,10 @@ class HasInputConnections(Block):
         The output of other goes into the input of self.
         If the inputs of self are already connected, then error is generated.
         """
-        if (isinstance(self, Machine) and isinstance(other, Clock) and self._isClock == 1): # state 0 means clock, 1 means clock (but as input)
+        if (isinstance(self, Machine) and isinstance(other, Clock) and self._isClock == 1): # state 1 means clock, 0 means clock (but as input)
             self.clk = other._output
             self._clockID = other.addFanout()
+            self._clkObj = other
             return True
 
         checkType([(other, (HasOutputConnections))])
@@ -682,6 +683,11 @@ class Machine(HasInputConnections, HasOutputConnections):
     def input(self, left=None, right=None):
         self._isClock = 0 # 1 for clock, 0 for clock as input and -1 for not being used
         return self
+
+    def getScopeDump(self):
+        dic = self._scopeDump.getValues()
+        dic.update(self._clkObj.getScopeDump())
+        return dic
 
 
 class Input(HasOnlyOutputConnections):

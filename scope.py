@@ -76,11 +76,10 @@ class Plotter:
             axs[counter].set_ylabel(key)
             axs[counter].set_yticks(range(0, max(value)+1))
             axs[counter].set_yticklabels([f"{x}" for x in range(0, max(value)+1)])
-            axs[counter].set_ylim(bottom=0.0)
 
             axs[counter].set_xticks(ticks)
             axs[counter].set_xticklabels([f"{int(x)}" for x in ticks])
-            axs[counter].set_xlim(left=0.0)
+            # axs[counter].set_xlim(left=0.0)
             axs[counter].sharex(axs[0])
             
             fig.tight_layout()
