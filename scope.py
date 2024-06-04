@@ -36,8 +36,7 @@ class Plotter:
                 if (len(value) == 2):
                     checkType([(value[0], (int, float)), (value[1], int)])
                 else:
-                    printErrorAndExit(f"{value} in {inputs[key]} in {
-                                      inputs} is not of length 2.")
+                    printErrorAndExit(f"{value} in {inputs[key]} in {inputs} is not of length 2.")
 
         # calculating max time
         maxTime = 0
@@ -54,8 +53,7 @@ class Plotter:
         for key in inputs:
             if (counter == 0):
                 numPlots += 1
-                fig, axs = plt.subplots(
-                    min(5, len(inputs) - done), 1, figsize=(8, 7.5), num=name + " #" + str(numPlots))
+                fig, axs = plt.subplots(min(5, len(inputs) - done), 1, figsize=(8, 7.5), num=name + " #" + str(numPlots))
 
                 if (len(inputs) - done == 1):
                     axs = [axs, None]
@@ -80,8 +78,7 @@ class Plotter:
             value = set(value)
             axs[counter].set_ylabel(key, fontsize=8, va="center")
             axs[counter].set_yticks(range(0, max(value)+1))
-            axs[counter].set_yticklabels(
-                [f"{x}" for x in range(0, max(value)+1)])
+            axs[counter].set_yticklabels([f"{x}" for x in range(0, max(value)+1)])
 
             axs[counter].set_xticks(ticks)
             axs[counter].set_xticklabels([f"{int(x)}" for x in ticks])
@@ -139,8 +136,7 @@ class Plotter:
         finalData = {}
 
         for i in range(len(headerFields)):
-            finalData[headerFields[i]] = [
-                (timeValues[x], timeCorresValues[x][i]) for x in range(len(timeValues))]
+            finalData[headerFields[i]] = [(timeValues[x], timeCorresValues[x][i]) for x in range(len(timeValues))]
 
         return finalData
 
