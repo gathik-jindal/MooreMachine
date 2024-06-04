@@ -24,12 +24,12 @@ pd = pydig()
 
 #Creating the input Objects
 PWM_Path = "Tests\\PWM.csv"
-PWM_Input = pd.source(filePath = PWM_Path, plot = True, blockID = "PWM Input")
+PWM_Input = pd.source(filePath = PWM_Path, plot = False, blockID = "PWM Input")
 period = pd.combinatorics(maxOutSize = 2, plot = False, blockID = "Period", func = lambda x : x >> 2, delay = 0)
 compare = pd.combinatorics(maxOutSize = 2, plot = False, blockID = "Compare", func = lambda x: x & 3, delay = 0)
 
 #Creating the clock
-clk = pd.clock(plot = True, blockID = "Clock", timePeriod = 1, onTime = 0.5)
+clk = pd.clock(plot = False, blockID = "clk", timePeriod = 1, onTime = 0.5)
 
 #Creating the comparators
 syncResetComparator = pd.combinatorics(maxOutSize = 1, plot = False, blockID = "Sync Reset Comparator", 

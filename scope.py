@@ -11,6 +11,7 @@ One can download matplotlib by
 
 from utilities import checkType, printErrorAndExit
 from matplotlib import pyplot as plt
+import textwrap
 
 class Plotter:
 
@@ -73,13 +74,13 @@ class Plotter:
 
             # formatting plots
             value = set(value)
-            axs[counter].set_ylabel(key)
+            axs[counter].set_ylabel(key, fontsize = 8, va = "center")
             axs[counter].set_yticks(range(0, max(value)+1))
             axs[counter].set_yticklabels([f"{x}" for x in range(0, max(value)+1)])
 
             axs[counter].set_xticks(ticks)
             axs[counter].set_xticklabels([f"{int(x)}" for x in ticks])
-            # axs[counter].set_xlim(left=0.0)
+            axs[counter].set_xlim(left=0.0)
             axs[counter].sharex(axs[0])
             
             fig.tight_layout()
@@ -87,6 +88,7 @@ class Plotter:
             counter += 1
             done += 1
             counter %= 5
+
 
     def show(self):
         """

@@ -685,8 +685,8 @@ class Machine(HasInputConnections, HasOutputConnections):
         return self
 
     def getScopeDump(self):
-        dic = self._scopeDump.getValues()
-        dic.update(self._clkObj.getScopeDump())
+        dic = self._clkObj.getScopeDump()
+        dic.update(self._scopeDump.getValues())
         return dic
 
 
