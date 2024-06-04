@@ -2,19 +2,18 @@
 This class is used for getting input from the user.
 The valid formats are txt, csv, and xlsx.
 In order to use this class for reading xlsx, one needs to have openpyxl installed.
-One can install openpyxl by the following method:
-    pip install openpyxl
 
 @author: Abhirath, Aryan, Gathik
-@date: 13/12/2023
-@version: 1.0
+@date: 4/12/2023
+@version: 1.6
 """
 
 from utilities import checkType, printErrorAndExit
 
+
 class InputGenerator:
 
-    def __init__(self, filePath:str):
+    def __init__(self, filePath: str):
         """
         filepath is the filepath of your txt, csv, or xlsx file relative to this directory in str.
         """
@@ -25,25 +24,25 @@ class InputGenerator:
         """
         returns the linked file name
         """
-        
+
         return f"The file linked is: {self.getFilePath()}"
-    
-    def setFilePath(self, filePath:str):
+
+    def setFilePath(self, filePath: str):
         """
         filepath is the filepath of your txt, csv, or xlsx file relative to this directory in str.
         """
-        
+
         checkType([(filePath, str)])
-        
+
         self.__filePath = filePath
-    
+
     def getFilePath(self):
         """
         Returns the current file path
         """
 
         return self.__filePath
-    
+
     def getInput(self):
         """
         This function reads the input stored in the file specified by the given filePath.
@@ -53,7 +52,7 @@ class InputGenerator:
 
         Feature: Each of the specified file types can have a header line which can contain anything,
                  the program will automatically skip it / ignore it.
-        
+
         For txt files, the format should be as follows: 
             Input format that is expected in the file as follows:
             <time> <input>
@@ -63,13 +62,13 @@ class InputGenerator:
 
             time should be convertible to float.
             input should be convertible to integer
-        
+
         For csv files, the format should be as follows:
             This function reads inputs from a csv file.
             It assumes that the newline was set to "" while creating the file 
 
             A sample creation in python:
-            
+
                 import csv
                 with open("Test.csv", "w", newline='') as file:
                     csw=csv.writer(file)
@@ -100,18 +99,18 @@ class InputGenerator:
         """
 
         try:
-            if(self.__filePath.endswith(".csv")):
+            if (self.__filePath.endswith(".csv")):
                 return self.__openCsvFile()
-            elif(self.__filePath.endswith(".txt")):
+            elif (self.__filePath.endswith(".txt")):
                 return self.__openTxtFile()
-            elif(self.__filePath.endswith(".xlsx")):
+            elif (self.__filePath.endswith(".xlsx")):
                 return self.__openExcelFile()
             else:
                 raise ValueError("File path is not of type csv, txt, or xlsx.")
-        
+
         except ValueError as e:
-           printErrorAndExit(e)
-    
+            printErrorAndExit(e)
+
     def __openCsvFile(self):
         """
         Returns valid input from a csv file
@@ -120,13 +119,14 @@ class InputGenerator:
         import csv
         try:
             with open(self.__filePath, "r", newline='') as file:
-                csr=csv.reader(file)
+                csr = csv.reader(file)
                 return self.__returnProperInputs(csr)
         except IOError:
-            printErrorAndExit(f"The file path {self.__filePath} does not exist.")
+            printErrorAndExit(
+                f"The file path {self.__filePath} does not exist.")
         except ValueError as e:
             printErrorAndExit(e)
-        
+
     def __openTxtFile(self):
         """
         Returns valid input from a txt file
@@ -138,7 +138,8 @@ class InputGenerator:
                 lines = list(map(lambda x: x.split(" "), lines))
                 return self.__returnProperInputs(lines)
         except IOError:
-            printErrorAndExit(f"The file path {self.__filePath} does not exist.")
+            printErrorAndExit(
+                f"The file path {self.__filePath} does not exist.")
         except ValueError as e:
             printErrorAndExit(e)
 
@@ -154,10 +155,11 @@ class InputGenerator:
             sheet = wb.active
             return self.__returnProperInputs(sheet.values)
         except IOError:
-            printErrorAndExit(f"The file path {self.__filePath} does not exist.")
+            printErrorAndExit(
+                f"The file path {self.__filePath} does not exist.")
         except ValueError as e:
             printErrorAndExit(e)
-    
+
     def __returnProperInputs(self, iterable):
         """
         This function return the input_schedule in form a dictionary.
@@ -172,28 +174,31 @@ class InputGenerator:
         try:
             for row in iterable:
                 row = [i for i in row if i]
-                if(len(row) == 2):
+                if (len(row) == 2):
                     try:
                         input_schedule.append((float(row[0]), int(row[1])))
                     except (ValueError, TypeError):
-                        if(counter != 0):
-                            raise ValueError(f"Input Error: Inputs are not valid type. Check row {counter + 1} of file {self.getFilePath()}.")
-                else:   
-                    raise ValueError(f"Input Error: Corrupt input/Garbage input because row {counter + 1} is not of length 2. Check file {self.getFilePath()}.")
+                        if (counter != 0):
+                            raise ValueError(f"Input Error: Inputs are not valid type. Check row {
+                                             counter + 1} of file {self.getFilePath()}.")
+                else:
+                    raise ValueError(f"Input Error: Corrupt input/Garbage input because row {
+                                     counter + 1} is not of length 2. Check file {self.getFilePath()}.")
                 counter += 1
         except TypeError:
             raise ValueError(f"{iterable} cannot be iterated upon.")
 
         return {"Inputs": input_schedule}
 
+
 if __name__ == "__main__":
 
-    #Correct ways for getting inputs
-    #Note: Test.txt, Test.csv and Test.xlsx must be in the same directory
+    # Correct ways for getting inputs
+    # Note: Test.txt, Test.csv and Test.xlsx must be in the same directory
     fileInput = InputGenerator("Tests\\Test.txt")
     inputs = fileInput.getInput()
     print(inputs)
-    
+
     fileInput.setFilePath("Tests\\Test.xlsx")
     inputs = fileInput.getInput()
     print(inputs)
@@ -205,32 +210,32 @@ if __name__ == "__main__":
     print("Current File Path", fileInput.getFilePath())
     print("String Representation:", fileInput)
 
-    #Creating the CSV file
-    #import csv
-    #with open("Tests\\Test.csv", "w", newline='') as file:
+    # Creating the CSV file
+    # import csv
+    # with open("Tests\\Test.csv", "w", newline='') as file:
     #    csw=csv.writer(file)
     #    for i in range(5):
     #        csw.writerow([i+0.1,i+1])
-    
-    #Incorrect ways for getting inputs
-    #It generates error message and exits
 
-    #fileInput.setFilePath("Test1.txt")
-    #inputs = fileInput.getInput()
-    #print(inputs)
-    
-    #fileInput.setFilePath("Test1.xlsx")
-    #inputs = fileInput.getInput()
-    #print(inputs)
+    # Incorrect ways for getting inputs
+    # It generates error message and exits
 
-    #fileInput.setFilePath("Test1.csv")
-    #inputs = fileInput.getInput()
-    #print(inputs)
+    # fileInput.setFilePath("Test1.txt")
+    # inputs = fileInput.getInput()
+    # print(inputs)
 
-    #fileInput.setFilePath(2)
-    #inputs = fileInput.getInput()
-    #print(inputs)
+    # fileInput.setFilePath("Test1.xlsx")
+    # inputs = fileInput.getInput()
+    # print(inputs)
 
-    #fileInput.setFilePath(None)
-    #inputs = fileInput.getInput()
-    #print(inputs)
+    # fileInput.setFilePath("Test1.csv")
+    # inputs = fileInput.getInput()
+    # print(inputs)
+
+    # fileInput.setFilePath(2)
+    # inputs = fileInput.getInput()
+    # print(inputs)
+
+    # fileInput.setFilePath(None)
+    # inputs = fileInput.getInput()
+    # print(inputs)

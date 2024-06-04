@@ -1,6 +1,6 @@
 Time,Input to PWM Input,Clock clk,Input to Mod 4 Counter,NS of Mod 4 Counter,PS of Mod 4 Counter,output of Mod 4 Counter,Sync Reset Comparator output,Output Comparator output,Final Output from PWM Output
-0,0,0,0,0,0,0,1,0,0
-0.05,9,0,0,0,0,0,0,1,0
+0,0,0,0,0,0,0,0,0,0
+0.05,9,0,0,0,0,0,1,0,0
 0.1,9,0,0,1,0,0,0,1,1
 0.2,9,0,0,1,0,0,0,1,1
 0.5,9,1,0,1,0,0,0,1,1

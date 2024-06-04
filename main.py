@@ -1,14 +1,30 @@
-from blocks import pydig
+"""
+This is a sample code of how a PWM can be simulated using this simulator
 
+The PWM we have designed takes 4 bits of input from a user created file (In our case: "Test\\PWM.csv")
+The first 2 bits (LSB) give the onTime for the PWM (Durition of each "High" in the required clock)
+The second 2 bits (MSB) give the Time Period of the PWM (The 2 bit number + 1 is taken as the time period of the required clock)
 
-#First two bits are Period and next two bits are Compare
-#Tperiod = (Period + 1) * Tclk
-#Ton = Compare * Tclk
+@author: Abhirath, Aryan, Gathik
+@date: 4/12/2023
+@version: 1.6
+"""
+
+import pydig
+
+# Functions with the required logics
+
 
 def n(a):
-    return (~a&0b1)
+
+    # This is the logic of a single input not gate
+    return (~a & 0b1)
+
 
 def nsl(ps, i):
+
+    # This is the Next State Logic for the PWM
+
     a = (ps >> 1) & 1
     b = (ps >> 0) & 1
 
@@ -17,49 +33,52 @@ def nsl(ps, i):
 
     return d << 1 | e
 
+
 def ol(ps):
+
+    # This is the output logic for the PWM
     return ps
 
-pd = pydig()
 
-#Creating the input Objects
+# Actual simulation begins from here.
+
+# Setup a simulator object to begin simulation
+pysim = pydig.pydig(name="PWM")
+
+# Creating an source object and connecting it to the required file
 PWM_Path = "Tests\\PWM.csv"
-PWM_Input = pd.source(filePath = PWM_Path, plot = False, blockID = "PWM Input")
-period = pd.combinatorics(maxOutSize = 2, plot = False, blockID = "Period", func = lambda x : x >> 2, delay = 0)
-compare = pd.combinatorics(maxOutSize = 2, plot = False, blockID = "Compare", func = lambda x: x & 3, delay = 0)
+PWM_Input = pysim.source(filePath=PWM_Path, plot=False, blockID="PWM Input")
 
-#Creating the clock
-clk = pd.clock(plot = False, blockID = "clk", timePeriod = 1, onTime = 0.5)
+# Creating the clock
+clk = pysim.clock(plot=False, blockID="clk", timePeriod=1, onTime=0.5)
 
-#Creating the comparators
-syncResetComparator = pd.combinatorics(maxOutSize = 1, plot = False, blockID = "Sync Reset Comparator", 
-                                       func = lambda x : int((x & 3) == (x >> 2)), delay = 0)
-outputComparator = pd.combinatorics(maxOutSize = 1, plot = False, blockID = "Output Comparator", 
-                                        func = lambda x : int((x & 3) > (x >> 2)), delay = 0)
-
-
-#Creating the moore machine
-mod4Counter = pd.moore(maxOutSize = 2, plot = True, blockID = "Mod 4 Counter", startingState = 0)
+# Creating the moore machine
+mod4Counter = pysim.moore(maxOutSize=2, plot=True, blockID="Mod 4 Counter", startingState=0)
 mod4Counter.nsl = nsl
 mod4Counter.ol = ol
 
-#Final output object
-finalOutput = pd.output(plot = True, blockID = "PWM Output")
+# Creating the comparators
+syncResetComparator = pysim.combinational(maxOutSize=1, plot=False, blockID="Sync Reset Comparator", func=lambda x: int((x & 3) == (x >> 2)), delay=0)
+outputComparator = pysim.combinational(maxOutSize=1, plot=False, blockID="Output Comparator", func=lambda x: int((x & 3) > (x >> 2)), delay=0)
 
-#Creating the connections
-PWM_Input.output() > period.input()
-PWM_Input.output() > compare.input()
+# Final output object
+finalOutput = pysim.output(plot=True, blockID="PWM Output")
 
-compare.output() > outputComparator.input()
-mod4Counter.output() > outputComparator.input()
-
-period.output() > syncResetComparator.input()
-mod4Counter.output() > syncResetComparator.input()
-
-outputComparator.output() > finalOutput.input()
+# Creating the connections
 
 syncResetComparator.output() > mod4Counter.input()
 clk.output() > mod4Counter.clock()
 
-pd.generateCSV()
-pd.run(until = 40)
+PWM_Input.output(0, 2) > outputComparator.input()
+mod4Counter.output() > outputComparator.input()
+
+PWM_Input.output(2, 4) > syncResetComparator.input()
+mod4Counter.output() > syncResetComparator.input()
+
+outputComparator.output() > finalOutput.input()
+
+# This prepares a csv file where the simulation can be recorded and stored for later use.
+pysim.generateCSV()
+
+# Runs the simulation and plots the results
+pysim.run(until=40)
