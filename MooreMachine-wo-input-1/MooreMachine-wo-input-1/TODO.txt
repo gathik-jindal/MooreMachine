@@ -1,0 +1,5 @@
+1) Put clock in moore machine plot
+2) Change all use cases to use input objects
+3) If output is 0, there is no line being drawn
+4) Fix comments for all files
+5) move stuff to new files
