@@ -8,6 +8,8 @@ This project implements a Moore Machine in Python. A Moore Machine is a finite s
 - [Installation](#installation)
 - [Libraries](#libraries)
 - [Usage](#usage)
+- [Different Building Blocks](#different-building-blocks)
+- [Sample Code](#sample-code)
 - [Elaborations and Explanations](#elaborations-and-explanations)
 
 ## <ins>Introduction</ins>
@@ -214,10 +216,9 @@ Clock2.output() > Moore.clock()
 ```
 
 To know about more features one can use to make connections go to: [More on types of connections](#More-on-types-of-connections)
-
 ### <ins>Generating the CSV File</ins>
 
-<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>
+In order to generate a csv file for a simulation we have to write the line `pydig.generateCSV()` before running the simulation. This will create a csv file having the name of the simulation object and will hold the values of all the blocks present in that simulation.
 
 ### <ins>Running and Plotting the simulation</ins>
 
@@ -319,13 +320,58 @@ the input becomes low again.
 ```python
 from BuildingBlocks.FreezeCounter import FreezeCounter as Counter
 
-variable_name = Counter(pydig = pysim, freeze = inputObject, clock = clockObject, plot = <True/False>)
+variable_name = Counter(pydig = pysim, modValue: int, freeze = inputObject, clock = clockObject, plot = <True/False>)
 ```
 
 The parameters that it accepts are listed below in order:
         1) pydig : pydig object
         2) modValue : the maximum value of the counter
         3) freeze : the freeze signal
+        4) clock : the clock signal
+        5) plot : boolean value whether to plot this moore machine or not (default is True)
+
+The above command creates a Combinational Block object.
+The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
+
+### <ins>SynchronousCounter</ins>
+
+The Synchronous Counter is a counter that increments its value only when
+the clock signal is high and the counter resets when the reset signal is high.
+The counter is a modulo counter, i.e., it resets to zero when it reaches
+the maximum value.
+
+```python
+from BuildingBlocks.SynchronousCounter import SynchronousCounter as Counter
+
+variable_name = Counter(pydig = pysim, modValue = <int>, syncReset = inputObject, clock = clockObject, plot = <True/False>)
+```
+
+The parameters that it accepts are listed below in order:
+        1) pydig : pydig object
+        2) modValue : the maximum value of the counter
+        3) syncReset : the synchronous reset signal
+        4) clock : the clock signal
+        5) plot : boolean value whether to plot this moore machine or not (default is True)
+
+The above command creates a Combinational Block object.
+The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
+
+### <ins>SynchronousCounterWithPeriod</ins>
+
+The Synchronous Counter is a counter that increments its value only when
+the clock signal is high. The counter resets when the value of the counter reaches "period"
+The counter is implemented using a Moore machine. The Moore machine has the next state logic as the increment function and the output logic as the identity function. The counter is implemented using the Combinational block.
+
+```python
+from BuildingBlocks.SynchronousCounterWithPeriod import SynchronousCounterWithPeriod as Counter
+
+variable_name = Counter(pydig = pysim, modValue = <int>, period = inputObject, clock = clockObject, plot = <True/False>)
+```
+
+The parameters that it accepts are listed below in order:
+        1) pydig : pydig object
+        2) modValue : the maximum value of the counter
+        3) period : the synchronous reset signal
         4) clock : the clock signal
         5) plot : boolean value whether to plot this moore machine or not (default is True)
 
@@ -608,5 +654,3 @@ The following methods are available for the user :
     2) `.clock()` (@return object): return the object itself.
     3) `.input()` (@return object): return the object itself.
     4) `.getScopeDump()` (@return dict): return a dictionary of all the values along with a label.
-
-## <ins>Combinational Block Methods</ins>
