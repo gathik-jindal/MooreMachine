@@ -223,7 +223,7 @@ In order to generate a csv file for a simulation we have to write the line `pysi
 
 ### <ins>Running and Plotting the simulation</ins>
 
-To run the simulation we 
+To run the simulation we need to write `pysim.run(until = <duration of simulation>)`. This line
 
 ## <ins>Different Building Blocks</ins>
 
@@ -507,40 +507,7 @@ outputComparator.output() > finalOutput.input()
 pysim.generateCSV()
 
 # Runs the simulation and plots the results
-pysim.run(until=40)i.output() > m1.input()
-m1.output() > m2.input()
-m2.output() > o.input()
-clk.output() > m1.clk()
-clk.output() > m2.clk()
-
-# Creating dump
-pydig.dumpVars()
-
-# Running all the blocks.
-pydig.run(until = 40)
-
-m1.output() > m2.input()
-m2.output() > o.input()
-clk.output() > m1.clk()
-clk.output() > m2.clk()
-
-# Creating dump
-pydig.dumpVars()
-
-# Running all the blocks.
-pydig.run(until = 40)
-
-m1.output() > m2.input()
-m2.output() > o.input()
-clk.output() > m1.clk()
-clk.output() > m2.clk()
-
-# Creating dump
-pydig.dumpVars()
-
-# Running all the blocks.
-pydig.run(until = 40)
-
+pysim.run(until=40)
 ```
 
 # <ins>Elaborations and Explanations</ins>
