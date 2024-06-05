@@ -67,9 +67,9 @@ The following libraries are required to be installed :
 
 You can install them by running the following commands : 
     
-    1) pip install simpy
-    2) pip install matplotlib
-    3) pip install openxl
+    1) `pip install simpy`
+    2) `pip install matplotlib`
+    3) `pip install openxl`
 
 ## <ins>Usage</ins>
 
