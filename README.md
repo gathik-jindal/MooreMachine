@@ -621,15 +621,15 @@ The important thing to note about using Multiple-Input connections is that the o
 
 For example: 
 
-Say that Block1 has the value 100101 and Block2 has the value 110 and we write the lines:
+Say that `Block1` has the value `100101` and `Block2` has the value `110` and we write the lines:
 
 ```python
 Block1.output(2,4) > Block3.input()
 Block2.output(1,3) > Block3.input()
 ```
 
-Then the value taken as input by Block3 would be the concatenation of --01-- and  11-.
-Hence, the final the input value passed on to Block3 will be 1101.
+Then the value taken as input by `Block3` would be the concatenation of `--01--` and  `11-`.
+Hence, the final the input value passed on to `Block3` will be `1101`.
 
 ## <ins>Input Block Methods</ins>
 
