@@ -175,7 +175,7 @@ NOTE: This block has only input connections and no output connections.
 #### <ins>Building Blocks</ins>
 
 There are numerous pre-built objects that can directly be used for more complex simulations
-To read more about it click on [Different Building Blocks](Different-Building-Blocks)
+To read more about it click on [Different Building Blocks](different-building-blocks)
 
 ### <ins>Making Connections</ins>
 
@@ -223,7 +223,7 @@ To know about more features one can use to make connections go to: [More on type
 
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-## Different Building Blocks
+## <ins>Different Building Blocks</ins>
 
 ### <ins>BitCounters</ins>
 
@@ -332,23 +332,6 @@ The parameters that it accepts are listed below in order:
 The above command creates a Combinational Block object.
 The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
 
-#### <ins>SRLatch</ins>
-
-```python
-from BuildingBlocks.Latches import SRLatch as latch
-
-variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject, plot = <True/False>)
-```
-
-The parameters that it accepts are listed below in order:
-        1) pydig : a pydig object that you want to add this counter to.
-        2) enable : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
-        3) clock : a clock object
-        4) plot : a boolean value whether to plot this object or not (default is True)
-
-The above command creates a Combinational Block object.
-The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
-
 ### <ins>Latches</ins>
 
 Latches are fundamental building blocks in digital design used to store a single bit of data. They are level-sensitive devices, meaning their output state depends on the input level rather than the edge of the input signal. Latches are classified into two main types: SR (Set-Reset) latches and D (Data or Delay) latches.
@@ -357,7 +340,39 @@ SR Latch: Consists of two inputs, Set (S) and Reset (R), which control the state
 
 D Latch: Simplifies the SR latch by eliminating the possibility of invalid states. It has a single input, D, and a clock signal that determines when the input data is sampled and transferred to the output.
 
+#### <ins>SRLatch</ins>
 
+```python
+from BuildingBlocks.Latches import SRLatch as Latch
+
+variable_name = Latch(pydig = pysim, SR = inputObject, clock = clockObject, plot = <True/False>)
+```
+
+The parameters that it accepts are listed below in order:
+        1) pydig : a pydig object that you want to add this counter to.
+        2) SR : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
+        3) clock : a clock object
+        4) plot : a boolean value whether to plot this object or not (default is True)
+
+The above command creates a Combinational Block object.
+The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
+
+#### <ins>DLatch</ins>
+
+```python
+from BuildingBlocks.Latches import DLatch as Latch
+
+variable_name = Latch(pydig = pysim, D = inputObject, clock = clockObject, plot = <True/False>)
+```
+
+The parameters that it accepts are listed below in order:
+        1) pydig : a pydig object that you want to add this counter to.
+        2) D : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
+        3) clock : a clock object
+        4) plot : a boolean value whether to plot this object or not (default is True)
+
+The above command creates a Combinational Block object.
+The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
 
 ## <ins>Sample Code</ins>
 
@@ -481,6 +496,8 @@ pydig.run(until = 40)
 
 ```
 
+# <ins>Elaborations and Explanations</ins>
+
 ## <ins>Inputs From Files</ins>
 The inputs to the Moore Machine can be from files that have the extension .txt, .csv, or .xlsx.
 
@@ -548,8 +565,6 @@ A sample txt file, csv file, and xlsx file are shown below (Note headers are not
             3.1  4
             4.1  5
 
-
-# <ins>Elaborations and Explanations</ins>
 
 ## <ins>More on types of connections</ins>
 
