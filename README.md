@@ -216,13 +216,14 @@ Clock2.output() > Moore.clock()
 ```
 
 To know about more features one can use to make connections go to: [More on types of connections](#More-on-types-of-connections)
+
 ### <ins>Generating the CSV File</ins>
 
-In order to generate a csv file for a simulation we have to write the line `pydig.generateCSV()` before running the simulation. This will create a csv file having the name of the simulation object and will hold the values of all the blocks present in that simulation.
+In order to generate a csv file for a simulation we have to write the line `pysim.generateCSV()` before running the simulation. This will create a csv file having the name of the simulation object and will hold the values of all the blocks present in that simulation.
 
 ### <ins>Running and Plotting the simulation</ins>
 
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+To run the simulation we 
 
 ## <ins>Different Building Blocks</ins>
 
@@ -654,3 +655,9 @@ The following methods are available for the user :
     2) `.clock()` (@return object): return the object itself.
     3) `.input()` (@return object): return the object itself.
     4) `.getScopeDump()` (@return dict): return a dictionary of all the values along with a label.
+
+## <ins>Combinational Block Methods</ins>
+
+The following methods are available for the user :
+
+    1) `.isConnected()` (@return bool): return true if all the ports of the machine are connected.
