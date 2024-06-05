@@ -55,10 +55,11 @@ variable_name_for_this_simulation_object = pydig.pydig(name="<Name of This simul
 
 The following objects can be created:
 
-    1. Clock
+    1. Input Block
     2. Moore Machine
     3. Combinational Block
-    4. Output Block
+    4. Clock
+    5. Output Block
 
 #### Input Block
 
@@ -72,32 +73,30 @@ xlsx (Excel Spreadsheet): A Microsoft Excel file format that contains data in a 
 Refer to [Inputs](#Inputs) for more information on the file format. 
 
 ```python
-    variable_name = pysim.source(filepath = "<filePath>", plot = <True/False>, blockID = "<Name of the block>")
+variable_name = pysim.source(filepath = "<filePath>", plot = <True/False>, blockID = "<Name of the block>")
 ``` 
 Parameters :
 
     1) 'filepath' (str): The path to the input file. This should be a string indicating the location of the file on the local filesystem. The file can be in CSV, TXT, or XLSX format.
-    
     2) 'plot' (bool): A boolean flag that indicates whether the data should be visualized (plotted) after being read. If True, the function will generate a plot of the data. If False, no plot will be generated. (default is False)
-
     3) 'blockID' (str): A unique identifier for the input block. This string is used to reference and manage the block. If the id is not unique, then a new id would be created and the user would be notified.
 
 The above command returns an Input object.
-The methods available for the user are at [Input Block Methods](#Input Block Methods).
+The methods available for the user are at [Input Block Methods](#input-block-methods).
 
 #### Moore Machine
 
 The Moore Machine is created by the following code:
 
 ```python
-    def _nsl(presentState, input):
-        # some function
-        return nextState
-    def _ol(presentState):
-        # some function
-        return output
+def _nsl(presentState, input):
+    # some function
+    return nextState
+def _ol(presentState):
+    # some function
+    return output
 
-    Variable_name = pysim.moore(plot = <True/False>, blockID = "<Name of the block>", nsl = _nsl, ol = _ol)
+Variable_name = pysim.moore(plot = <True/False>, blockID = "<Name of the block>", nsl = _nsl, ol = _ol)
 ```
 
 The parameters that it accepts are listed below in order:
@@ -118,11 +117,11 @@ This Block is to be used when needed insert a combinational logic in between.
 The Combinational Block is created by the following code:
 
 ```python
-    def _function(x, y):
-        # some function
-        return x
+def _function(x, y):
+    # some function
+    return x
 
-    Variable_name = pysim.combinational(plot = <True/False>, blockID = "<Name of the block>", function = _function)
+Variable_name = pysim.combinational(plot = <True/False>, blockID = "<Name of the block>", function = _function)
 ```
 
 The parameters that it accepts are listed below in order:
@@ -135,7 +134,7 @@ The parameters that it accepts are listed below in order:
     6) 'initialValue' (int): The initial output value given by this block at t = 0 while running
 
 The above command creates a Combinational Block object.
-The following methods are available for the user at [Combinational Block Extra](#combinational-block-extra).
+The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
 
 #### Clock Block
 
@@ -188,14 +187,14 @@ The terminal count of the counter is high only when the counter's output is the 
 This is an enabled 1 bit counter. The output of the counter is either 0 or 1. When the output of the counter is 1, the terminal count of the counter is high.
 
 ```python
-    from BuildingBlocks.BitCounters import Enabled1BitCounterWithTC as Counter
+from BuildingBlocks.BitCounters import Enabled1BitCounterWithTC as Counter
 
-    variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject, plot = <True/False>)
+variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject, plot = <True/False>)
 ```
 
 The parameters that it accepts are listed below in order:
-        1) pydig : a pydig object that you want to add this counter to.
-        2) enable: a HasOutputConnection object (an Input object, a Machine        
+        1) pydig (pydig object): a pydig object that you want to add this counter to.
+        2) enable (): a HasOutputConnection object (an Input object, a Machine        
                     object, or a Combinational object).
         3) clock : a clock object
         4) plot : a boolean value whether to plot this object or not
@@ -230,23 +229,20 @@ For example: if the output value is `11001` and we do `.output(1,4)` we connect 
 ```python
     Block1 > Block2 > Block3 .......
 ```
-But the output connections using this method will include all output bits.
+But the output connections using this method will include all output bits being connected to the next block.
 
-5) 
-
-##### Types of connections
-
-The simulator can handle different types of connections.
-
-###### Connection to Input vs Connection to Clocks (Only for Moore and Mealy Machines):
-
+5) If we wish to connect a clock to the input of a moore machine we use `Moore.input()` and If we wish to connect it to the registers of the Moore Machine then we use `Moore.clock()`
 ```python
     
     Clock1.output() > Moore.input()
     Clock2.output() > Moore.clock()
 
 ```
-If we wish to connect a clock to the input of a moore machine we use `Moore.input()` and If we wish to connect it to the registers of the Moore Machine then we use `Moore.clock()`
+
+
+##### Types of connections
+
+The simulator can handle different types of connections.
 
 ###### Single Out vs Multiple Out:
 
@@ -269,13 +265,22 @@ Block1.output(e,f) > Block3.input()
 
 ###### Single In vs Multiple In:
 
-
-
 ```python
-lock0.output(a,b) > Block1.input()
+Block0.output(a,b) > Block1.input()
 
 Block1.output(c,d) > Block2.input()
+Block0.output(e,f) > Block2.input()
+```
 
+```python
+Block0.output(a,b) > Block1.input()
+
+Block1.output(c,d) > Block2.input()
+```
+
+## Sample Code
+
+```
 """
 This is a sample code of how a PWM can be simulated using this simulator
 
@@ -382,6 +387,17 @@ pydig.dumpVars()
 # Running all the blocks.
 pydig.run(until = 40)
 
+m1.output() > m2.input()
+m2.output() > o.input()
+clk.output() > m1.clk()
+clk.output() > m2.clk()
+
+# Creating dump
+pydig.dumpVars()
+
+# Running all the blocks.
+pydig.run(until = 40)
+
 ```
 
 ## Inputs From Files
@@ -458,4 +474,8 @@ The following methods are available for the user :
         1) Refer to [Making Connections](#Making Connections) for more information on making connections
 
 ## Moore Machine Methods
+
+The following methods are available for the user :
+    
+
 ## Combinational Block Methods
