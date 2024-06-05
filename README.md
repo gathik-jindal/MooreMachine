@@ -1,15 +1,16 @@
-# Moore Machine in Python
+# <ins>Moore Machine in Python</ins>
 
 This project implements a Moore Machine in Python. A Moore Machine is a finite state machine where the outputs depend only on the current state.
 
-## Table of Contents
+## <ins>Table of Contents</ins>
 
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Libraries](#libraries)
 - [Usage](#usage)
+- [Elaborations and Explanations](#elaborations-and-explanations)
 
-## Introduction
+## <ins>Introduction</ins>
 
 A Moore Machine is a type of finite state machine (FSM) named after the American engineer and computer scientist Edward F. Moore. In a Moore Machine, the outputs are associated with states rather than transitions. This means that the output of the system is determined solely by the current state, not by the input or the transition taken.
 
@@ -21,17 +22,17 @@ Here are the key characteristics of a Moore Machine:
 
 The transition between states in a Moore Machine is based solely on the input, and the output is a function of the current state. This makes Moore Machines particularly useful for modelling systems where the output depends on the current state of the system.
 
-## Installation
+## <ins>Installation</ins>
 
 In order to install this project, download the zip file from above and extract it to your local destination.
 
-## Libraries
+## <ins>Libraries</ins>
 
 The following libraries are required to be installed : 
     
     1) simpy
     2) matplotlib
-    3) openxl (for reading excel files only)
+    3) openxl (for reading excel files)
 
 You can install them by running the following commands : 
     
@@ -39,9 +40,9 @@ You can install them by running the following commands :
     2) pip install matplotlib
     3) pip install openxl
 
-## Usage
+## <ins>Usage</ins>
 
-### Starting the Simulation
+### <ins>Starting the Simulation</ins>
 
 To start off, we need to create a simulation object, that handles the creation of objects.
 This can be done by the following code:
@@ -53,7 +54,7 @@ variable_name_for_this_simulation_object = pydig.pydig(name="<Name of This simul
 # we will use "pysim" as a variable name for this object in the following examples.
 ```
 
-### Creation of objects
+### <ins>Creation of objects</ins>
 
 The following objects can be created:
 
@@ -63,7 +64,7 @@ The following objects can be created:
     4. Clock
     5. Output Block
 
-#### Input Block
+#### <ins>Input Block</ins>
 
 The input block is designed to handle file inputs in various formats, including csv, txt, and xlsx. It reads the content of the file and processes it for further use in the application.
 
@@ -86,7 +87,7 @@ Parameters :
 The above command returns an Input object.
 The methods available for the user are at [Input Block Methods](#input-block-methods).
 
-#### Moore Machine
+#### <ins>Moore Machine</ins>
 
 The Moore Machine is created by the following code:
 
@@ -113,7 +114,7 @@ The parameters that it accepts are listed below in order:
 The above command returns a Moore Machine object.
 The following methods are available for the user at [Moore Machine Methods](#moore-machine-methods).
 
-#### Combinational Block
+#### <ins>Combinational Block</ins>
 
 This Block is to be used when needed insert a combinational logic in between.
 The Combinational Block is created by the following code:
@@ -138,12 +139,12 @@ The parameters that it accepts are listed below in order:
 The above command creates a Combinational Block object.
 The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
 
-#### Clock Block
+#### <ins>Clock Block</ins>
 
 The Clock Block is created by the following code:
 
 ```python
-    Variable_name = pysim.clock(plot = <True/False>, blockID = "<Name of the block>", timePeriod = <float>, onTime = <float>, initialValue = <int>)
+Variable_name = pysim.clock(plot = <True/False>, blockID = "<Name of the block>", timePeriod = <float>, onTime = <float>, initialValue = <int>)
 ```
 
 The parameters that it accepts are listed below in order:
@@ -156,12 +157,12 @@ The parameters that it accepts are listed below in order:
 
 NOTE: This block has no input connection and only has an output connection.
 
-#### Output Block
+#### <ins>Output Block</ins>
 
 The Output Block is created by the following code:
 
 ```python
-    Variable_name = pysim.output(plot = <True/False>, blockID = "<Name of the block>")
+Variable_name = pysim.output(plot = <True/False>, blockID = "<Name of the block>")
 ```
 
 The parameters that it accepts are listed below in order:
@@ -171,11 +172,60 @@ The parameters that it accepts are listed below in order:
 
 NOTE: This block has only input connections and no output connections.
 
-Methods:
+#### <ins>Building Blocks</ins>
 
-### Building Blocks
+There are numerous pre-built objects that can directly be used for more complex simulations
+To read more about it click on [Different Building Blocks](Different-Building-Blocks)
 
-#### BitCounters
+### <ins>Making Connections</ins>
+
+There are 2 ways to make connections between Blocks. Both these are identical in function and properties. The user can use the method they find comfortable.
+
+```python
+#Method 1
+Block1.output(a, b) > Block2.input()
+    
+#Method 2
+Block2.input() <= Block1.output(a,b)
+```
+In the above code we have taken output bits `a`(inclusive) to `b`(exclusive) of Block1 and connected it to the input of Block2.
+
+NOTE:
+
+1) In this example we have to make sure that Block2 can accept input connections and Block1 has valid output lines. 
+
+2) By "bits `a` to `b`" we mean the first bit connected is the `a`th bit from the LSB and the last bit connected will be `b - 1`th bit from the LSB starting our numbering from 0.
+For example: if the output value is `11001` and we do `.output(1,4)` we connect the middle 3 bits holding `100`.
+
+3) If we just write `.output()` it will automatically connect all bits. If we write `.output(a)` It will connect all bits from `a`(inclusive) till the end of the value. 
+
+4) We can do multiple connections in a row like:
+
+```python
+Block1 > Block2 > Block3 .......
+```
+But the output connections using this method will include all output bits being connected to the next block.
+
+5) If we wish to connect a clock to the input of a Moore machine we use `Moore.input()` and If we wish to connect it to the registers of the Moore Machine then we use `Moore.clock()`
+
+```python    
+Clock1.output() > Moore.input()
+Clock2.output() > Moore.clock()
+```
+
+To know about more features one can use to make connections go to: [More on types of connections](#More-on-types-of-connections)
+
+### <ins>Generating the CSV File</ins>
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+### <ins>Running and Plotting the simulation</ins>
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+## Different Building Blocks
+
+### <ins>BitCounters</ins>
 
 This file contains 1 - 4 bit counters that take an enable line as input and 
 the output is the actual output of the counter as well as the terminal count
@@ -184,7 +234,7 @@ When the enable line is high, the counter starts counting and when the enable li
 is low, the counter is frozen. 
 The terminal count of the counter is high only when the counter's output is the max value of the counter.
 
-##### Enabled1BitCounterWithTC
+#### <ins>Enabled1BitCounterWithTC</ins>
 
 This is an enabled 1 bit counter. The output of the counter is either 0 or 1. When the output of the counter is 1, the terminal count of the counter is high.
 
@@ -195,16 +245,15 @@ variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject
 ```
 
 The parameters that it accepts are listed below in order:
-        1) pydig (pydig object): a pydig object that you want to add this counter to.
-        2) enable (): a HasOutputConnection object (an Input object, a Machine        
-                    object, or a Combinational object).
+        1) pydig : a pydig object that you want to add this counter to.
+        2) enable : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
         3) clock : a clock object
-        4) plot : a boolean value whether to plot this object or not
+        4) plot : a boolean value whether to plot this object or not (default is True)
 
 The above command creates a Combinational Block object.
 The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
 
-##### Enabled2BitCounterWithTC
+#### <ins>Enabled2BitCounterWithTC</ins>
 
 This is an enabled 2 bit counter. The output of the counter is 0-3. When the output of the counter is 3, the terminal count of the counter is high.
 
@@ -215,16 +264,15 @@ variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject
 ```
 
 The parameters that it accepts are listed below in order:
-        1) pydig (pydig object): a pydig object that you want to add this counter to.
-        2) enable (): a HasOutputConnection object (an Input object, a Machine        
-                    object, or a Combinational object).
+        1) pydig : a pydig object that you want to add this counter to.
+        2) enable : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
         3) clock : a clock object
-        4) plot : a boolean value whether to plot this object or not
+        4) plot : a boolean value whether to plot this object or not (default is True)
 
 The above command creates a Combinational Block object.
 The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
 
-##### Enabled3BitCounterWithTC
+#### <ins>Enabled3BitCounterWithTC</ins>
 
 This is an enabled 3 bit counter. The output of the counter is 0-7. When the output of the counter is 7, the terminal count of the counter is high.
 
@@ -235,16 +283,15 @@ variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject
 ```
 
 The parameters that it accepts are listed below in order:
-        1) pydig (pydig object): a pydig object that you want to add this counter to.
-        2) enable (): a HasOutputConnection object (an Input object, a Machine        
-                    object, or a Combinational object).
+        1) pydig : a pydig object that you want to add this counter to.
+        2) enable : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
         3) clock : a clock object
-        4) plot : a boolean value whether to plot this object or not
+        4) plot : a boolean value whether to plot this object or not (default is True)
 
 The above command creates a Combinational Block object.
 The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
 
-##### Enabled4BitCounterWithTC
+#### <ins>Enabled4BitCounterWithTC</ins>
 
 This is an enabled 4 bit counter. The output of the counter is 0-15. When the output of the counter is 15, the terminal count of the counter is high.
 
@@ -255,16 +302,15 @@ variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject
 ```
 
 The parameters that it accepts are listed below in order:
-        1) pydig (pydig object): a pydig object that you want to add this counter to.
-        2) enable (): a HasOutputConnection object (an Input object, a Machine        
-                    object, or a Combinational object).
+        1) pydig : a pydig object that you want to add this counter to.
+        2) enable : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
         3) clock : a clock object
-        4) plot : a boolean value whether to plot this object or not
+        4) plot : a boolean value whether to plot this object or not (default is True)
 
 The above command creates a Combinational Block object.
 The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
 
-#### FreezeCounter
+### <ins>FreezeCounter</ins>
 
 A freeze counter is a type of counter in which if the input is high,
 the counter "freezes" or, in other terms, stays at the same value until
@@ -281,56 +327,39 @@ The parameters that it accepts are listed below in order:
         2) modValue : the maximum value of the counter
         3) freeze : the freeze signal
         4) clock : the clock signal
-        @param plot : boolean value whether to plot this moore machine or not
+        5) plot : boolean value whether to plot this moore machine or not (default is True)
 
-### Making Connections
+The above command creates a Combinational Block object.
+The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
 
-There are 2 ways to make connections between Blocks. Both these are identical in function and properties. The user can use the method they find comfortable.
-
-```python
-    #Method 1
-    Block1.output(a, b) > Block2.input()
-    
-    #Method 2
-    Block2.input() <= Block1.output(a,b)
-```
-In the above code we have taken output bits `a`(inclusive) to `b`(exclusive) of Block1 and connected it to the input of Block2.
-
-NOTE:
-
-1) In this example we have to make sure that Block2 can accept input connections and Block1 has valid output lines. 
-
-2) By "bits `a` to `b`" we mean the first bit connected is the `a`th bit from the LSB and the last bit connected will be `b - 1`th bit from the LSB starting our numbering from 0.
-For example: if the output value is `11001` and we do `.output(1,4)` we connect the middle 3 bits holding `100`.
-
-3) If we just write `.output()` it will automatically connect all bits. If we write `.output(a)` It will connect all bits from `a`(inclusive) till the end of the value. 
-
-4) We can do multiple connections in a row like:
+#### <ins>SRLatch</ins>
 
 ```python
-    Block1 > Block2 > Block3 .......
-```
-But the output connections using this method will include all output bits being connected to the next block.
+from BuildingBlocks.Latches import SRLatch as latch
 
-5) If we wish to connect a clock to the input of a Moore machine we use `Moore.input()` and If we wish to connect it to the registers of the Moore Machine then we use `Moore.clock()`
-```python
-    
-    Clock1.output() > Moore.input()
-    Clock2.output() > Moore.clock()
-
+variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject, plot = <True/False>)
 ```
 
-To know about more features one can use to make connections go to: [More on types of connections](#More-on-types-of-connections)
+The parameters that it accepts are listed below in order:
+        1) pydig : a pydig object that you want to add this counter to.
+        2) enable : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
+        3) clock : a clock object
+        4) plot : a boolean value whether to plot this object or not (default is True)
 
-### Generating the CSV File
+The above command creates a Combinational Block object.
+The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
 
-<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>
+### <ins>Latches</ins>
 
-### Running and Plotting the simulation
+Latches are fundamental building blocks in digital design used to store a single bit of data. They are level-sensitive devices, meaning their output state depends on the input level rather than the edge of the input signal. Latches are classified into two main types: SR (Set-Reset) latches and D (Data or Delay) latches.
 
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+SR Latch: Consists of two inputs, Set (S) and Reset (R), which control the state of the latch. When S is high, the latch is set, and when R is high, the latch is reset.
 
-## Sample Code
+D Latch: Simplifies the SR latch by eliminating the possibility of invalid states. It has a single input, D, and a clock signal that determines when the input data is sampled and transferred to the output.
+
+
+
+## <ins>Sample Code</ins>
 
 ```python
 """
@@ -452,7 +481,7 @@ pydig.run(until = 40)
 
 ```
 
-## Inputs From Files
+## <ins>Inputs From Files</ins>
 The inputs to the Moore Machine can be from files that have the extension .txt, .csv, or .xlsx.
 
 Feature: Each of the specified file types can have a header line which can contain anything, the program will automatically skip it / ignore it.
@@ -469,11 +498,11 @@ Feature: Each of the specified file types can have a header line which can conta
             A sample creation in python:
 
 ```python
-        import csv
-        with open("Test.csv", "w", newline='') as file:
-            csw=csv.writer(file)
-            for i in range(5):
-            csw.writerow([i+0.1,i+1])
+import csv
+with open("Test.csv", "w", newline='') as file:
+    csw=csv.writer(file)
+    for i in range(5):
+    csw.writerow([i+0.1,i+1])
 ```
 
             Input format that is expected in the file as follows:
@@ -520,11 +549,13 @@ A sample txt file, csv file, and xlsx file are shown below (Note headers are not
             4.1  5
 
 
-## More on types of connections
+# <ins>Elaborations and Explanations</ins>
+
+## <ins>More on types of connections</ins>
 
 The simulator can handle different types of connections.
 
-### Single Out vs Multiple Out:
+### <ins>Single Out vs Multiple Out:</ins>
 
 The simulator can internally handle both of these types of connections. If a block, say `Block0`, has only one connection going out. It is treated as a Single-Output connection. If we have a block, say `Block1`, having multiple connections going out then it is treated as a Multiple-Output connection. Both are valid and the range of bits we select need not be the same nor be mutually exclusive. (a,b), (c,d) and (e,f) can be any range of values and the simulator can handle it accordingly. 
 
@@ -536,10 +567,10 @@ Block1.output(c,d) > Block2.input()
 Block1.output(e,f) > Block3.input()
 ```
 
-### Single In vs Multiple In:
+### <ins>Single In vs Multiple In:</ins>
 
 
-"""hgehgeuhgwe"""
+<<<<<<<<<<<<<<>>>>>>>>>>>>>>
 
 ```python
 Block0.output(a,b) > Block1.input()
@@ -548,16 +579,19 @@ Block1.output(c,d) > Block2.input()
 Block0.output(e,f) > Block2.input()
 ```
 
-## Input Block Methods
+## <ins>Input Block Methods</ins>
 
 The following methods are available for the user : 
     variable_name.output(left = 0, right = None)
         1) Refer to [Making Connections](#Making Connections) for more information on making connections
 
-## Moore Machine Methods
+## <ins>Moore Machine Methods</ins>
 
 The following methods are available for the user :
     
-    1) `.isConnected()` (@return boolean): return true if all the connections 
+    1) `.isConnected()` (@return bool): return true if all the ports of the machine are connected.
+    2) `.clock()` (@return object): return the object itself.
+    3) `.input()` (@return object): return the object itself.
+    4) `.getScopeDump()` (@return dict): return a dictionary of all the values along with a label.
 
-## Combinational Block Methods
+## <ins>Combinational Block Methods</ins>
