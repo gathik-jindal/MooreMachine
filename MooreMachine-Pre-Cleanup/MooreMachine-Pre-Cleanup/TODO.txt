@@ -1,0 +1,4 @@
+1) in utilities.py we need to move the dumpvars into a new file or do something about it.
+3) have a strong urge to push blocks to new file, or atleast move everything else to new files.
+5) need to have custom error messages for the checkType utility function.
+6) Debugging
