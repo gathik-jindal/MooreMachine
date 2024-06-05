@@ -53,8 +53,9 @@ This can be done by the following code:
 import pydig
 
 variable_name_for_this_simulation_object = pydig.pydig(name="<Name of This simulation (used while generating output csv files)>")
-# we will use "pysim" as a variable name for this object in the following examples.
 ```
+
+NOTE: We will use "pysim" as a variable name for this object in the following examples.
 
 ### <ins>Creation of objects</ins>
 
@@ -157,7 +158,8 @@ The parameters that it accepts are listed below in order:
     4) onTime (float): the amount of time in each cycle that the clock shows high (1).
     5) initialValue (int): the initial value of the clock (default is 0)
 
-NOTE: This block has no input connection and only has an output connection.
+The above command creates a Clock Block object.
+The following methods are available for the user at [Clock Block Methods](#clock-block-methods).
 
 #### <ins>Output Block</ins>
 
@@ -172,11 +174,12 @@ The parameters that it accepts are listed below in order:
     1) plot (boolean): boolean value whether to plot this output source or not
     2) blockID (str): the id of this input block. If None, then new unique ID is given.
 
-NOTE: This block has only input connections and no output connections.
+The above command creates a Output Block object.
+The following methods are available for the user at [Clock Block Methods](#output-block-methods).
 
 #### <ins>Building Blocks</ins>
 
-There are numerous pre-built objects that can directly be used for more complex simulations
+There are numerous pre-built objects that can directly be used for more complex simulations.
 To read more about it click on [Different Building Blocks](different-building-blocks)
 
 ### <ins>Making Connections</ins>
@@ -223,7 +226,7 @@ In order to generate a csv file for a simulation we have to write the line `pysi
 
 ### <ins>Running and Plotting the simulation</ins>
 
-To run the simulation we need to write `pysim.run(until = <duration of simulation>)`. This line
+To run the simulation we need to write `pysim.run(until = <duration of simulation>)`. This line runs the simulation and then plots the results. If we had previously written `pysim.generateCSV()` then the `.run()` would also generate a csv file holding all the values for every block used in this simulation.
 
 ## <ins>Different Building Blocks</ins>
 
@@ -247,6 +250,7 @@ variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject
 ```
 
 The parameters that it accepts are listed below in order:
+
         1) pydig : a pydig object that you want to add this counter to.
         2) enable : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
         3) clock : a clock object
@@ -266,6 +270,7 @@ variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject
 ```
 
 The parameters that it accepts are listed below in order:
+
         1) pydig : a pydig object that you want to add this counter to.
         2) enable : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
         3) clock : a clock object
@@ -285,6 +290,7 @@ variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject
 ```
 
 The parameters that it accepts are listed below in order:
+
         1) pydig : a pydig object that you want to add this counter to.
         2) enable : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
         3) clock : a clock object
@@ -304,6 +310,7 @@ variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject
 ```
 
 The parameters that it accepts are listed below in order:
+
         1) pydig : a pydig object that you want to add this counter to.
         2) enable : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
         3) clock : a clock object
@@ -325,6 +332,7 @@ variable_name = Counter(pydig = pysim, modValue: int, freeze = inputObject, cloc
 ```
 
 The parameters that it accepts are listed below in order:
+
         1) pydig : pydig object
         2) modValue : the maximum value of the counter
         3) freeze : the freeze signal
@@ -348,6 +356,7 @@ variable_name = Counter(pydig = pysim, modValue = <int>, syncReset = inputObject
 ```
 
 The parameters that it accepts are listed below in order:
+
         1) pydig : pydig object
         2) modValue : the maximum value of the counter
         3) syncReset : the synchronous reset signal
@@ -370,6 +379,7 @@ variable_name = Counter(pydig = pysim, modValue = <int>, period = inputObject, c
 ```
 
 The parameters that it accepts are listed below in order:
+
         1) pydig : pydig object
         2) modValue : the maximum value of the counter
         3) period : the synchronous reset signal
@@ -396,6 +406,7 @@ variable_name = Latch(pydig = pysim, SR = inputObject, clock = clockObject, plot
 ```
 
 The parameters that it accepts are listed below in order:
+
         1) pydig : a pydig object that you want to add this counter to.
         2) SR : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
         3) clock : a clock object
@@ -413,6 +424,7 @@ variable_name = Latch(pydig = pysim, D = inputObject, clock = clockObject, plot 
 ```
 
 The parameters that it accepts are listed below in order:
+
         1) pydig : a pydig object that you want to add this counter to.
         2) D : a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
         3) clock : a clock object
@@ -588,7 +600,6 @@ The simulator can handle different types of connections.
 
 The simulator can internally handle both of these types of connections. If a block, say `Block0`, has only one connection going out. It is treated as a Single-Output connection. If we have a block, say `Block1`, having multiple connections going out then it is treated as a Multiple-Output connection. Both are valid and the range of bits we select need not be the same nor be mutually exclusive. (a,b), (c,d) and (e,f) can be any range of values and the simulator can handle it accordingly. 
 
-
 ```python
 Block0.output(a,b) > Block1.input()
 
@@ -598,8 +609,7 @@ Block1.output(e,f) > Block3.input()
 
 ### <ins>Single In vs Multiple In:</ins>
 
-
-<<<<<<<<<<<<<<>>>>>>>>>>>>>>
+The simulator can internally handle both of these types of connections. If a block, say `Block1`, has only one connection coming in. It is treated as a Single-Input connection. If we have a block, say `Block2`, having multiple connections coming in then it is treated as a Multiple-Input connection. Both are valid and the range of bits we select need not be the same nor be mutually exclusive. (a,b), (c,d) and (e,f) can be any range of values and the simulator can handle it accordingly. 
 
 ```python
 Block0.output(a,b) > Block1.input()
@@ -607,24 +617,67 @@ Block0.output(a,b) > Block1.input()
 Block1.output(c,d) > Block2.input()
 Block0.output(e,f) > Block2.input()
 ```
+The important thing to note about using Multiple-Input connections is that the order of connection matters. The first block to be connected will have its output passed as the first bits forming the LSB of the final value taken as input and the next the connection will result in its output being concatenated to the previous block's output's MSB forming the next bits of the final value taken as input. Hence, the last connection would thus form the MSB of the final input.
+
+For example: 
+
+Say that Block1 has the value 100101 and Block2 has the value 110 and we write the lines:
+
+```python
+Block1.output(2,4) > Block3.input()
+Block2.output(1,3) > Block3.input()
+```
+
+Then the value taken as input by Block3 would be the concatenation of --01-- and  11-.
+Hence, the final the input value passed on to Block3 will be 1101.
 
 ## <ins>Input Block Methods</ins>
 
 The following methods are available for the user : 
-    variable_name.output(left = 0, right = None)
-        1) Refer to [Making Connections](#Making Connections) for more information on making connections
+
+    1) `.output()` (@return object): return the object itself.
+    2) `.getScopeDump()` (@return dict): return a dictionary of all the values along with a label.
+    3) `.getBlockID()` (@return str): return the blockID of the object.
 
 ## <ins>Moore Machine Methods</ins>
 
 The following methods are available for the user :
-    
+
     1) `.isConnected()` (@return bool): return true if all the ports of the machine are connected.
     2) `.clock()` (@return object): return the object itself.
     3) `.input()` (@return object): return the object itself.
-    4) `.getScopeDump()` (@return dict): return a dictionary of all the values along with a label.
+    4) `.output()` (@return object): return the object itself.
+    5) `.getScopeDump()` (@return dict): return a dictionary of all the values along with a label.
+    6) `.getBlockID()` (@return str): return the blockID of the object.
+    7) `.getInputVal()` (@return int): return the input value of the object.
+    9) `.getInputCount()` (@return int): return the number of input components connected to the object.
 
 ## <ins>Combinational Block Methods</ins>
 
 The following methods are available for the user :
 
     1) `.isConnected()` (@return bool): return true if all the ports of the machine are connected.
+    2) `.input()` (@return object): return the object itself.
+    3) `.output()` (@return object): return the object itself.
+    4) `.getScopeDump()` (@return dict): return a dictionary of all the values along with a label.
+    5) `.getBlockID()` (@return str): return the blockID of the object.
+    6) `.getInputVal()` (@return int): return the input value of the object.
+    7) `.getInputCount()` (@return int): return the number of input components connected to the object.
+
+## <ins>Clock Block Methods</ins>
+
+The following methods are available for the user :
+
+    1) `.isConnected()` (@return bool): return true if all the ports of the machine are connected.
+    2) `.output()` (@return object): return the object itself.
+    3) `.getScopeDump()` (@return dict): return a dictionary of all the values along with a label.
+    4) `.getBlockID()` (@return str): return the blockID of the object.
+
+## <ins>Output Block Methods</ins>
+
+The following methods are available for the user :
+
+    1) `.isConnected()` (@return bool): return true if all the ports of the machine are connected.
+    2) `.input()` (@return object): return the object itself.
+    3) `.getScopeDump()` (@return dict): return a dictionary of all the values along with a label.
+    4) `.getBlockID()` (@return str): return the blockID of the object.
