@@ -18,7 +18,7 @@ Here are the key characteristics of a Moore Machine:
     Inputs: External inputs can trigger transitions between states.
     Outputs: Each state is associated with a specific output.
 
-The transition between states in a Moore Machine is based solely on the input, and the output is a function of the current state. This makes Moore Machines particularly useful for modeling systems where the output depends on the current state of the system.
+The transition between states in a Moore Machine is based solely on the input, and the output is a function of the current state. This makes Moore Machines particularly useful for modelling systems where the output depends on the current state of the system.
 
 ## Installation
 
@@ -26,6 +26,7 @@ In order to install this project, download the zip file from above and extract i
 
 ## Usage
 
+### Inputs
 The inputs to the Moore Machine can be from files that have the extension .txt, .csv, or .xlsx.
 
 Feature: Each of the specified file types can have a header line which can contain anything, the program will automatically skip it / ignore it.
@@ -92,8 +93,33 @@ A sample txt file, csv file, and xlsx file are shown below (Note headers are not
             3.1  4
             4.1  5
 
+### Starting Simulation
+
+'''python
+from pydig import pydig as pd
+
+'''
+
+### Creation of objects
+
+#### Moore, ........
+
+#### Moore, ........
+
+#### Moore, ........
+
+#### Building Blocks
+
+### Making Connections
+
+### Generating CSV
+
+### Run
+
+
 The following code specifies a sample way to create and run the Moore Machine. It is also present in the file main.py.
 It consists of 2 machines m1 and m2. The input is received from the text file and the final output is stored in the object o.
+
 
 ```python
 from blocks import pydig as pd
