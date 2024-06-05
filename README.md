@@ -6,6 +6,7 @@ This project implements a Moore Machine in Python. A Moore Machine is a finite s
 
 - [Introduction](#introduction)
 - [Installation](#installation)
+- [Libraries](#libraries)
 - [Usage](#usage)
 
 ## Introduction
@@ -24,104 +25,257 @@ The transition between states in a Moore Machine is based solely on the input, a
 
 In order to install this project, download the zip file from above and extract it to your local destination.
 
+## Libraries
+
+The following libraries are required to be installed : 
+    1) simpy
+    2) matplotlib
+    3) openxl
+
+You can install them by running the following commands : 
+    1) pip install simpy
+    2) pip install matplotlib
+    3) pip install openxl
+
 ## Usage
-
-### Inputs
-The inputs to the Moore Machine can be from files that have the extension .txt, .csv, or .xlsx.
-
-Feature: Each of the specified file types can have a header line which can contain anything, the program will automatically skip it / ignore it.
-
-        For txt files, the format should be as follows:
-            <time> <input>
-            <time> <input>
-            ...
-            time should be convertible to float.
-            input should be convertible to integer.
-
-        For csv files, the format should be as follows:
-            It assumes that the newline was set to "" while creating the file.
-            A sample creation in python:
-
-```python
-        import csv
-        with open("Test.csv", "w", newline='') as file:
-            csw=csv.writer(file)
-            for i in range(5):
-            csw.writerow([i+0.1,i+1])
-```
-
-            Input format that is expected in the file as follows:
-            <time>,<input>
-            <time>,<input>
-            ...
-            time should be convertible to float.
-            input should be convertible to integer.
-
-        For xlsx files, the format should be as follows:
-        Input format is expected in the file as follows:
-            Column:  A         B
-                    <time>   <input>
-                    <time>   <input>
-                    ...
-            time should be convertible to a float.
-            input should be convertible to integer.
-
-Look at Tests\\Test.txt, Tests\\Test.csv, Tests\\Tests.xlsx for more information.
-
-A sample txt file, csv file, and xlsx file are shown below (Note headers are not required) :
-
-    Txt File:
-            Time Input
-            0.1 1
-            1.1 2
-            2.1 3
-            3.1 4
-            4.1 5
-    CSV File:
-            time,inputs
-            0.1,1
-            1.1,2
-            2.1,3
-            3.1,4
-            4.1,5
-    XLSX File:
-    Column: A    B
-            Time Input
-            0.1  1
-            1.1  2
-            2.1  3
-            3.1  4
-            4.1  5
 
 ### Starting Simulation
 
-'''python
-from pydig import pydig as pd
+To start off, we need to create a simulation object, that handles the creation of objects.
+This can be done by the following code:
 
-'''
+```python
+import pydig
+
+variable_name_for_this_simulation_object = pydig.pydig(name="<Name of This simulation (used while generating output csv files)>")
+# we will use "pysim" as a variable name for this object in the following examples.
+```
 
 ### Creation of objects
 
-#### Moore, ........
+The following objects can be created:
 
-#### Moore, ........
+    1. Clock
+    2. Moore Machine
+    3. Combinational Block
+    4. Output Block
 
-#### Moore, ........
+#### Input Block
 
-#### Building Blocks
+The input block is designed to handle file inputs in various formats, including csv, txt, and xlsx. It reads the content of the file and processes it for further use in the application.
+
+Supported File Formats
+csv (Comma-Separated Values): A plain text file that uses commas to separate values.
+txt (Text): A plain text file that contains unformatted text.
+xlsx (Excel Spreadsheet): A Microsoft Excel file format that contains data in a tabular form with rows and columns.
+
+Refer to [Inputs](#Inputs) for more information on the file format. 
+
+```python
+    variable_name = pysim.source(filepath = "<filePath>", plot = <True/False>, blockID = "<Name of the block>")
+``` 
+Parameters :
+
+    1) 'filepath' (str): The path to the input file. This should be a string indicating the location of the file on the local filesystem. The file can be in CSV, TXT, or XLSX format.
+    
+    2) 'plot' (bool): A boolean flag that indicates whether the data should be visualized (plotted) after being read. If True, the function will generate a plot of the data. If False, no plot will be generated. (default is False)
+
+    3) 'blockID' (str): A unique identifier for the input block. This string is used to reference and manage the block. If the id is not unique, then a new id would be created and the user would be notified.
+
+The above command returns an Input object.
+The methods available for the user are at [Input Block Methods](#Input Block Methods).
+
+#### Moore Machine
+
+The Moore Machine is created by the following code:
+
+```python
+    def _nsl(presentState, input):
+        # some function
+        return nextState
+    def _ol(presentState):
+        # some function
+        return output
+
+    Variable_name = pysim.moore(plot = <True/False>, blockID = "<Name of the block>", nsl = _nsl, ol = _ol)
+```
+
+The parameters that it accepts are listed below in order:
+
+    1) 'maxOutSize' (int): the maximum number of output wires
+    2) 'plot' (bool): boolean value whether to plot this moore machine or not
+    3) 'blockID' (str): the id of this machine. If None, then new unique ID is given.  
+    4) 'nsl' (function): next state logic function, this accepts two arguments, the first is the input and the second is the present state.
+    5) 'ol' (function): output logic function
+    6) 'startingState' (int): the starting value for all the wires excpet the output of the moore machine, the values should be less than 2^maxOutSize.
+
+The above command returns a Moore Machine object.
+The following methods are available for the user at [Moore Machine Methods](#moore-machine-methods).
+
+#### Combinational Block
+
+This Block is to be used when needed insert a combinational logic in between.
+The Combinational Block is created by the following code:
+
+```python
+    def _function(x, y):
+        # some function
+        return x
+
+    Variable_name = pysim.combinational(plot = <True/False>, blockID = "<Name of the block>", function = _function)
+```
+
+The parameters that it accepts are listed below in order:
+
+    1) 'maxOutSize' (int): the maximum number of parallel output wires
+    2) 'plot' (boolean): boolean value whether to plot this moore machine or not
+    3) 'blockID' (str): the id of this machine. If None, then new unique ID is given.
+    4) 'function' (function): inner gate logic
+    5) 'delay' (float): the time delay for this object
+    6) 'initialValue' (int): The initial output value given by this block at t = 0 while running
+
+The above command creates a Combinational Block object.
+The following methods are available for the user at [Combinational Block Extra](#combinational-block-extra).
+
+#### Clock Block
+
+The Clock Block is created by the following code:
+
+```python
+    Variable_name = pysim.clock(plot = <True/False>, blockID = "<Name of the block>", timePeriod = <float>, onTime = <float>, initialValue = <int>)
+```
+
+The parameters that it accepts are listed below in order:
+
+    1) plot (boolean): boolean value whether to plot this clock or not
+    2) blockID (str): the id of this clock. If None, then new unique ID is given.  
+    3) timePeriod (float): the time period of this clock.
+    4) onTime (float): the amount of time in each cycle that the clock shows high (1).
+    5) initialValue (int): the initial value of the clock (default is 0)
+
+NOTE: This block has no input connection and only has an output connection.
+
+#### Output Block
+
+The Output Block is created by the following code:
+
+```python
+    Variable_name = pysim.output(plot = <True/False>, blockID = "<Name of the block>")
+```
+
+The parameters that it accepts are listed below in order:
+
+    1) plot (boolean): boolean value whether to plot this output source or not
+    2) blockID (str): the id of this input block. If None, then new unique ID is given.
+
+NOTE: This block has only input connections and no output connections.
+
+Methods:
+
+### Building Blocks
+
+#### BitCounters
+
+This file contains 1 - 4 bit counters that take an enable line as input and 
+the output is the actual output of the counter as well as the terminal count
+of the counter. 
+When the enable line is high, the counter starts counting and when the enable line
+is low, the counter is frozen. 
+The terminal count of the counter is high only when the counter's output is the max value of the counter.
+
+##### Enabled1BitCounterWithTC
+
+This is an enabled 1 bit counter. The output of the counter is either 0 or 1. When the output of the counter is 1, the terminal count of the counter is high.
+
+```python
+    from BuildingBlocks.BitCounters import Enabled1BitCounterWithTC as Counter
+
+    variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject, plot = <True/False>)
+```
+
+The parameters that it accepts are listed below in order:
+        1) pydig : a pydig object that you want to add this counter to.
+        2) enable: a HasOutputConnection object (an Input object, a Machine        
+                    object, or a Combinational object).
+        3) clock : a clock object
+        4) plot : a boolean value whether to plot this object or not
+
+The above command creates a Combinational Block object.
+The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
 
 ### Making Connections
 
-### Generating CSV
+There are 2 ways to make connections between Blocks. Both these are identical in function and properties. The user can use the method they find comfortable.
 
-### Run
+```python
+    #Method 1
+    Block1.output(a, b) > Block2.input()
+    
+    #Method 2
+    Block2.input() <= Block1.output(a,b)
+```
+In the above code we have taken output bits `a`(inclusive) to `b`(exclusive) of Block1 and connected it to the input of Block2.
 
+NOTE:
 
-The following code specifies a sample way to create and run the Moore Machine. It is also present in the file main.py.
-It consists of 2 machines m1 and m2. The input is received from the text file and the final output is stored in the object o.
+1) In this example we have to make sure that Block2 can accept input connections and Block1 has valid output lines. 
+
+2) By "bits `a` to `b`" we mean the first bit connected is the `a`th bit from the LSB and the last bit connected will be `b - 1`th bit from the LSB starting our numbering from 0.
+For example: if the output value is `11001` and we do `.output(1,4)` we connect the middle 3 bits holding `100`.
+
+3) If we just write `.output()` it will automatically connect all bits. If we write `.output(a)` It will connect all bits from `a`(inclusive) till the end of the value. 
+
+4) We can do multiple connections in a row like:
+
+```python
+    Block1 > Block2 > Block3 .......
+```
+But the output connections using this method will include all output bits.
+
+5) 
+
+##### Types of connections
+
+The simulator can handle different types of connections.
+
+###### Connection to Input vs Connection to Clocks (Only for Moore and Mealy Machines):
+
+```python
+    
+    Clock1.output() > Moore.input()
+    Clock2.output() > Moore.clock()
+
+```
+If we wish to connect a clock to the input of a moore machine we use `Moore.input()` and If we wish to connect it to the registers of the Moore Machine then we use `Moore.clock()`
+
+###### Single Out vs Multiple Out:
+
+```python
+Block0.output(a,b) > Block1.input()
+
+Block1.output(c,d) > Block2.input()
+Block1.output(e,f) > Block3.input()
+```
+
+The simulator can internally handle both these types of connections. If a block say `Block0` has only one conection going out it is treated as a Single-Output connection and if we have a block say `Block1` having multiple connections going out then it is treated as a Multiple-Output connection. Both are valid and the range of bits we select need not be the same nor be mutually exclusive. (a,b), (c,d) and (e,f) can be any range of values and the simulator can handle it accordingly. 
 
 
 ```python
+Block0.output(a,b) > Block1.input()
+
+Block1.output(c,d) > Block2.input()
+Block1.output(e,f) > Block3.input()
+```
+
+###### Single In vs Multiple In:
+
+
+
+```python
+lock0.output(a,b) > Block1.input()
+
+Block1.output(c,d) > Block2.input()
+
 """
 This is a sample code of how a PWM can be simulated using this simulator
 
@@ -205,5 +359,103 @@ outputComparator.output() > finalOutput.input()
 pysim.generateCSV()
 
 # Runs the simulation and plots the results
-pysim.run(until=40)
+pysim.run(until=40)i.output() > m1.input()
+m1.output() > m2.input()
+m2.output() > o.input()
+clk.output() > m1.clk()
+clk.output() > m2.clk()
+
+# Creating dump
+pydig.dumpVars()
+
+# Running all the blocks.
+pydig.run(until = 40)
+
+m1.output() > m2.input()
+m2.output() > o.input()
+clk.output() > m1.clk()
+clk.output() > m2.clk()
+
+# Creating dump
+pydig.dumpVars()
+
+# Running all the blocks.
+pydig.run(until = 40)
+
 ```
+
+## Inputs From Files
+The inputs to the Moore Machine can be from files that have the extension .txt, .csv, or .xlsx.
+
+Feature: Each of the specified file types can have a header line which can contain anything, the program will automatically skip it / ignore it.
+
+        For txt files, the format should be as follows:
+            <time> <input>
+            <time> <input>
+            ...
+            time should be convertible to float.
+            input should be convertible to integer.
+
+        For csv files, the format should be as follows:
+            It assumes that the newline was set to "" while creating the file.
+            A sample creation in python:
+
+```python
+        import csv
+        with open("Test.csv", "w", newline='') as file:
+            csw=csv.writer(file)
+            for i in range(5):
+            csw.writerow([i+0.1,i+1])
+```
+
+            Input format that is expected in the file as follows:
+            <time>,<input>
+            <time>,<input>
+            ...
+            time should be convertible to float.
+            input should be convertible to integer.
+
+        For xlsx files, the format should be as follows:
+        Input format is expected in the file as follows:
+            Column:  A         B
+                    <time>   <input>
+                    <time>   <input>
+                    ...
+            time should be convertible to a float.
+            input should be convertible to integer.
+
+Look at Tests\\Test.txt, Tests\\Test.csv, Tests\\Tests.xlsx for more information.
+
+A sample txt file, csv file, and xlsx file are shown below (Note headers are not required) :
+
+    Txt File:
+            Time Input
+            0.1 1
+            1.1 2
+            2.1 3
+            3.1 4
+            4.1 5
+    CSV File:
+            time,inputs
+            0.1,1
+            1.1,2
+            2.1,3
+            3.1,4
+            4.1,5
+    XLSX File:
+    Column: A    B
+            Time Input
+            0.1  1
+            1.1  2
+            2.1  3
+            3.1  4
+            4.1  5
+
+## Input Block Methods
+
+The following methods are available for the user : 
+    variable_name.output(left = 0, right = None)
+        1) Refer to [Making Connections](#Making Connections) for more information on making connections
+
+## Moore Machine Methods
+## Combinational Block Methods
