@@ -28,18 +28,20 @@ In order to install this project, download the zip file from above and extract i
 ## Libraries
 
 The following libraries are required to be installed : 
+    
     1) simpy
     2) matplotlib
-    3) openxl
+    3) openxl (for reading excel files only)
 
 You can install them by running the following commands : 
+    
     1) pip install simpy
     2) pip install matplotlib
     3) pip install openxl
 
 ## Usage
 
-### Starting Simulation
+### Starting the Simulation
 
 To start off, we need to create a simulation object, that handles the creation of objects.
 This can be done by the following code:
@@ -70,7 +72,7 @@ csv (Comma-Separated Values): A plain text file that uses commas to separate val
 txt (Text): A plain text file that contains unformatted text.
 xlsx (Excel Spreadsheet): A Microsoft Excel file format that contains data in a tabular form with rows and columns.
 
-Refer to [Inputs](#Inputs) for more information on the file format. 
+Refer to [Inputs From Files](#inputs-from-files) for more information on the file format. 
 
 ```python
 variable_name = pysim.source(filepath = "<filePath>", plot = <True/False>, blockID = "<Name of the block>")
@@ -117,9 +119,9 @@ This Block is to be used when needed insert a combinational logic in between.
 The Combinational Block is created by the following code:
 
 ```python
-def _function(x, y):
+def _function(input):
     # some function
-    return x
+    return output
 
 Variable_name = pysim.combinational(plot = <True/False>, blockID = "<Name of the block>", function = _function)
 ```
@@ -202,6 +204,85 @@ The parameters that it accepts are listed below in order:
 The above command creates a Combinational Block object.
 The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
 
+##### Enabled2BitCounterWithTC
+
+This is an enabled 2 bit counter. The output of the counter is 0-3. When the output of the counter is 3, the terminal count of the counter is high.
+
+```python
+from BuildingBlocks.BitCounters import Enabled2BitCounterWithTC as Counter
+
+variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject, plot = <True/False>)
+```
+
+The parameters that it accepts are listed below in order:
+        1) pydig (pydig object): a pydig object that you want to add this counter to.
+        2) enable (): a HasOutputConnection object (an Input object, a Machine        
+                    object, or a Combinational object).
+        3) clock : a clock object
+        4) plot : a boolean value whether to plot this object or not
+
+The above command creates a Combinational Block object.
+The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
+
+##### Enabled3BitCounterWithTC
+
+This is an enabled 3 bit counter. The output of the counter is 0-7. When the output of the counter is 7, the terminal count of the counter is high.
+
+```python
+from BuildingBlocks.BitCounters import Enabled3BitCounterWithTC as Counter
+
+variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject, plot = <True/False>)
+```
+
+The parameters that it accepts are listed below in order:
+        1) pydig (pydig object): a pydig object that you want to add this counter to.
+        2) enable (): a HasOutputConnection object (an Input object, a Machine        
+                    object, or a Combinational object).
+        3) clock : a clock object
+        4) plot : a boolean value whether to plot this object or not
+
+The above command creates a Combinational Block object.
+The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
+
+##### Enabled4BitCounterWithTC
+
+This is an enabled 4 bit counter. The output of the counter is 0-15. When the output of the counter is 15, the terminal count of the counter is high.
+
+```python
+from BuildingBlocks.BitCounters import Enabled4BitCounterWithTC as Counter
+
+variable_name = Counter(pydig = pysim, enable = inputObject, clock = clockObject, plot = <True/False>)
+```
+
+The parameters that it accepts are listed below in order:
+        1) pydig (pydig object): a pydig object that you want to add this counter to.
+        2) enable (): a HasOutputConnection object (an Input object, a Machine        
+                    object, or a Combinational object).
+        3) clock : a clock object
+        4) plot : a boolean value whether to plot this object or not
+
+The above command creates a Combinational Block object.
+The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
+
+#### FreezeCounter
+
+A freeze counter is a type of counter in which if the input is high,
+the counter "freezes" or, in other terms, stays at the same value until
+the input becomes low again.
+
+```python
+from BuildingBlocks.FreezeCounter import FreezeCounter as Counter
+
+variable_name = Counter(pydig = pysim, freeze = inputObject, clock = clockObject, plot = <True/False>)
+```
+
+The parameters that it accepts are listed below in order:
+        1) pydig : pydig object
+        2) modValue : the maximum value of the counter
+        3) freeze : the freeze signal
+        4) clock : the clock signal
+        @param plot : boolean value whether to plot this moore machine or not
+
 ### Making Connections
 
 There are 2 ways to make connections between Blocks. Both these are identical in function and properties. The user can use the method they find comfortable.
@@ -231,7 +312,7 @@ For example: if the output value is `11001` and we do `.output(1,4)` we connect 
 ```
 But the output connections using this method will include all output bits being connected to the next block.
 
-5) If we wish to connect a clock to the input of a moore machine we use `Moore.input()` and If we wish to connect it to the registers of the Moore Machine then we use `Moore.clock()`
+5) If we wish to connect a clock to the input of a Moore machine we use `Moore.input()` and If we wish to connect it to the registers of the Moore Machine then we use `Moore.clock()`
 ```python
     
     Clock1.output() > Moore.input()
@@ -239,48 +320,19 @@ But the output connections using this method will include all output bits being 
 
 ```
 
+To know about more features one can use to make connections go to: [More on types of connections](#More-on-types-of-connections)
 
-##### Types of connections
+### Generating the CSV File
 
-The simulator can handle different types of connections.
+<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-###### Single Out vs Multiple Out:
+### Running and Plotting the simulation
 
-```python
-Block0.output(a,b) > Block1.input()
-
-Block1.output(c,d) > Block2.input()
-Block1.output(e,f) > Block3.input()
-```
-
-The simulator can internally handle both these types of connections. If a block say `Block0` has only one conection going out it is treated as a Single-Output connection and if we have a block say `Block1` having multiple connections going out then it is treated as a Multiple-Output connection. Both are valid and the range of bits we select need not be the same nor be mutually exclusive. (a,b), (c,d) and (e,f) can be any range of values and the simulator can handle it accordingly. 
-
-
-```python
-Block0.output(a,b) > Block1.input()
-
-Block1.output(c,d) > Block2.input()
-Block1.output(e,f) > Block3.input()
-```
-
-###### Single In vs Multiple In:
-
-```python
-Block0.output(a,b) > Block1.input()
-
-Block1.output(c,d) > Block2.input()
-Block0.output(e,f) > Block2.input()
-```
-
-```python
-Block0.output(a,b) > Block1.input()
-
-Block1.output(c,d) > Block2.input()
-```
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 ## Sample Code
 
-```
+```python
 """
 This is a sample code of how a PWM can be simulated using this simulator
 
@@ -467,6 +519,35 @@ A sample txt file, csv file, and xlsx file are shown below (Note headers are not
             3.1  4
             4.1  5
 
+
+## More on types of connections
+
+The simulator can handle different types of connections.
+
+### Single Out vs Multiple Out:
+
+The simulator can internally handle both of these types of connections. If a block, say `Block0`, has only one connection going out. It is treated as a Single-Output connection. If we have a block, say `Block1`, having multiple connections going out then it is treated as a Multiple-Output connection. Both are valid and the range of bits we select need not be the same nor be mutually exclusive. (a,b), (c,d) and (e,f) can be any range of values and the simulator can handle it accordingly. 
+
+
+```python
+Block0.output(a,b) > Block1.input()
+
+Block1.output(c,d) > Block2.input()
+Block1.output(e,f) > Block3.input()
+```
+
+### Single In vs Multiple In:
+
+
+"""hgehgeuhgwe"""
+
+```python
+Block0.output(a,b) > Block1.input()
+
+Block1.output(c,d) > Block2.input()
+Block0.output(e,f) > Block2.input()
+```
+
 ## Input Block Methods
 
 The following methods are available for the user : 
@@ -477,5 +558,6 @@ The following methods are available for the user :
 
 The following methods are available for the user :
     
+    1) `.isConnected()` (@return boolean): return true if all the connections 
 
 ## Combinational Block Methods
