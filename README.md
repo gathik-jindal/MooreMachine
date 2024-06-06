@@ -101,6 +101,7 @@ The following objects can be created:
 The input block is designed to handle file inputs in various formats, including csv, txt, and xlsx. It reads the content of the file and processes it for further use in the application.
 
 Supported File Formats
+
 csv (Comma-Separated Values): A plain text file that uses commas to separate values.
 txt (Text): A plain text file that contains unformatted text.
 xlsx (Excel Spreadsheet): A Microsoft Excel file format that contains data in a tabular form with rows and columns.
