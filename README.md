@@ -90,11 +90,11 @@ NOTE: We will use "pysim" as a variable name for this object in the following ex
 
 The following objects can be created:
 
-    1. Input Block
-    2. Moore Machine
-    3. Combinational Block
-    4. Clock
-    5. Output Block
+    1) Input Block
+    2) Moore Machine
+    3) Combinational Block
+    4) Clock
+    5) Output Block
 
 #### <ins>Input Block</ins>
 
@@ -102,9 +102,9 @@ The input block is designed to handle file inputs in various formats, including 
 
 Supported File Formats
 
-    1. csv (Comma-Separated Values): A plain text file that uses commas to separate values.
-    2. txt (Text): A plain text file that contains unformatted text.
-    3. xlsx (Excel Spreadsheet): A Microsoft Excel file format that contains data in a tabular form with rows and columns.
+    1) csv (Comma-Separated Values): A plain text file that uses commas to separate values.
+    2) txt (Text): A plain text file that contains unformatted text.
+    3) xlsx (Excel Spreadsheet): A Microsoft Excel file format that contains data in a tabular form with rows and columns.
 
 Refer to [Inputs From Files](#inputs-from-files) for more information on the file format. 
 
@@ -159,19 +159,42 @@ def _function(input):
     # some function
     return output
 
-Variable_name = pysim.combinational(plot = <True/False>, blockID = "<Name of the block>", function = _function)
+variable_name = pysim.combinational(maxOutSize = <int>, plot = <True/False>, blockID = "<Name of the block>", function = _function, delay = <float>)
 ```
 
 The parameters that it accepts are listed below in order:
 
     1) 'maxOutSize' (int): the maximum number of parallel output wires
-    2) 'plot' (boolean): boolean value whether to plot this moore machine or not
+    2) 'plot' (boolean): boolean value whether to plot this moore machine or not (default is False)
     3) 'blockID' (str): the id of this machine. If None, then new unique ID is given.
     4) 'function' (function): inner gate logic
     5) 'delay' (float): the time delay for this object
-    6) 'initialValue' (int): The initial output value given by this block at t = 0 while running
+    6) 'initialValue' (int): The initial output value given by this block at t = 0 while running (default is 0)
 
-The above command creates a Combinational Block object.
+You can also create a combinational block directly as shown:
+
+```python
+def _function(input):
+    # some function
+    return output
+
+variable_name = Combinational(maxOutSize = <int>, plot = <True/False>, blockID = "<Name of the block>", func = _function, env = pysim.getEnv(), delay = <float>, initialValue = <int>)
+
+pysim.combinationalFromObject(variable_name)
+```
+
+The key-word arguments that it accepts are listed below in order:
+
+    1) 'maxOutSize' (int): the maximum number of parallel output wires
+    2) 'plot' (boolean): boolean value whether to plot this moore machine or not (default is False)
+    3) 'blockID' (str): the id of this machine. If None, then new unique ID is given.
+    4) 'function' (function): inner gate logic
+    5) 'env' (simpy environment): the simpy environment variable (pysim.getEnv())
+    6) 'delay' (float): the time delay for this object
+    7) 'initialValue' (int): The initial output value given by this block at t = 0 while running (default is 0)
+
+
+The above commands creates a Combinational Block object.
 The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
 
 #### <ins>Clock Block</ins>
