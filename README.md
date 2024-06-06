@@ -627,30 +627,39 @@ with open("Test.csv", "w", newline='') as file:
 
 Look at Tests\\Test.txt, Tests\\Test.csv, Tests\\Tests.xlsx for more information.
 
-A sample txt file, csv file, and xlsx file are shown below (Note headers are not required) :
+There can be inputs in multiple columns. If such inputs are given, then the program would concatenate them bitwise. For example, consider the row given as 0.1,2,3,4. The first element would be the time at which this input occurs. The next three elements would be the input values. The resultant input value would be "10"(2) + "11"(3) + "100"(4) = "1011100"(92). Look at the sample csv file below for such an example. 
+
+A sample txt file, csv file, and xlsx file are shown below (Note headers are not required). The generated inputs are also shown below.
 
     Txt File:
             Time Input
-            0.1 1
-            1.1 2
-            2.1 3
-            3.1 4
+            0.1 6
+            1.1 165
+            2.1 118
+            3.1 37
             4.1 5
     CSV File:
             time,inputs
-            0.1,1
-            1.1,2
-            2.1,3
-            3.1,4
+            0.1,1,2
+            1.1,2,4,5
+            2.1,3,5,2
+            3.1,4,5
             4.1,5
     XLSX File:
     Column: A    B
             Time Input
-            0.1  1
-            1.1  2
-            2.1  3
-            3.1  4
+            0.1  6
+            1.1  165
+            2.1  118
+            3.1  37
             4.1  5
+    Generated Input:
+    Time Value
+    0.1  6
+    1.1  165
+    2.1  118
+    3.1  37
+    4.1  5
 
 
 ## <ins>More on types of connections</ins>
