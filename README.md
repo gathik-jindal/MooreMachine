@@ -601,38 +601,48 @@ Input Format:
     4) The next how many ever lines should be the inputs.
     5) If there are any empty elements, an error would be thrown.
 
+Example on how to generate a csv file:
+```python
+import csv
+with open("Test.csv", "w", newline='') as file:
+    csw=csv.writer(file)
+    csw.writerow['-',3]
+    for i in range(5):
+    csw.writerow([i+0.1,i+1])
+```
+
 Sample Input Format:
 
 Txt File:
 ```
-        Time Input
-        - 9
-        0.1 80
-        1.1 165
-        2.1 234
-        3.1 296
-        4.1 320
+Time Input
+- 9
+0.1 80
+1.1 165
+2.1 234
+3.1 296
+4.1 320
 ```
 CSV File:
 ```
-        time,input
-        -,9
-        0.1,80
-        1.1,165
-        2.1,234
-        3.1,296
-        4.1,320
+time,input
+-,9
+0.1,80
+1.1,165
+2.1,234
+3.1,296
+4.1,320
 ```
 XLSX File:
 ```
-        Column: A    B      C      D
-                Time Input1 Input2 Input3
-                -    3      3      3
-                0.1  1      2      0
-                1.1  2      4      5
-                2.1  3      5      2
-                3.1  4      5      0
-                4.1  5      0      0
+Column: A    B      C      D
+        Time Input1 Input2 Input3
+        -    3      3      3
+        0.1  1      2      0
+        1.1  2      4      5
+        2.1  3      5      2
+        3.1  4      5      0
+        4.1  5      0      0
 ```
 Internally, all the inputs would be combined into one input wire. For example, the generated input from the above input would be:
 
@@ -648,68 +658,6 @@ Generated Input:
 ```
 
 Thus, all the above formats shown generate the same input of `[80, 165, 234, 296, 320]` at times `[0.1, 1.1, 2.1, 3.1, 4.1]` respectively. 
-
-```python
-import csv
-with open("Test.csv", "w", newline='') as file:
-    csw=csv.writer(file)
-    csw.writerow['-',3]
-    for i in range(5):
-    csw.writerow([i+0.1,i+1])
-```
-
-            Input format that is expected in the file as follows:
-            <time>,<input>
-            <time>,<input>
-            ...
-            time should be convertible to float.
-            input should be convertible to integer.
-
-        For xlsx files, the format should be as follows:
-        Input format is expected in the file as follows:
-            Column:  A         B
-                    <time>   <input>
-                    <time>   <input>
-                    ...
-            time should be convertible to a float.
-            input should be convertible to integer.
-
-Look at Tests\\Test.txt, Tests\\Test.csv, Tests\\Tests.xlsx for more information.
-
-There can be inputs in multiple columns. If such inputs are given, then the program would concatenate them bitwise. For example, consider the row given as 0.1,2,3,4. The first element would be the time at which this input occurs. The next three elements would be the input values. The resultant input value would be "10"(2) + "11"(3) + "100"(4) = "1011100"(92). Look at the sample csv file below for such an example. 
-
-A sample txt file, csv file, and xlsx file are shown below (Note headers are not required). The generated inputs are also shown below.
-
-    Txt File:
-            Time Input
-            0.1 6
-            1.1 165
-            2.1 118
-            3.1 37
-            4.1 5
-    CSV File:
-            time,inputs
-            0.1,1,2
-            1.1,2,4,5
-            2.1,3,5,2
-            3.1,4,5
-            4.1,5
-    XLSX File:
-    Column: A    B
-            Time Input
-            0.1  6
-            1.1  165
-            2.1  118
-            3.1  37
-            4.1  5
-    Generated Input:
-    Time Value
-    0.1  6
-    1.1  165
-    2.1  118
-    3.1  37
-    4.1  5
-
 
 ## <ins>More on types of connections</ins>
 
