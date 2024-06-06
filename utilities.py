@@ -40,6 +40,16 @@ def printErrorAndExit(message: str):
 
     sys.exit(1)
 
+def bitCount(num):
+        """
+        @param num : the number to find the bit count
+        @return int : the number of bits in the number
+        """
+        a = 0
+        while (num):
+            a += 1
+            num = num >> 1
+        return a
 
 def dumpVars(dic: dict, name: str = "dumpVars"):
     """

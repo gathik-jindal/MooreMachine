@@ -20,7 +20,7 @@ sys.path.append(parent)
 
 from pydig import pydig as pd
 from blocks import Clock as Clock, Combinational as Comb, HasOutputConnections as HOC
-from utilities import checkType
+from utilities import checkType, bitCount
 
 
 class SynchronousCounter(Comb):
@@ -36,7 +36,7 @@ class SynchronousCounter(Comb):
         @param plot : boolean value whether to plot this moore machine or not
         """
         checkType([(pydig, pd), (modValue, int), (syncReset, HOC), (clock, Clock), (plot, bool)])
-        maxOutSize = SynchronousCounter.__bitCount(modValue)
+        maxOutSize = bitCount(modValue)
         self.__modValue = modValue
         SynchronousCounter.__counter += 1
 
@@ -53,18 +53,6 @@ class SynchronousCounter(Comb):
         i.output() > m.input()
         self.__clk.output() > m.clock()
         m.output() > o.input()
-
-    @staticmethod
-    def __bitCount(num):
-        """
-        @param num : the number to find the bit count
-        @return int : the number of bits in the number
-        """
-        a = 0
-        while (num):
-            a += 1
-            num = num >> 1
-        return a
 
     def __nsl(self, ps, i):
         """
