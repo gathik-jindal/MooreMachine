@@ -609,7 +609,7 @@ with open("Test.csv", "w", newline='') as file:
     csw=csv.writer(file)
     csw.writerow['-',3]
     for i in range(5):
-    csw.writerow([i+0.1,i+1])
+        csw.writerow([i+0.1,i+1])
 ```
 
 Sample Input Format:
