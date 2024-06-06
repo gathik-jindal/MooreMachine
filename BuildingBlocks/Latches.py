@@ -131,7 +131,7 @@ class DLatch(Comb):
 if __name__ == "__main__":
 
     pydig = pd()
-    i = pydig.source(filePath="Tests\\DLatch.csv", plot=False, blockID=f"D Latch")
+    i = pydig.source(filePath="..\\Tests\\DLatch.csv", plot=False, blockID=f"D Latch")
     clk = pydig.clock(plot=False, blockID="Clock", timePeriod=6, onTime=3, initialValue = 1)
     output1 = DLatch(pydig, clk, i, plot=True)
 
