@@ -45,57 +45,62 @@ class InputGenerator:
 
     def getInput(self):
         """
-        This function reads the input stored in the file specified by the given filePath.
-        For txt files, the delimiter should be a space ' '
-        For csv files, the delimiter should be a comma ','
-        For xlsx files, the columns used should be A and B
+        Input Format:
 
-        Feature: Each of the specified file types can have a header line which can contain anything,
-                 the program will automatically skip it / ignore it.
-
-        For txt files, the format should be as follows: 
-            Input format that is expected in the file as follows:
-            <time> <input>
-            <time> <input>
-            ...
-
-
-            time should be convertible to float.
-            input should be convertible to integer
-
-        For csv files, the format should be as follows:
-            This function reads inputs from a csv file.
-            It assumes that the newline was set to "" while creating the file 
-
-            A sample creation in python:
-
-                import csv
-                with open("Test.csv", "w", newline='') as file:
-                    csw=csv.writer(file)
-                    for i in range(5):
-                        csw.writerow([i+0.1,i+1])
-
-            Input format that is expected in the file as follows:
-            <time>,<input>
-            <time>,<input>
-            ...
-
-            time should be convertible to float.
-            input should be convertible to integer
-
-        For xlsx files, the format should be as follows:
-            Input format is expected in the file as follows:
-            Column:  A         B
-                    <time>   <input>
-                    <time>   <input>
-                    <time>   <input>
-                    ...
-
-
-            time should be convertible to a float
-            input should be convertible to integer 
-
-        Returns a list consisting of (time, input) as entries  
+        1) The inputs to the Moore Machine can be from files that have the extension .txt, .csv, or .xlsx.
+        2) The first line of each file should be an header line which can contain anything, the program will automatically skip it / ignore it.
+        3) The second line of each file should contain the number of bits for each input field. The first value for the time can be anything (it would be ignored). If the inputs given contain more number of bits than specified, then an error would be thrown.
+        4) The next how many ever lines should be the inputs.
+        5) If there are any empty elements, an error would be thrown.
+        Example on how to generate a csv file:
+        
+        import csv
+        with open("Test.csv", "w", newline='') as file:
+            csw=csv.writer(file)
+            csw.writerow['-',3]
+            for i in range(5):
+                csw.writerow([i+0.1,i+1])
+        Sample Input Format:
+        
+        Txt File:
+        
+        Time Input1 Input2 Input3
+        --- 3 3 3
+        0.1 1 2 0
+        1.1 2 4 5
+        2.1 3 5 2
+        3.1 4 5 0
+        4.1 5 0 0
+        CSV File:
+        
+        time,input1,input2,input3
+        ---,3,3,3
+        0.1,1,2,0
+        1.1,2,4,5
+        2.1,3,5,2
+        3.1,4,5,0
+        4.1,5,0,0
+        XLSX File:
+        
+        Column: A    B      C      D
+                Time Input1 Input2 Input3
+                -    3      3      3
+                0.1  1      2      0
+                1.1  2      4      5
+                2.1  3      5      2
+                3.1  4      5      0
+                4.1  5      0      0
+        Internally, all the inputs would be combined into one input wire. For example, the generated input from the above input would be:
+        
+        Generated Input:
+        
+            Time Input
+            0.1  ("001" + "010" + "000") = "001010000" = 80
+            1.1  ("010" + "100" + "101") = "010100101" = 165
+            2.1  ("011" + "101" + "010") = "011101010" = 234
+            3.1  ("100" + "101" + "000") = "100101000" = 296
+            4.1  ("101" + "000" + "000") = "101000000" = 320
+        Thus, all the above formats shown generate the same input of [80, 165, 234, 296, 320] at times [0.1, 1.1, 2.1, 3.1, 4.1] respectively.
         """
 
         try:
