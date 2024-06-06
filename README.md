@@ -56,10 +56,10 @@ The transition between states in a Moore Machine is based solely on the input, a
 ## <ins>Installation</ins>
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/your-repo-name.git
+git clone https://github.com/gathik-jindal/MooreMachine.git
 
 # Change directory to the repository
-cd your-repo-name
+cd MooreMachine
 
 # Create and activate a virtual environment (optional)
 python -m venv venv
