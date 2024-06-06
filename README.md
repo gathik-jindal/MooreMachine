@@ -132,17 +132,19 @@ def _ol(presentState):
     # some function
     return output
 
-Variable_name = pysim.moore(plot = <True/False>, blockID = "<Name of the block>", nsl = _nsl, ol = _ol)
+variable_name = pysim.moore(maxOutSize = <int>, plot = <True/False>, blockID = "<Name of the block>")
+variable_name.nsl = _nsl
+variable_name.ol = _ol
 ```
 
 The parameters that it accepts are listed below in order:
 
-    1) 'maxOutSize' (int): the maximum number of output wires
-    2) 'plot' (bool): boolean value whether to plot this moore machine or not
+    1) 'maxOutSize' (int): the maximum number of output wires.
+    2) 'plot' (bool): boolean value whether to plot this moore machine or not (default is False).
     3) 'blockID' (str): the id of this machine. If None, then new unique ID is given.  
-    4) 'nsl' (function): next state logic function, this accepts two arguments, the first is the input and the second is the present state.
-    5) 'ol' (function): output logic function
-    6) 'startingState' (int): the starting value for all the wires excpet the output of the moore machine, the values should be less than 2^maxOutSize.
+    4) 'nsl' (function): next state logic function, this accepts two arguments, the first is the input and the second is the present state (can be passed in or can be written as above).
+    5) 'ol' (function): output logic function (can be passed in or can be written as above).
+    6) 'startingState' (int): the starting value for all the wires excpet the output of the moore machine, the values should be less than 2^maxOutSize (default is 0).
 
 The above command returns a Moore Machine object.
 The following methods are available for the user at [Moore Machine Methods](#moore-machine-methods).
