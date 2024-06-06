@@ -604,6 +604,7 @@ Input Format:
 Sample Input Format:
 
 Txt File:
+```
         Time Input
         - 9
         0.1 80
@@ -611,8 +612,9 @@ Txt File:
         2.1 234
         3.1 296
         4.1 320
-
+```
 CSV File:
+```
         time,input
         -,9
         0.1,80
@@ -620,27 +622,30 @@ CSV File:
         2.1,234
         3.1,296
         4.1,320
-
+```
 XLSX File:
-Column: A    B      C      D
-        Time Input1 Input2 Input3
-        -    3      3      3
-        0.1  1      2      0
-        1.1  2      4      5
-        2.1  3      5      2
-        3.1  4      5      0
-        4.1  5      0      0
-
+```
+        Column: A    B      C      D
+                Time Input1 Input2 Input3
+                -    3      3      3
+                0.1  1      2      0
+                1.1  2      4      5
+                2.1  3      5      2
+                3.1  4      5      0
+                4.1  5      0      0
+```
 Internally, all the inputs would be combined into one input wire. For example, the generated input from the above input would be:
 
 Generated Input:
 
-Time Input
-0.1  ("001" + "010" + "000") = "001010000" = 80
-1.1  ("010" + "100" + "101") = "010100101" = 165
-2.1  ("011" + "101" + "010") = "011101010" = 234
-3.1  ("100" + "101" + "000") = "100101000" = 296
-4.1  ("101" + "000" + "000") = "101000000" = 320
+```
+    Time Input
+    0.1  ("001" + "010" + "000") = "001010000" = 80
+    1.1  ("010" + "100" + "101") = "010100101" = 165
+    2.1  ("011" + "101" + "010") = "011101010" = 234
+    3.1  ("100" + "101" + "000") = "100101000" = 296
+    4.1  ("101" + "000" + "000") = "101000000" = 320
+```
 
 Thus, all the above formats shown generate the same input of `[80, 165, 234, 296, 320]` at times `[0.1, 1.1, 2.1, 3.1, 4.1]` respectively. 
 
