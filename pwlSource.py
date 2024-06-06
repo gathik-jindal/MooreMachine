@@ -171,21 +171,25 @@ class InputGenerator:
         try:
             for row in iterable:
                 row = [i for i in row if i]
-                if (len(row) == 2):
-                    try:
-                        input_schedule.append((float(row[0]), int(row[1])))
-                    except (ValueError, TypeError):
-                        if (counter != 0):
-                            raise ValueError(f"Input Error: Inputs are not valid type. Check row {counter + 1} of file {self.getFilePath()}.")
-                else:
-                    raise ValueError(f"Input Error: Corrupt input/Garbage input because row {counter + 1} is not of length 2. Check file {self.getFilePath()}.")
+                try:
+                    temp = 0
+                    for i in range(1, len(row)):
+                        temp = temp << (InputGenerator.__countTotalBits(int(row[i]))) | int(row[i])
+                    input_schedule.append((float(row[0]), temp))
+                except (ValueError, TypeError):
+                    if (counter != 0):
+                        raise ValueError(f"Input Error: Inputs are not valid type. Check row {counter + 1} of file {self.getFilePath()}.")
                 counter += 1
         except TypeError:
             raise ValueError(f"{iterable} cannot be iterated upon.")
 
         return {"Inputs": input_schedule}
 
-
+    @staticmethod
+    def __countTotalBits(num):
+        binary = bin(num)[2:]
+        return len(binary)
+    
 if __name__ == "__main__":
 
     # Correct ways for getting inputs
