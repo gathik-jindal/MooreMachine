@@ -643,7 +643,6 @@ class Combinational(HasInputConnections, HasOutputConnections):
         Use keyword arguments to pass the following parameters:
         @param func : is the function that will be used to calculate the output.
         @param delay : is the delay in the output.
-        @param state : is the initial state of the block.
         @param env : is the simpy environment.
         @param plot : is a boolean variable which represents whether or not we should plot this class.
         @param blockID : is the id of this input block. If blockID is a duplicate or None, then new unique ID is given.
