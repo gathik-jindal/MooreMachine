@@ -102,9 +102,9 @@ The input block is designed to handle file inputs in various formats, including 
 
 Supported File Formats
 
-csv (Comma-Separated Values): A plain text file that uses commas to separate values.
-txt (Text): A plain text file that contains unformatted text.
-xlsx (Excel Spreadsheet): A Microsoft Excel file format that contains data in a tabular form with rows and columns.
+    1. csv (Comma-Separated Values): A plain text file that uses commas to separate values.
+    2. txt (Text): A plain text file that contains unformatted text.
+    3. xlsx (Excel Spreadsheet): A Microsoft Excel file format that contains data in a tabular form with rows and columns.
 
 Refer to [Inputs From Files](#inputs-from-files) for more information on the file format. 
 
