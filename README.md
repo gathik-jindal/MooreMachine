@@ -171,16 +171,22 @@ The parameters that it accepts are listed below in order:
     5) 'delay' (float): the time delay for this object
     6) 'initialValue' (int): The initial output value given by this block at t = 0 while running (default is 0)
 
-You can also create a combinational block directly as shown:
+You can also create a combinational block directly. This method is advised when you want to create your own custom class that can act like a block as shown:
 
 ```python
+from blocks import Combinational
+
 def _function(input):
     # some function
     return output
 
-variable_name = Combinational(maxOutSize = <int>, plot = <True/False>, blockID = "<Name of the block>", func = _function, env = pysim.getEnv(), delay = <float>, initialValue = <int>)
+class className(Combinational):
 
-pysim.combinationalFromObject(variable_name)
+    def __init__(self, pysim, **kwargs):
+        super().__init__(maxOutSize=<int>, plot=<True/False>, blockID="<Name of the block>", func=_function, env=pysim.getEnv(), delay=<float>)
+
+        #The below method is to add this object to the manager pysim class. (It is required.)
+        pysim.combinationalFromObject(self)
 ```
 
 The key-word arguments that it accepts are listed below in order:
