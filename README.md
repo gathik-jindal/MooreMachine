@@ -595,6 +595,7 @@ pysim.run(until=40)
 ## <ins>Inputs From Files</ins>
 
 Input Format:
+
     1) The inputs to the Moore Machine can be from files that have the extension .txt, .csv, or .xlsx.
     2) The first line of each file should be an header line which can contain anything, the program will automatically skip it / ignore it.
     3) The second line of each file should contain the number of bits for each input field. The first value for the time can be anything (it would be ignored). If the inputs given contain more number of bits than specified, then an error would be thrown.
