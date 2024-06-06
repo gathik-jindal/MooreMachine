@@ -9,7 +9,7 @@ In order to use this class for reading xlsx, one needs to have openpyxl installe
 """
 
 from utilities import checkType, printErrorAndExit
-
+import pandas as pd
 
 class InputGenerator:
 
@@ -166,30 +166,57 @@ class InputGenerator:
         This function raises a ValueError if any error is encountered. 
         """
 
-        input_schedule = []
-        counter = 0
+        def to_binary(val):
+            return bin(int(val))[2:]
+
+        def to_decimal(val):
+            return int(val, 2)
+        
+        def pad_with_zeros(value):
+
+            if(len(value) > length):
+                printErrorAndExit("Number of bits in input is bigger than that specified by the first column.")
+            
+            padded_value = str(value).zfill(length)
+            return padded_value
+
+        #For txt files
+        df = pd.DataFrame(data = iterable).replace("\n", "", regex = True)
+
+        if df.isnull().values.any():
+            printErrorAndExit("Input contains illegal values.")
+
+        df.columns = df.iloc[0]
+        df = df.drop(df.index[0])
+        
         try:
-            for row in iterable:
-                row = [i for i in row if i]
-                try:
-                    temp = 0
-                    for i in range(1, len(row)):
-                        temp = temp << (InputGenerator.__countTotalBits(int(row[i]))) | int(row[i])
-                    input_schedule.append((float(row[0]), temp))
-                except (ValueError, TypeError):
-                    if (counter != 0):
-                        raise ValueError(f"Input Error: Inputs are not valid type. Check row {counter + 1} of file {self.getFilePath()}.")
-                counter += 1
-        except TypeError:
-            raise ValueError(f"{iterable} cannot be iterated upon.")
+            df.set_index(df.columns[0], inplace = True)
+            df = df.astype(int)
+            df = df.astype(str)
+            df.iloc[1:,:] = df.iloc[1:,:].apply(lambda x: x.apply(to_binary))            
+        except ValueError as e:
+            printErrorAndExit("Input contains illegal values.")
 
-        return {"Inputs": input_schedule}
+        for col in df.columns:
+            length = int(df[col].iloc[0])
 
-    @staticmethod
-    def __countTotalBits(num):
-        binary = bin(num)[2:]
-        return len(binary)
-    
+            df[col].iloc[1:] = df[col].iloc[1:].apply(pad_with_zeros)
+
+        df = df.drop(df.index[0])
+        df['Input'] = df.apply(lambda row: ''.join(map(str, row)), axis=1)
+        df.drop(df.columns.difference(['Input']), axis=1, inplace=True)
+        df.reset_index(inplace = True)
+        
+        try:
+            df[df.columns[0]] = df[df.columns[0]].astype(float)
+            df[df.columns[1]] = df[df.columns[1]].apply(to_decimal).astype(int)
+        except ValueError as e:
+            printErrorAndExit("Input contains illegal values.")
+
+        list_of_tuples = [tuple([float(x[0]), int(x[1])]) for x in df.to_records(index=False)]
+        
+        return {"Inputs":list_of_tuples}
+
 if __name__ == "__main__":
 
     # Correct ways for getting inputs
