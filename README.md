@@ -75,7 +75,8 @@ The following libraries are required to be installed :
     
     1) simpy
     2) matplotlib
-    3) openxl (for reading excel files)
+    3) pandas
+    4) openxl (for reading excel files)
 
 ## <ins>Usage</ins>
 
@@ -592,25 +593,62 @@ pysim.run(until=40)
 # <ins>Elaborations and Explanations</ins>
 
 ## <ins>Inputs From Files</ins>
-The inputs to the Moore Machine can be from files that have the extension .txt, .csv, or .xlsx.
 
-Feature: Each of the specified file types can have a header line which can contain anything, the program will automatically skip it / ignore it.
+Input Format:
+    1) The inputs to the Moore Machine can be from files that have the extension .txt, .csv, or .xlsx.
+    2) The first line of each file should be an header line which can contain anything, the program will automatically skip it / ignore it.
+    3) The second line of each file should contain the number of bits for each input field. The first value for the time can be anything (it would be ignored). If the inputs given contain more number of bits than specified, then an error would be thrown.
+    4) The next how many ever lines should be the inputs.
+    5) If there are any empty elements, an error would be thrown.
 
-        For txt files, the format should be as follows:
-            <time> <input>
-            <time> <input>
-            ...
-            time should be convertible to float.
-            input should be convertible to integer.
+Sample Input Format:
 
-        For csv files, the format should be as follows:
-            It assumes that the newline was set to "" while creating the file.
-            A sample creation in python:
+Txt File:
+        Time Input
+        - 9
+        0.1 80
+        1.1 165
+        2.1 234
+        3.1 296
+        4.1 320
+
+CSV File:
+        time,input
+        -,9
+        0.1,80
+        1.1,165
+        2.1,234
+        3.1,296
+        4.1,320
+
+XLSX File:
+Column: A    B      C      D
+        Time Input1 Input2 Input3
+        -    3      3      3
+        0.1  1      2      0
+        1.1  2      4      5
+        2.1  3      5      2
+        3.1  4      5      0
+        4.1  5      0      0
+
+Internally, all the inputs would be combined into one input wire. For example, the generated input from the above input would be:
+
+Generated Input:
+
+Time Input
+0.1  ("001" + "010" + "000") = "001010000" = 80
+1.1  ("010" + "100" + "101") = "010100101" = 165
+2.1  ("011" + "101" + "010") = "011101010" = 234
+3.1  ("100" + "101" + "000") = "100101000" = 296
+4.1  ("101" + "000" + "000") = "101000000" = 320
+
+Thus, all the above formats shown generate the same input of `[80, 165, 234, 296, 320]` at times `[0.1, 1.1, 2.1, 3.1, 4.1]` respectively. 
 
 ```python
 import csv
 with open("Test.csv", "w", newline='') as file:
     csw=csv.writer(file)
+    csw.writerow['-',3]
     for i in range(5):
     csw.writerow([i+0.1,i+1])
 ```
