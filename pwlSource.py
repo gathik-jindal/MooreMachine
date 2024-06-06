@@ -236,13 +236,6 @@ if __name__ == "__main__":
     print("Current File Path", fileInput.getFilePath())
     print("String Representation:", fileInput)
 
-    # Creating the CSV file
-    # import csv
-    # with open("Tests\\Test.csv", "w", newline='') as file:
-    #    csw=csv.writer(file)
-    #    for i in range(5):
-    #        csw.writerow([i+0.1,i+1])
-
     # Incorrect ways for getting inputs
     # It generates error message and exits
 
