@@ -147,7 +147,7 @@ The parameters that it accepts are listed below in order:
     6) 'startingState' (int): the starting value for all the wires excpet the output of the moore machine, the values should be less than 2^maxOutSize (default is 0).
 
 The above command returns a Moore Machine object.
-The following methods are available for the user at [Moore Machine Methods](#moore-machine-methods).
+The methods available for the user are at [Moore Machine Methods](#moore-machine-methods).
 
 #### <ins>Combinational Block</ins>
 
@@ -201,7 +201,7 @@ The key-word arguments that it accepts are listed below in order:
 
 
 The above commands creates a Combinational Block object.
-The following methods are available for the user at [Combinational Block Methods](#combinational-block-methods).
+The methods available for the user are at [Combinational Block Methods](#combinational-block-methods).
 
 #### <ins>Clock Block</ins>
 
@@ -220,7 +220,7 @@ The parameters that it accepts are listed below in order:
     5) initialValue (int): the initial value of the clock (default is 0)
 
 The above command creates a Clock Block object.
-The following methods are available for the user at [Clock Block Methods](#clock-block-methods).
+The methods available for the user are at [Clock Block Methods](#clock-block-methods).
 
 #### <ins>Output Block</ins>
 
@@ -236,7 +236,7 @@ The parameters that it accepts are listed below in order:
     2) blockID (str): the id of this input block. If None, then new unique ID is given.
 
 The above command creates a Output Block object.
-The following methods are available for the user at [Clock Block Methods](#output-block-methods).
+The methods available for the user are at [Clock Block Methods](#output-block-methods).
 
 #### <ins>Building Blocks</ins>
 
