@@ -54,8 +54,20 @@ Here are the key characteristics of a Moore Machine:
 The transition between states in a Moore Machine is based solely on the input, and the output is a function of the current state. This makes Moore Machines particularly useful for modelling systems where the output depends on the current state of the system.
 
 ## <ins>Installation</ins>
+```bash
+# Clone the repository
+git clone https://github.com/your-username/your-repo-name.git
 
-In order to install this project, download the zip file from above and extract it to your local destination.
+# Change directory to the repository
+cd your-repo-name
+
+# Create and activate a virtual environment (optional)
+python -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
 
 ## <ins>Libraries</ins>
 
@@ -64,12 +76,6 @@ The following libraries are required to be installed :
     1) simpy
     2) matplotlib
     3) openxl (for reading excel files)
-
-You can install them by running the following commands : 
-    
-    1) pip install simpy
-    2) pip install matplotlib
-    3) pip install openxl
 
 ## <ins>Usage</ins>
 
