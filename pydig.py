@@ -75,7 +75,7 @@ class pydig:
         if (blockID == None):
             blockID = self.__makeUniqueID("Combi")
         elif blockID in self.__uniqueIDlist:
-            id = self.__makeUniqueID("Combi")
+            id = self.__makeUniqueID(blockID)
             print(f"{blockID} is already used so changing to {id}")
             blockID = id
 
@@ -94,7 +94,7 @@ class pydig:
         checkType([(combObj, Combinational)])
 
         if combObj._blockID in self.__uniqueIDlist:
-            id = self.__makeUniqueID("Combi")
+            id = self.__makeUniqueID(combObj._blockID)
             print(f"{combObj._blockID} is already used so changing to {id}")
             combObj._blockID = id
 
