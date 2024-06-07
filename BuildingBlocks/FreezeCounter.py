@@ -9,9 +9,9 @@ the input becomes low again.
 @version 1.6
 """
 
-from pydig import pydig as pd, bitCount
+from pydig import pydig as pd
 from blocks import Clock as Clock, Combinational as Comb, HasOutputConnections as HOC
-from utilities import checkType
+from utilities import checkType, bitCount
 import os
 import sys
 
