@@ -9,6 +9,7 @@ sys.path.append(parent)
 from utilities import printErrorAndExit, checkType, bitCount
 from pydig import pydig as pd
 from blocks import Combinational as Comb
+import random
 
 
 class NOT(Comb):
@@ -35,7 +36,7 @@ class NOT(Comb):
         @param val (int): The value to be negated (can be more than single bit)
         @return (int): The negated value
         """
-        return (2**len(bin(val)[2:])-1) & ~val
+        return (2**bitCount(val)-1) & ~val
 
 
 class AND(Comb):
@@ -65,7 +66,7 @@ class AND(Comb):
         @param val (int): The value that's going to be used to AND
         @return (int): The result of the AND operation
         """
-        numBits = len(bin(val)[2:])
+        numBits = bitCount(val)
         val1 = val >> (numBits // 2)
         val2 = val & ((1 << (numBits // 2)) - 1)
         return val1 & val2
@@ -98,7 +99,7 @@ class OR(Comb):
         @param val (int): The value to be ORed
         @return (int): The result of the OR operation
         """
-        numBits = len(bin(val)[2:])
+        numBits = bitCount(val)
         val1 = val >> (numBits // 2)
         val2 = val & ((1 << (numBits // 2)) - 1)
         return val1 | val2
@@ -131,7 +132,7 @@ class XOR(Comb):
         @param val (int): The value to be XORed
         @return (int): The result of the XOR operation
         """
-        numBits = len(bin(val)[2:])
+        numBits = bitCount(val)
         val1 = val >> (numBits // 2)
         val2 = val & ((1 << (numBits // 2)) - 1)
         return val1 ^ val2
@@ -154,7 +155,7 @@ class NAND(Comb):
         @param plot : boolean value whether to plot this block or not
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
-        self.__andGate = AND(pydig, delay, initialValue, False, blockID)
+        self.__andGate = AND(pydig, delay, initialValue, False, blockID + str(random.randint(10, 10000)))
         self.__notGate = NOT(pydig, 0, initialValue, plot, blockID)
 
         self.__andGate.output() > self.__notGate.input()
@@ -195,7 +196,7 @@ class NOR(Comb):
         @param plot : boolean value whether to plot this block or not
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
-        self.__orGate = OR(pydig, delay, initialValue, False, blockID)
+        self.__orGate = OR(pydig, delay, initialValue, False, blockID + str(random.randint(10, 10000)))
         self.__notGate = NOT(pydig, 0, initialValue, plot, blockID)
 
         self.__orGate.output() > self.__notGate.input()
@@ -219,38 +220,138 @@ class NOR(Comb):
         return self.__notGate.getScopeDump()
 
 
-def XNOR(val1, val2):
+class XNOR(Comb):
     """
-    @param val1 (int): The first value to be XNORed
-    @param val2 (int): The second value to be XNORed
-    @return (int): The result of the XNOR operation
+    This class represents the XNOR gate.
+    Half the incoming lines will be XNORed with the other half.
+
+    Lets say the incoming bits are: 10101100
+    Then the first 4 bits will be XNORed with the last 4 bits, in this order: 1010 & 1100
     """
-    return NOT(XOR(val1, val2))
+
+    def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
+        """
+        @param pydig : pydig object
+        @param delay : the time delay for the XNOR gate
+        @param initialValue : The initial output value given by this block at t = 0 while running
+        @param plot : boolean value whether to plot this block or not
+        @param blockID : the id of this block. If None, then new unique ID is given.
+        """
+        self.__xorGate = XOR(pydig, delay, initialValue, False, blockID + str(random.randint(10, 10000)))
+        self.__notGate = NOT(pydig, 0, initialValue, plot, blockID)
+
+        self.__xorGate.output() > self.__notGate.input()
+    
+    def input(self, left=None, right=None):
+        """
+        @return obj : instance of the xorGate object
+        """
+        return self.__xorGate.input(left, right)
+
+    def output(self, left=0, right=None):
+        """
+        @return obj : instance of the notGate object
+        """
+        return self.__notGate.output(left, right)
+    
+    def getScopeDump(self):
+        """
+        @return dict : the scope dump values for this block.
+        """
+        return self.__notGate.getScopeDump()
 
 
-def MUX(sel, val1, val2):
+class MUX(Comb):
     """
-    @param sel (int): The selection bit (0 or 1)
-    @param val1 (int): The first value to be selected (0 or 1)
-    @param val2 (int): The second value to be selected (0 or 1)
-    @return (int): The selected value (0 or 1)
+    This class represents the MUX gate.
+    If the selection bit is 0, then the first value is selected, else the second value is selected.
+
+    The first bit is the selectin bit, and from rest of the bits, the first half is the first value and the second half is the second value.
+    For example, if the input is 110101100, then the selection bit is 1, the first value is 1010 and the second value is 1100.
     """
-    if (sel > 1 and val1 > 1 and val2 > 1):
-        printErrorAndExit("selection, val1, val2 can only be 0 or 1")
 
-    return OR(AND(sel, val1), AND(NOT(sel), val2))
+    def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
+        """
+        @param pydig : pydig object
+        @param delay : the time delay for the MUX gate
+        @param initialValue : The initial output value given by this block at t = 0 while running
+        @param plot : boolean value whether to plot this block or not
+        @param blockID : the id of this block. If None, then new unique ID is given.
+        """
+        checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
+        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID, maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
+
+        pydig.combinationalFromObject(self)  # make this object a part of the pydig object
+
+    def __func(self, val):
+        """
+        @param val (int): The value to be MUXed
+        @return (int): The result of the MUX operation
+        """
+        length = bitCount(val)
+        sel = val >> (length - 1) # getting selection bit
+        val = val & ((1 << (length - 1)) - 1) # removing selection bit
+        length -= 1
+        val1 = val >> (length // 2) # getting first value
+        val2 = val & ((1 << (length // 2)) - 1) # getting second value
+
+        mask = 1 << ((length // 2) + 1) # obtaining the mask
+        mask -= sel # subtracting sel from the mask, this decides which value to select
+        
+        return (val1 & n(mask)) | (val2 & mask)
 
 
-def DMUX(sel, val):
+# class DMUX(Comb):
+#     """
+#     This class represents the DMUX gate.
+#     If the selection bit is 0, then the first value is selected, else the second value is selected.
+
+#     The first bit is the selectin bit, and the rest of the bits are the values.
+#     For example, if the input is 110, then the selection bit is 1, the first value is 1 and the second value is 0.
+#     """
+
+#     def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
+#         """
+#         @param pydig : pydig object
+#         @param delay : the time delay for the DMUX gate
+#         @param initialValue : The initial output value given by this block at t = 0 while running
+#         @param plot : boolean value whether to plot this block or not
+#         @param blockID : the id of this block. If None, then new unique ID is given.
+#         """
+#         checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
+#         super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID, maxOutSize=2, delay=delay, plot=plot, initialValue=initialValue)
+
+#         pydig.combinationalFromObject(self)  # make this object a part of the pydig object
+
+#     def __func(self, val):
+#         """
+#         @param val (int): The value to be demultiplexed
+#         @return (int, int): The demultiplexed values
+#         """
+#         sel = val >> 1
+#         val = val & 1
+
+#         return (val & n(sel), val & sel)
+# def DMUX(sel, val):
+#     """
+#     @param sel (int): The selection bit (0 or 1)
+#     @param val (int): The value to be demultiplexed (0 or 1)
+#     @return (int, int): The demultiplexed values (2 bits)
+#     """
+#     if (sel > 1 and val):
+#         printErrorAndExit("selection, val can only be 0 or 1")
+
+#     return (MUX(sel, val, 0) << 1) & MUX(NOT(sel), val, 0)
+
+
+def n(val):
     """
-    @param sel (int): The selection bit (0 or 1)
-    @param val (int): The value to be demultiplexed (0 or 1)
-    @return (int, int): The demultiplexed values (2 bits)
+    @param val (int): The value to be negated
+    @return (int): The negated value
     """
-    if (sel > 1 and val):
-        printErrorAndExit("selection, val can only be 0 or 1")
-
-    return (MUX(sel, val, 0) << 1) & MUX(NOT(sel), val, 0)
+    
+    mask = (1 << bitCount(val)) - 1
+    return mask & ~val
 
 if __name__ == "__main__":
     
@@ -261,6 +362,7 @@ if __name__ == "__main__":
     xorGate = XOR(pysim, 0, 1, True, "Xor Gate")
     nandGate = NAND(pysim, 0, 1, True, "Nand Gate")
     norGate = NOR(pysim, 0, 1, True, "Nor Gate")
+    xnor = XNOR(pysim, 0, 1, True, "Xnor Gate")
 
     clock = pysim.clock(plot=True)
 
@@ -270,6 +372,6 @@ if __name__ == "__main__":
     clock.output() > xorGate.input()
     clock.output() > nandGate.input()
     clock.output() > norGate.input()
-
+    clock.output() > xnor.input()
 
     pysim.run(10)
