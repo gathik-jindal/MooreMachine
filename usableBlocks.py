@@ -1,3 +1,4 @@
+from blocks import *
 
 class Machine(HasInputConnections, HasOutputConnections):
     """
