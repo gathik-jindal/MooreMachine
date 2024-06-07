@@ -1,4 +1,7 @@
 from blocks import *
+from utilities import checkType, printErrorAndExit
+import simpy
+from scope import Plotter, ScopeDump
 
 class Machine(HasInputConnections, HasOutputConnections):
     """
