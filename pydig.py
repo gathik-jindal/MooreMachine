@@ -14,6 +14,7 @@ pip install openxl
 from utilities import printErrorAndExit, checkType, dumpVars
 from scope import Plotter
 from blocks import *
+from usableBlocks import *
 from pwlSource import InputGenerator
 import simpy
 import os
