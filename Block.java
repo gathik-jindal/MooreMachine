@@ -3,12 +3,18 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import java.awt.geom.Line2D;
+
 import java.io.File;
+
 import java.text.NumberFormat;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -22,18 +28,22 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
 public class Block 
 {
     private Rectangle rect;
+    private Line2D.Double line;
     private Color color;
     private String name;
     private Map<String, Component> map;
     private DrawingPanel drawingPanel;
+    private int currID = 0;
     private static int id = 0;
 
     public Block(String name, Rectangle rect, Color color, DrawingPanel panel) 
@@ -43,6 +53,19 @@ public class Block
         this.color = color;
         this.map = new LinkedHashMap<>();
         this.drawingPanel = panel;
+        this.currID = id;
+
+        id++;
+    }
+
+    public Block(String name, Line2D.Double line, Color color, DrawingPanel panel)
+    {
+        this.name = name;
+        this.line = line;
+        this.color = color;
+        this.map = new LinkedHashMap<>();
+        this.drawingPanel = panel;
+        this.currID = id;
 
         id++;
     }
@@ -53,9 +76,20 @@ public class Block
         this.color = color;
     }
 
+    public void setLine(Line2D.Double line, Color color)
+    {
+        this.line = line;
+        this.color = color;
+    }
+
     public Rectangle getRect() 
     {
         return this.rect;
+    }
+
+    public Line2D.Double getLine()
+    {
+        return this.line;
     }
 
     public Color getColor() 
@@ -239,7 +273,7 @@ public class Block
     @Override
     public String toString()
     {
-        return id + "";
+        return currID + "";
     }
 
     @SuppressWarnings("unchecked")
@@ -254,7 +288,24 @@ public class Block
     }
 }
 
-class Moore extends Block
+abstract class RectangleBlock extends Block
+{
+    public RectangleBlock(String name, Rectangle rect, Color color, DrawingPanel panel)
+    {
+        super(name, rect, color, panel);
+    }
+
+    public String getObjectName()
+    {
+        return "rectangle_block" + super.toString();
+    }
+
+    public abstract boolean hasOutput();
+    public abstract boolean hasInput();
+    public abstract String getType();
+}
+
+class Moore extends RectangleBlock
 {
     public Moore(String name, Rectangle rect, Color color, DrawingPanel panel)
     {
@@ -296,13 +347,32 @@ class Moore extends Block
         return (Integer)(((JSpinner)(getMap().get("startingState"))).getValue());
     }
 
+    @Override
     public String getObjectName()
     {
         return "moore" + super.toString();
     }
+
+    @Override
+    public boolean hasOutput() 
+    {
+        return true;
+    }
+
+    @Override
+    public boolean hasInput() 
+    {
+        return true;
+    }
+
+    @Override
+    public String getType() 
+    {
+        return "Moore";
+    }
 }
 
-class Input extends Block
+class Input extends RectangleBlock
 {
     public Input(String name, Rectangle rect, Color color, DrawingPanel panel)
     {
@@ -326,13 +396,32 @@ class Input extends Block
         return (String)(((JTextField)(getMap().get("filePath"))).getText());
     }
 
+    @Override
     public String getObjectName()
     {
         return "input" + super.toString();
     }
+
+    @Override
+    public boolean hasOutput() 
+    {
+        return true;
+    }
+
+    @Override
+    public boolean hasInput() 
+    {
+        return false;
+    }
+
+    @Override
+    public String getType() 
+    {
+        return "Input Block";
+    }
 }
 
-class Clock extends Block
+class Clock extends RectangleBlock
 {
     public Clock(String name, Rectangle rect, Color color, DrawingPanel panel)
     {
@@ -353,6 +442,7 @@ class Clock extends Block
             ", timePeriod = " + getTimePeriod() +", onTime = " + getOnTime() + ", initialValue = " + getInitialValue() + ")";
     }
 
+    @Override
     public String getObjectName()
     {
         return "clock" + super.toString();
@@ -372,9 +462,27 @@ class Clock extends Block
     {
         return ((JSpinner)(getMap().get("initialValue"))).getValue().toString();
     }
+
+    @Override
+    public boolean hasOutput() 
+    {
+        return true;
+    }
+
+    @Override
+    public boolean hasInput() 
+    {
+        return false;
+    }
+
+    @Override
+    public String getType() 
+    {
+        return "Clock";
+    }
 }
 
-class Output extends Block
+class Output extends RectangleBlock
 {
     public Output(String name, Rectangle rect, Color color, DrawingPanel panel)
     {
@@ -391,13 +499,32 @@ class Output extends Block
         return getObjectName() + " = pysim.output(plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" + ")";
     }
 
+    @Override
     public String getObjectName()
     {
         return "output" + super.toString();
     }
+
+    @Override
+    public boolean hasOutput() 
+    {
+        return false;
+    }
+
+    @Override
+    public boolean hasInput() 
+    {
+        return true;
+    }
+
+    @Override
+    public String getType() 
+    {
+        return "Output Block";
+    }
 }
 
-class Combinational extends Block
+class Combinational extends RectangleBlock
 {
     public Combinational(String name, Rectangle rect, Color color, DrawingPanel panel)
     {
@@ -439,16 +566,58 @@ class Combinational extends Block
         return ((JSpinner)(getMap().get("initialValue"))).getValue().toString();
     }
 
+    @Override
     public String getObjectName()
     {
         return "comb" + super.toString();
+    }
+
+    @Override
+    public boolean hasOutput() 
+    {
+        return true;
+    }
+
+    @Override
+    public boolean hasInput() 
+    {
+        return true;
+    }
+
+    @Override
+    public String getType() 
+    {
+        return "Combinational Block";
     }
 }
 
 class Wire extends Block
 {
-    public Wire(String name, Rectangle rect, Color color, DrawingPanel panel)
+    private Block startBlock, endBlock;
+
+    public Wire(String name, Line2D.Double line, Color color, DrawingPanel panel)
     {
-        super(name, rect, color, panel);
+        super(name, line, color, panel);
+    }
+
+    public void setBlock(Block block)
+    {
+        if(startBlock == null) startBlock = block;
+        else endBlock = block;
+    }
+
+    public void setStartBlock(Block block)
+    {
+        startBlock = block;
+    }
+
+    public Block getStartBlock()
+    {
+        return startBlock;
+    }
+
+    public Block getEndBlock()
+    {
+        return endBlock;
     }
 }
