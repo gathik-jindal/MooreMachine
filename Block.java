@@ -272,7 +272,6 @@ public class Block
 
         comboBox.addActionListener(new ActionListener() 
         {
-
             @Override
             public void actionPerformed(ActionEvent e) 
             {
@@ -457,7 +456,7 @@ class Input extends RectangleBlock
 
     public String getFilePath()
     {
-        return (String)(((JTextField)(getMap().get("filePath"))).getText());
+        return (String)(((JTextField)(getMap().get("filePath"))).getText()).replaceAll("\\", "\\\\");
     }
 
     @Override
@@ -716,12 +715,6 @@ class Wire extends Block
         if(startBlock == null) 
         {
             startBlock = block;
-
-            if(block instanceof Wire)
-            {
-                Wire inputWire = (Wire)(block);
-                getMap().put("Is Clock Line", createOptions(new String [] {"True", "False"}, isClocked(this, inputWire)));
-            }
         }
         else endBlock = block;
     }
@@ -729,17 +722,6 @@ class Wire extends Block
     public void setStartBlock(Block block, Wire inputWire)
     {
         startBlock = block;
-        getMap().put("Is Clock Line", createOptions(new String [] {"True", "False"}, isClocked(this, inputWire)));
-    }
-
-    @SuppressWarnings("unchecked")
-    private static String isClocked(Wire w1, Wire w2)
-    {
-        if(((JComboBox<String>)(w1.getMap().get("Is Clock Line"))).getSelectedItem().equals("True") || 
-            ((JComboBox<String>)(w1.getMap().get("Is Clock Line"))).getSelectedItem().equals("True"))
-            return "True";
-        
-            return "False";
     }
 
     @SuppressWarnings("unchecked")

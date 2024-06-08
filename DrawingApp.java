@@ -730,7 +730,7 @@ class DrawingPanel extends JPanel
             int textX = rect.x + (rect.width - textWidth) / 2;
             int textY = rect.y + (rect.height - textHeight) / 2 + metrics.getAscent();
 
-            if(block.getPlot() == "True")
+            if(block.getPlot().equals("True"))
                 g.setColor(Color.BLACK);
             else
                 g.setColor(Color.WHITE);
@@ -746,7 +746,9 @@ class DrawingPanel extends JPanel
 
             if(block == highlightedBlock)
                 g.setColor(Color.MAGENTA);
-                
+            else if(((Wire)(block)).isClocked())
+                g.setColor(new Color(255, 127, 80));
+
             int x1 = (int)(line.x1), y1 = (int)(line.y1), x2 = (int)(line.x2), y2 = (int)(line.y2);
     
             g.drawLine(x1, y1, x2, y2);
