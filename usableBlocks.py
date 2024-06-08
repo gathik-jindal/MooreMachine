@@ -21,12 +21,12 @@ class Machine(HasInputConnections, HasOutputConnections):
         """
         self.nsl = kwargs.get("nsl")
         self.ol = kwargs.get("ol")
-        self.clk = kwargs.get("clk", None)
+        self.clkVal = kwargs.get("clk", []) #### make it always []
+        self.clkObj = None
+        self._isClock = 0
         startingState = kwargs.get("startingState", 0)
         self.presentState = startingState
         self.nextState = startingState
-        self._Pchange = simpy.Store(kwargs.get("env", None))
-        self._Pchange.put(False)
         super().__init__(**kwargs)
         self._scopeDump.add(f"Input to {self.getBlockID()}", 0, self._output[0])
 
@@ -40,53 +40,29 @@ class Machine(HasInputConnections, HasOutputConnections):
         """
         Runs the next state logic if the input to this machine changed.
         """
+        # adding the inputs to scopedump
+        self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self.getInputVal())
 
-        while True:
-            yield self._trigger.get()
+        # running the NSL
+        tempout = self.nsl(self.presentState, self.getInputVal())
+        yield self._env.timeout(timeout)
 
-            # adding the inputs to scopedump
-            self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self.getInputVal())
-
-            # running the NSL
-            tempout = self.nsl(self.presentState, self.getInputVal())
-            yield self._env.timeout(timeout)
-
-            # updating the next State
-            self.nextState = tempout
-            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.nextState)
-
-
-    def __runNSLp(self):
-        """
-        Runs the next state logic if the present state changed. 
-        """
-
-        while True:
-            yield self._Pchange.get()
-
-            # running the NSL
-            tempout = self.nsl(self.presentState, self.getInputVal())
-            yield self._env.timeout(timeout)
-
-            # updating the output
-            self.nextState = tempout
-            self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.nextState)
+        # updating the next State
+        self.nextState = tempout
+        self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.nextState)
 
     def __runReg(self):
         """
         Registers run based on clock.
         """
-
-        while True:
-            output = yield self.clk[self._clockID].get()
-            if (output):
+            if (self.clkVal[0]):
                 if self.presentState == self.nextState:
                     continue
                 yield self._env.timeout(timeout)
                 self.presentState = self.nextState
                 self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.presentState)
-                self._Pchange.put(True)
                 self._env.process(self.__runOL())
+                self._env.process(self.__runNSL())
 
     def __runOL(self):
         """
@@ -99,23 +75,23 @@ class Machine(HasInputConnections, HasOutputConnections):
         self._scopeDump.add(f"output of {self.getBlockID()}", self._env.now, self._output[0])
         
         # triggering events for the connected machines
-        for i in range(1, self._fanOutCount + 1):
-            self._output[i].put(True)
+        self.processFanOut()
 
+    def runReg(self):
+        self._env.process(self.__runReg())
+        
     def run(self):
         """
         Runs this block.
         """
         self._env.process(self.__runNSL())
-        self._env.process(self.__runReg())
-        self._env.process(self.__runNSLp())
-        self.runTriggers()
-
+        self._env.process(self.__runOL())
+        
     def isConnected(self):
         """
         @return bool : True if this block is connected to everything, False otherwise.
         """
-        return self.clk != None and self.nsl != None and self.ol != None and self.isConnectedToInput()
+        return self.clk != [] and self.nsl != None and self.ol != None and self.isConnectedToInput()
 
     def clock(self):
         """
@@ -151,8 +127,8 @@ class Machine(HasInputConnections, HasOutputConnections):
         """
         # state 1 means clock, 0 means clock (but as input)
         if (isinstance(other, Clock) and self._isClock == 1):
-            self.clk = other._output
-            self._clockID = other.addFanout()
+            self.clkVal = other._output
+            other.addFanout(self, 1)
             self._clkObj = other
             return True
         else:
@@ -200,11 +176,8 @@ class Input(HasOnlyOutputConnections):
             yield self._env.timeout(i[0]-self._env.now)
 
             self._output[0] = i[1]
-
-            for i in range(1, self._fanOutCount+1):
-                self._output[i].put(True)
-
             self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self._output[0])
+            self.processFanOut()
 
 
 class Clock(HasOnlyOutputConnections):
@@ -223,8 +196,8 @@ class Clock(HasOnlyOutputConnections):
                          duplicate or None, then new unique ID is given.
         @param initialValue : is the initial state of the clock.
         """
-        timePeriod = kwargs.get("timePeriod", 1.2)
-        onTime = kwargs.get("onTime", 0.6)
+        timePeriod = kwargs.get("timePeriod", 1)
+        onTime = kwargs.get("onTime", 0.5)
         initialValue = kwargs.get("initialValue", 0)
 
         checkType([(timePeriod, (int, float)), (onTime, (int, float)), (initialValue, int)])
@@ -233,11 +206,22 @@ class Clock(HasOnlyOutputConnections):
 
         self.__timePeriod = timePeriod
         self.__onTime = onTime
-
         super().__init__(**kwargs)
         self._output[0] = initialValue
         self._scopeDump.add(f"Clock {self.getBlockID()}", 0, self._output[0])
+        self.__regList = []
 
+
+    def addFanOut(self, other, val = 0):
+        if isinstance(other, Machine) and val == 1:
+            self.regList.append(other)
+        else:
+            super().addFanOut(other)
+
+    def triggerReg(self):
+        for i in self.__regList:
+            self._env.process(self.runReg())
+        
     # left, right are for future versions. NOT USED IN CURRENT VERSION.
     def output(self, left=None, right=None):
         """
@@ -260,11 +244,9 @@ class Clock(HasOnlyOutputConnections):
             yield self._env.timeout((1-self._output[0])*(self.__timePeriod - self.__onTime)+self._output[0]*(self.__onTime))
 
             self._output[0] = 1 - self._output[0]
-
-            for i in range(1, self._fanOutCount+1):
-                self._output[i].put(self._output[0])
-
             self._scopeDump.add(f"Clock {self.getBlockID()}", self._env.now, self._output[0])
+            self.processFanOut()
+            self.triggerReg()
 
 
 class Output(HasInputConnections):
@@ -280,7 +262,7 @@ class Output(HasInputConnections):
         Use keyword arguments to pass the following parameters:
         @param env : is a simpy environment.
         @param blockID : is the id of this input block. If blockID is a
-                            duplicate or None, then new unique ID is given.
+                         duplicate or None, then new unique ID is given.
         """
         super().__init__(**kwargs)
 
@@ -294,16 +276,13 @@ class Output(HasInputConnections):
         """
         Adds the output value to this class every time there is a change in it.
         """
-        while True:
-            yield self._trigger.get()
-            self._scopeDump.add(f"Final Output from {self.getBlockID()}", self._env.now, self.getInputVal())
+        self._scopeDump.add(f"Final Output from {self.getBlockID()}", self._env.now, self.getInputVal())
 
     def run(self):
         """
         Runs the output block
         """
         self._env.process(self.__give())
-        self.runTriggers()
 
     def isConnected(self):
         """
