@@ -11,7 +11,7 @@ public class GenerateFile
 {
     private PrintWriter pw;
 
-    public GenerateFile(ArrayList<Block> block, ArrayList<Block> wires, JTextArea area)
+    public GenerateFile(ArrayList<Block> block, ArrayList<Block> wires, JTextArea area, int generateCSV, int time)
     {
         try
         {
@@ -27,7 +27,12 @@ public class GenerateFile
         writeBlock(block);
         writeWire(wires);
 
+        if(generateCSV == 0)
+            pw.println("pysim.generateCSV()");
+        pw.println("pysim.run(until = " + time + ")");
+
         pw.close();
+
     }    
 
     private void writeImport()
@@ -57,7 +62,20 @@ public class GenerateFile
                 RectangleBlock startBlock = (RectangleBlock)(wire.getStartBlock());
                 RectangleBlock endBlock = (RectangleBlock)(wire.getEndBlock());
 
-                pw.println(startBlock.getObjectName() + ".output() > " + endBlock.getObjectName() + ".input()");
+                String outputMSB = wire.getOutputMSB(), outputLSB = wire.getOutputLSB();
+                
+                String outputString = ".output";
+                String inputString = ".input";
+                
+                if(startBlock instanceof Clock && endBlock instanceof Moore && wire.isClocked())
+                    inputString = ".clock";
+
+                if(outputMSB == null || outputLSB == null)
+                    pw.print(startBlock.getObjectName() + outputString + "() > ");
+                else
+                    pw.print(startBlock.getObjectName() + outputString + "(" + outputLSB + ", " + outputMSB + ") > ");
+                
+                pw.println(endBlock.getObjectName() + inputString + "()");
             }
         }
     }

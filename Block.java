@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 
 import java.awt.event.ActionEvent;
@@ -25,6 +26,8 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -123,7 +126,7 @@ public class Block
         component.setBackground(Color.WHITE);
     }
 
-    protected JTextField creaTextField(String value)
+    protected JTextField createTextField(String value)
     {
         JTextField jTextField = new JTextField(value);
         
@@ -267,7 +270,66 @@ public class Block
         comboBox.setEditable(false);
         comboBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
+        comboBox.addActionListener(new ActionListener() 
+        {
+
+            @Override
+            public void actionPerformed(ActionEvent e) 
+            {
+                drawingPanel.repaint();
+            }
+            
+        });
+
         return comboBox;
+    }
+
+    protected JLabel createLabel()
+    {
+        JLabel label = new JLabel();
+        applyFormatting(label);
+        label.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+        return label;
+    }
+
+    protected JButton createDeleteButton(String str)
+    {
+        JButton button = new JButton(str);
+        applyFormatting(button);
+        button.setBackground(new Color(178, 34, 34));
+        button.setForeground(Color.WHITE);
+
+        button.addMouseListener(new MouseAdapter() 
+        {
+            @Override
+            public void mouseEntered(MouseEvent evt) 
+            {
+                button.setBackground(Color.RED);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent evt) 
+            {
+                button.setBackground(new Color(178, 34, 34));
+            }
+        });
+
+        Block b = this;
+        button.addActionListener(new ActionListener() 
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) 
+            {
+                int option = JOptionPane.showInternalConfirmDialog(null, "Are you sure you want to delete this block?", 
+                            "Delete Block?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                
+                if(option == 0)
+                    drawingPanel.deleteBlock(b);
+            }
+        });
+
+        return button;
     }
 
     @Override
@@ -313,10 +375,11 @@ class Moore extends RectangleBlock
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
         map.put("maxOutSize", createIntField(1, 0, Integer.MAX_VALUE));
         map.put("plot", createOptions(new String [] {"True", "False"}, "False"));
-        map.put("blockID", creaTextField(name));
-        map.put("nsl", creaTextField("lambda ps, i: 0"));
-        map.put("ol", creaTextField("lambda ps, i: 0"));
+        map.put("blockID", createTextField(name));
+        map.put("nsl", createTextField("lambda ps, i: 0"));
+        map.put("ol", createTextField("lambda ps, i: 0"));
         map.put("startingState", createIntField(0, 0, Integer.MAX_VALUE));
+        map.put("Delete", createDeleteButton("Delete Moore Machine"));
         setMap(map);
     }
 
@@ -378,10 +441,11 @@ class Input extends RectangleBlock
     {
         super(name, rect, color, panel);
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
-        map.put("filePath", creaTextField("filePath"));
+        map.put("filePath", createTextField("filePath"));
         map.put("", createFileButton("Choose File", (JTextField)(map.get("filePath"))));
         map.put("plot", createOptions(new String [] {"True", "False"}, "False"));
-        map.put("blockID", creaTextField(name));
+        map.put("blockID", createTextField(name));
+        map.put("Delete", createDeleteButton("Delete Input Block"));
         setMap(map);
     }
 
@@ -428,10 +492,11 @@ class Clock extends RectangleBlock
         super(name, rect, color, panel);
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
         map.put("plot", createOptions(new String [] {"True", "False"}, "False"));
-        map.put("blockID", creaTextField(name));
+        map.put("blockID", createTextField(name));
         map.put("timePeriod", createFloatField(1.2));
         map.put("onTime", createFloatField(0.6));
         map.put("initialValue", createIntField(0, 0, 1));
+        map.put("Delete", createDeleteButton("Delete Clock"));
         setMap(map);
     }
 
@@ -489,7 +554,8 @@ class Output extends RectangleBlock
         super(name, rect, color, panel);
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
         map.put("plot", createOptions(new String [] {"True", "False"}, "False"));
-        map.put("blockID", creaTextField(name));
+        map.put("blockID", createTextField(name));
+        map.put("Delete", createDeleteButton("Delete Output Block"));
         setMap(map);
     }
 
@@ -532,10 +598,11 @@ class Combinational extends RectangleBlock
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
         map.put("maxOutSize", createIntField(1, 0, Integer.MAX_VALUE));
         map.put("plot", createOptions(new String [] {"True", "False"}, "False"));
-        map.put("blockID", creaTextField(name));
-        map.put("func", creaTextField("lambda x: x"));
+        map.put("blockID", createTextField(name));
+        map.put("func", createTextField("lambda x: x"));
         map.put("delay", createIntField(0, 0, Integer.MAX_VALUE));
         map.put("initialValue", createIntField(0, 0, Integer.MAX_VALUE));
+        map.put("Delete", createDeleteButton("Delete Combinational Block"));
         setMap(map);
     }
 
@@ -594,21 +661,94 @@ class Combinational extends RectangleBlock
 class Wire extends Block
 {
     private Block startBlock, endBlock;
+    private JLabel startLabel, endLabel;
+    private Polygon arrowHead;
 
     public Wire(String name, Line2D.Double line, Color color, DrawingPanel panel)
     {
         super(name, line, color, panel);
+
+        startLabel = createLabel();
+        endLabel = createLabel();
+        startLabel.setBackground(Color.WHITE);
+        startLabel.setOpaque(true);
+        endLabel.setBackground(Color.WHITE);
+        endLabel.setOpaque(true);
+
+        startLabel.setText(getStartBlock() == null ? "None" : getStartBlock().getName());
+        endLabel.setText(getEndBlock() == null ? "None" : getEndBlock().getName());
+
+        LinkedHashMap<String, Component> map = new LinkedHashMap<>();
+        map.put("Wire ID", createTextField("wire"));
+        map.put("Output LSB (inclusive)", createTextField("--"));
+        map.put("Output MSB (exclusive)", createTextField("--"));
+        map.put("Input Block (with output wires)", startLabel);
+        map.put("Output Block (with input wires)", endLabel);
+        map.put("Is Clock Line", createOptions(new String [] {"True", "False"}, "False"));
+        map.put("Delete", createDeleteButton("Delete Wire"));
+        setMap(map);
+
+        int x1 = (int)(line.x1), y1 = (int)(line.y1), x2 = (int)(line.x2), y2 = (int)(line.y2);
+    
+        double angle = Math.atan2(y2 - y1, x2 - x1);
+        int arrowLength = 10;
+
+        int[] arrowX = 
+        {
+            x2,                                            
+            (int) (x2 - arrowLength * Math.cos(angle - Math.PI / 6)),
+            (int) (x2 - arrowLength * Math.cos(angle + Math.PI / 6))
+        };
+        int[] arrowY = 
+        {
+            y2,                                            
+            (int) (y2 - arrowLength * Math.sin(angle - Math.PI / 6)),
+            (int) (y2 - arrowLength * Math.sin(angle + Math.PI / 6))
+        };
+
+        arrowHead = new Polygon(arrowX, arrowY, 3);
+
+        panel.repaint();
     }
 
     public void setBlock(Block block)
     {
-        if(startBlock == null) startBlock = block;
+        if(startBlock == null) 
+        {
+            startBlock = block;
+
+            if(block instanceof Wire)
+            {
+                Wire inputWire = (Wire)(block);
+                getMap().put("Is Clock Line", createOptions(new String [] {"True", "False"}, isClocked(this, inputWire)));
+            }
+        }
         else endBlock = block;
     }
 
-    public void setStartBlock(Block block)
+    public void setStartBlock(Block block, Wire inputWire)
     {
         startBlock = block;
+        getMap().put("Is Clock Line", createOptions(new String [] {"True", "False"}, isClocked(this, inputWire)));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static String isClocked(Wire w1, Wire w2)
+    {
+        if(((JComboBox<String>)(w1.getMap().get("Is Clock Line"))).getSelectedItem().equals("True") || 
+            ((JComboBox<String>)(w1.getMap().get("Is Clock Line"))).getSelectedItem().equals("True"))
+            return "True";
+        
+            return "False";
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean isClocked()
+    {
+        if(((JComboBox<String>)(getMap().get("Is Clock Line"))).getSelectedItem().equals("True"))
+            return true;
+        
+        return false;
     }
 
     public Block getStartBlock()
@@ -619,5 +759,50 @@ class Wire extends Block
     public Block getEndBlock()
     {
         return endBlock;
+    }
+
+    public String getOutputMSB()
+    {
+        try
+        {
+            return Integer.parseInt(((JTextField)(getMap().get("Output MSB (exclusive)"))).getText()) + "";
+        }
+        catch(NumberFormatException e)
+        {
+            return null;
+        }
+    }
+
+    public String getOutputLSB()
+    {
+        try
+        {
+            return Integer.parseInt(((JTextField)(getMap().get("Output LSB (inclusive)"))).getText()) + "";
+        }
+        catch(NumberFormatException e)
+        {
+            return null;
+        }
+    }
+
+    public String getOutputString()
+    {
+        String outputMSB = getOutputMSB(), outputLSB = getOutputLSB();
+        
+        if(outputMSB == null || outputLSB == null)
+            return "";
+        
+        return outputLSB + ":" + outputMSB;
+    }
+
+    public Polygon getArrowHead()
+    {
+        return arrowHead;
+    }
+
+    public void updateBlocks()
+    {
+        startLabel.setText(getStartBlock() == null ? "None" : getStartBlock().getName());
+        endLabel.setText(getEndBlock() == null ? "None" : getEndBlock().getName());
     }
 }

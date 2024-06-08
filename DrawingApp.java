@@ -18,8 +18,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -48,7 +51,7 @@ public class DrawingApp extends JFrame
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(1500, 800);
         this.setResizable(false);
-        manage = new Manager();
+        manage = new Manager(this);
 
         this.add(manage);
 
@@ -69,7 +72,7 @@ class MenuBar extends JMenuBar
     
     public MenuBar(Manager manage) 
     {
-        drawMenu = new JMenu("Select Type");
+        drawMenu = new JMenu("Add Component");
         input = new Item(Manager.Blocks.INPUT, DrawingPanel.Mode.BOX, Color.ORANGE, manage);
         clock = new Item(Manager.Blocks.CLOCK, DrawingPanel.Mode.BOX, Color.BLUE, manage);
         moore = new Item(Manager.Blocks.MOORE, DrawingPanel.Mode.BOX, Color.GREEN, manage);
@@ -107,7 +110,8 @@ class Manager extends JPanel
     private MenuBar bar;
     private DrawingPanel drawingPanel;
     private InfoPanel infoPanel;
-    
+    private JFrame frame;
+
     public enum Blocks
     {
         INPUT("Input Block"), MOORE("Moore Machine"), COMB("Combinational Block"), 
@@ -126,7 +130,7 @@ class Manager extends JPanel
         }
     }
 
-    public Manager() 
+    public Manager(JFrame frame) 
     {
         super(new BorderLayout());
         
@@ -138,6 +142,8 @@ class Manager extends JPanel
 
         infoPanel = new InfoPanel(this);
         this.add(infoPanel, BorderLayout.WEST);
+
+        this.frame = frame;
     }
 
     public DrawingPanel getDrawingPanel() 
@@ -171,7 +177,7 @@ class Manager extends JPanel
         }
     }
 
-    public boolean setClosestBlock() 
+    public boolean setClosestBlock(boolean showMessageDialog) 
     {
         ArrayList<Block> wires = drawingPanel.getWires();
         ArrayList<Block> rectangles = drawingPanel.getRectangles();
@@ -180,12 +186,15 @@ class Manager extends JPanel
     
         for (Block wire : wires) 
         {
-            Point[] endPoints = 
+            Point [] endPoints;
+            Point arrowTip = new Point(((Wire)(wire)).getArrowHead().xpoints[0], ((Wire)(wire)).getArrowHead().ypoints[0]);
+
+            endPoints = new Point []
             {
                 new Point((int)(wire.getLine().x1), (int)(wire.getLine().y1)),
-                new Point((int)(wire.getLine().x2), (int)(wire.getLine().y2))
+                arrowTip
             };
-    
+
             for (int i = 0; i < endPoints.length; i++) 
             {
                 Point endPoint = endPoints[i];
@@ -244,10 +253,11 @@ class Manager extends JPanel
     
                 if (closestDistance > thresholdDistance) 
                 {
-                    JOptionPane.showMessageDialog(null, "Invalid Connections. Check wire connections.", "Error", JOptionPane.ERROR_MESSAGE);
+                    if(showMessageDialog)
+                        JOptionPane.showMessageDialog(null, "Invalid Connections. Check wire connections.", "Error", JOptionPane.ERROR_MESSAGE);
                     return false;
                 }
-    
+                
                 ((Wire)(wire)).setBlock(closestBlock);
             }
         }
@@ -255,12 +265,14 @@ class Manager extends JPanel
         for (Block wire : wires) 
         {
             Block currentBlock = ((Wire)(wire)).getStartBlock();
+            Wire currentWire = (Wire)(wire);
             boolean foundRectangle = !(currentBlock instanceof Wire);
     
             while (currentBlock instanceof Wire) 
             {
                 Wire connection = (Wire) currentBlock;
                 Block endBlock = connection.getStartBlock();
+                currentWire = connection;
                 if (endBlock instanceof RectangleBlock) 
                 {
                     foundRectangle = true;
@@ -276,11 +288,12 @@ class Manager extends JPanel
             if (foundRectangle) 
             {
                 Wire connection = (Wire) wire;
-                connection.setStartBlock(currentBlock);
+                connection.setStartBlock(currentBlock, currentWire);
             } 
             else 
             {
-                JOptionPane.showMessageDialog(null, "Invalid Connections. Check wire connections.", "Error", JOptionPane.ERROR_MESSAGE);
+                if(showMessageDialog)
+                    JOptionPane.showMessageDialog(null, "Invalid Connections. Check wire connections.", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         }
@@ -320,6 +333,11 @@ class Manager extends JPanel
 
         return true;
     }
+
+    public JFrame getFrame()
+    {
+        return this.frame;
+    }
 }
 
 class InfoPanel extends JPanel 
@@ -333,7 +351,7 @@ class InfoPanel extends JPanel
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(350, 0));
 
-        JLabel headerLabel = new JLabel("Right click on block to get information about it");
+        JLabel headerLabel = new JLabel("Right click on block or wire to get information about it");
         headerLabel.setFont(new Font("Arial", Font.BOLD, 13));
         headerLabel.setForeground(Color.BLUE);
         headerLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -376,9 +394,33 @@ class InfoPanel extends JPanel
             @Override
             public void actionPerformed(ActionEvent e) 
             {
-                if(manage.setClosestBlock())
+                if(manage.setClosestBlock(true))
                     if(manage.isValidConnections(manage.getDrawingPanel().getWires()))
-                        new GenerateFile(manage.getDrawingPanel().getRectangles(), manage.getDrawingPanel().getWires(), getTextArea());
+                    {
+                        int option = JOptionPane.showInternalConfirmDialog(null, "Do you want to generate a CSV file?", 
+                            "Generate CSV File", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                        
+                        int number = 0;
+                        boolean validInput = false;
+                        while (!validInput) 
+                        {
+                            String input = JOptionPane.showInputDialog(null, "Please enter how much time you want to run for:");
+            
+                            try 
+                            {
+                                number = Integer.parseInt(input);
+                                validInput = true;
+                            } 
+                            catch (NumberFormatException exception) 
+                            {
+                                JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid integer.", "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+
+                        new GenerateFile(manage.getDrawingPanel().getRectangles(), manage.getDrawingPanel().getWires(), getTextArea(), option, number);
+                        manage.getFrame().dispatchEvent(new WindowEvent(manage.getFrame(), WindowEvent.WINDOW_CLOSING));
+
+                    }
             } 
         });
 
@@ -410,9 +452,16 @@ class InfoPanel extends JPanel
         infoMap = new LinkedHashMap<>();
     }
 
-    public void updateInfo(Map<String, Component> info) 
+    public void removeInfo()
     {
         infoPanel.removeAll();
+        this.revalidate();
+        this.repaint();
+    }
+
+    public void updateInfo(Map<String, Component> info) 
+    {
+        removeInfo();
 
         for (String label : info.keySet()) 
         {
@@ -456,6 +505,8 @@ class InfoPanel extends JPanel
 class DrawingPanel extends JPanel 
 {
     public enum Mode { NONE, BOX, LINE}
+    public static final double TOLERANCE = 10.0;
+    
     private Mode drawingMode = Mode.NONE;
     private Point startPoint;
     private ArrayList<Block> rectangles;
@@ -466,6 +517,7 @@ class DrawingPanel extends JPanel
     private Manager.Blocks currentName;
     private Manager manager;
     private boolean isDragging;
+    private Block highlightedBlock;
 
     public DrawingPanel(Manager manager) 
     {
@@ -484,6 +536,7 @@ class DrawingPanel extends JPanel
                 if (SwingUtilities.isRightMouseButton(e)) 
                 {
                     handleRightClick(e.getPoint());
+                    repaint();
                 } 
                 else if (drawingMode == Mode.BOX) 
                 {
@@ -547,6 +600,7 @@ class DrawingPanel extends JPanel
                         if(!isIntersecting(currentLine))
                         {
                             wires.add(manager.createBlock(currentName, currentLine, null, currentColor));
+                            handleRightClick(wires.getLast());
                         }
                     }
 
@@ -561,16 +615,67 @@ class DrawingPanel extends JPanel
         addMouseMotionListener(mouseAdapter);
     }
 
+    private void reset()
+    {
+        isDragging = false;
+        highlightedBlock = null;
+        manager.getInfoPanel().removeInfo();
+        repaint();
+    }
+
     private void handleRightClick(Point point) 
     {
-        for (Block block : rectangles) 
+        for(Block block : rectangles) 
         {
-            if (block.getRect().contains(point)) 
+            if(block.getRect().contains(point)) 
             {
-                manager.getInfoPanel().updateInfo(block.getMap());
+                handleRightClick(block);
                 return;
             }
         }
+
+        for (Block wire : wires) 
+        {
+            if (isPointNearLine(wire.getLine(), point, TOLERANCE)) 
+            {
+                handleRightClick(wire);
+                return;
+            }
+        }
+    }
+
+    private void handleRightClick(Block block)
+    {
+        manager.getInfoPanel().updateInfo(block.getMap());
+        highlightedBlock = block;
+    }
+    
+
+    private boolean isPointNearLine(Line2D line, Point point, double tolerance) 
+    {
+        double dx = line.getX2() - line.getX1();
+        double dy = line.getY2() - line.getY1();
+        double length = Math.sqrt(dx * dx + dy * dy);
+
+        double ux = dx / length;
+        double uy = dy / length;
+
+        double px = -uy;
+        double py = ux;
+
+        Point2D.Double p1 = new Point2D.Double(line.getX1() + px * tolerance, line.getY1() + py * tolerance);
+        Point2D.Double p2 = new Point2D.Double(line.getX1() - px * tolerance, line.getY1() - py * tolerance);
+        Point2D.Double p3 = new Point2D.Double(line.getX2() + px * tolerance, line.getY2() + py * tolerance);
+        Point2D.Double p4 = new Point2D.Double(line.getX2() - px * tolerance, line.getY2() - py * tolerance);
+
+        Polygon bufferPolygon = new Polygon();
+        bufferPolygon.addPoint((int) p1.x, (int) p1.y);
+        bufferPolygon.addPoint((int) p3.x, (int) p3.y);
+        bufferPolygon.addPoint((int) p4.x, (int) p4.y);
+        bufferPolygon.addPoint((int) p2.x, (int) p2.y);
+
+        return bufferPolygon.contains(point);
+
     }
 
     public void setDrawingMode(Mode mode, Color color, Manager.Blocks name) 
@@ -599,29 +704,49 @@ class DrawingPanel extends JPanel
     {
         super.paintComponent(g);
 
+        manager.setClosestBlock(false);
+
+        g.setFont(new Font("Arial", Font.BOLD, 15));
+        g.setColor(Color.BLACK);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setStroke(new BasicStroke(4));
+
         for (Block block : rectangles) 
         {
             Rectangle rect = block.getRect();
             g.setColor(block.getColor());
+
             g.fillRect(rect.x, rect.y, rect.width, rect.height);
-            g.setColor(Color.black);
-            Graphics2D g2 = (Graphics2D) g;
-            g2.setStroke(new BasicStroke(2));
+
+            if(block == highlightedBlock)
+                g.setColor(Color.MAGENTA);
+            else
+                g.setColor(Color.black);
+
             g2.drawRect(rect.x, rect.y, rect.width, rect.height);
-            g.setFont(new Font("Arial", Font.BOLD, 15));
             FontMetrics metrics = g.getFontMetrics();
             int textWidth = metrics.stringWidth(block.getName());
             int textHeight = metrics.getHeight();
             int textX = rect.x + (rect.width - textWidth) / 2;
             int textY = rect.y + (rect.height - textHeight) / 2 + metrics.getAscent();
+
+            if(block.getPlot() == "True")
+                g.setColor(Color.BLACK);
+            else
+                g.setColor(Color.WHITE);
+
             g.drawString(block.getName(), textX, textY);
         }
 
         for (Block block : wires)
         {
+            ((Wire)(block)).updateBlocks();
             Line2D.Double line = block.getLine();
             g.setColor(block.getColor());
 
+            if(block == highlightedBlock)
+                g.setColor(Color.MAGENTA);
+                
             int x1 = (int)(line.x1), y1 = (int)(line.y1), x2 = (int)(line.x2), y2 = (int)(line.y2);
     
             g.drawLine(x1, y1, x2, y2);
@@ -629,22 +754,20 @@ class DrawingPanel extends JPanel
             g.fillOval(x1 - 5, y1 - 5, 10, 10);
             
             double angle = Math.atan2(y2 - y1, x2 - x1);
-            int arrowLength = 10;
+            
+            g.drawPolygon(((Wire)(block)).getArrowHead());
 
-            int[] arrowX = 
-            {
-                x2,                                            
-                (int) (x2 - arrowLength * Math.cos(angle - Math.PI / 6)),
-                (int) (x2 - arrowLength * Math.cos(angle + Math.PI / 6))
-            };
-            int[] arrowY = 
-            {
-                y2,                                            
-                (int) (y2 - arrowLength * Math.sin(angle - Math.PI / 6)),
-                (int) (y2 - arrowLength * Math.sin(angle + Math.PI / 6))
-            };
+            String startText = ((Wire)(block)).getOutputString();
+            FontMetrics metrics = g.getFontMetrics(g.getFont());
 
-            g.drawPolygon(new Polygon(arrowX, arrowY, 3));
+            AffineTransform originalTransform = g2.getTransform();
+            
+            int startTextX = x1 - metrics.stringWidth(startText) / 2;
+            int startTextY = y1 - 10;
+            g2.rotate(angle, x1, y1);
+            g2.drawString(startText, startTextX, startTextY);
+            
+            g2.setTransform(originalTransform);
         }
 
         if (currentRect != null) 
@@ -652,8 +775,6 @@ class DrawingPanel extends JPanel
             g.setColor(currentColor);
             g.fillRect(currentRect.x, currentRect.y, currentRect.width, currentRect.height);
             g.setColor(Color.black);
-            Graphics2D g2 = (Graphics2D) g;
-            g2.setStroke(new BasicStroke(3));
             g2.drawRect(currentRect.x, currentRect.y, currentRect.width, currentRect.height);
         }
 
@@ -781,5 +902,28 @@ class DrawingPanel extends JPanel
     public ArrayList<Block> getWires()
     {
         return wires;
+    }
+
+    public void deleteBlock(Block block)
+    {
+        for(Block b : rectangles)
+        {
+            if(b == block)
+            {
+                rectangles.remove(b);
+                reset();
+                return;
+            }
+        }
+
+        for(Block b : wires)
+        {
+            if(b == block)
+            {
+                wires.remove(b);
+                reset();
+                return;
+            }
+        }
     }
 }
