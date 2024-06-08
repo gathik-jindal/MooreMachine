@@ -318,23 +318,21 @@ class Combinational(HasInputConnections, HasOutputConnections):
         self._output[0] = initialValue
         self._scopeDump.add(f"{self._blockID} output", 0, self._output[0])
         
-    def go(self):
+    def __runFunc(self):
         """
         Runs the block for the specified input and timeouts for the delay.
         """
-        while True:
-            yield self._trigger.get()
 
-            self.__value = self.getInputVal()
-            self.__value = self.__func(self.__value)
 
-            yield self._env.timeout(self.__delay)
-            self._output[0] = self.__value
+        self.__value = self.getInputVal()
+        self.__value = self.__func(self.__value)
 
-            self._scopeDump.add(f"{self._blockID} output", self._env.now, self._output[0])
+        yield self._env.timeout(self.__delay)
+        self._output[0] = self.__value
 
-            for i in range(1, self._fanOutCount+1):
-                self._output[i].put(True)
+        self._scopeDump.add(f"{self._blockID} output", self._env.now, self._output[0])
+
+        self.processFanOut()
 
     def __str__(self):
         """
@@ -346,8 +344,7 @@ class Combinational(HasInputConnections, HasOutputConnections):
         """
         Runs this block.
         """
-        self._env.process(self.go())
-        self.runTriggers()
+        self._env.process(self.__runFunc())
 
     def isConnected(self):
         """
