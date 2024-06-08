@@ -1,3 +1,11 @@
+/**
+ * This is the DrawingApp file which allows the user to draw different components. 
+ * 
+ * @author Aryan, Abhirath, Gathik
+ * @version 1.0
+ * @since 06/08/2024
+ */
+
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -41,10 +49,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+/**
+ * The DrawingApp class manages the frame and allows one to run the program.
+ */
 public class DrawingApp extends JFrame 
 {
-    private Manager manage;
+    private Manager manage; //This is the manager object which stores all the JPanels
 
+    /**
+     * Creates a Frame and initializes all the panels.
+     */
     public DrawingApp() 
     {
         super("Moore Machine Simulator");
@@ -65,11 +79,19 @@ public class DrawingApp extends JFrame
     }
 }
 
+/**
+ * This class handles the menu bar that appears at the top of the page.
+ */
+
 class MenuBar extends JMenuBar 
 {
-    private JMenu drawMenu;
-    private Item input, clock, moore, comb, output, wire;
+    private JMenu drawMenu;                                 //the draw menu allows the user to draw on the pannel
+    private Item input, clock, moore, comb, output, wire;   //these items are what the user can draw on the pannel
     
+    /**
+     * Creates a Menubar and add the different items.
+     * @param manage : The Manager JPanel object in which the bar would be placed
+     */
     public MenuBar(Manager manage) 
     {
         drawMenu = new JMenu("Add Component");
@@ -91,8 +113,18 @@ class MenuBar extends JMenuBar
     }
 }
 
+/**
+ * This class handles each JMenuItem that appears in the JMenu.
+ */
 class Item extends JMenuItem 
 {
+    /**
+     * Creates a JMenuItem.
+     * @param title : the type of block this Item is
+     * @param mode : the drawing mode that is initiated when this item is clicked
+     * @param color : the color of the object which would be drawn
+     * @param manage : the Manager class which has the JPanels
+     */
     public Item(Manager.Blocks title, DrawingPanel.Mode mode, Color color, Manager manage) 
     {
         super(title.getName());
@@ -105,252 +137,25 @@ class Item extends JMenuItem
     }
 }
 
-class Manager extends JPanel 
-{
-    private MenuBar bar;
-    private DrawingPanel drawingPanel;
-    private InfoPanel infoPanel;
-    private JFrame frame;
-
-    public enum Blocks
-    {
-        INPUT("Input Block"), MOORE("Moore Machine"), COMB("Combinational Block"), 
-        OUTPUT("Output Block"), CLOCK("Clock"), WIRE("Wire");
-
-        private String name;
-
-        private Blocks(String name)
-        {
-            this.name = name;
-        }
-
-        public String getName()
-        {
-            return name;
-        }
-    }
-
-    public Manager(JFrame frame) 
-    {
-        super(new BorderLayout());
-        
-        bar = new MenuBar(this);
-        this.add(bar, BorderLayout.NORTH);
-
-        drawingPanel = new DrawingPanel(this);
-        this.add(drawingPanel, BorderLayout.CENTER);
-
-        infoPanel = new InfoPanel(this);
-        this.add(infoPanel, BorderLayout.WEST);
-
-        this.frame = frame;
-    }
-
-    public DrawingPanel getDrawingPanel() 
-    {
-        return drawingPanel;
-    }
-
-    public InfoPanel getInfoPanel() 
-    {
-        return infoPanel;
-    }
-
-    public Block createBlock(Blocks block, Line2D.Double line, Rectangle rect, Color color)
-    {
-        switch(block)
-        {
-            case INPUT:
-                return new Input(block.getName(), rect, color, drawingPanel);
-            case OUTPUT:
-                return new Output(block.getName(), rect, color, drawingPanel);
-            case MOORE:
-                return new Moore(block.getName(), rect, color, drawingPanel);
-            case CLOCK:
-                return new Clock(block.getName(), rect, color, drawingPanel);
-            case COMB:
-                return new Combinational(block.getName(), rect, color, drawingPanel);
-            case WIRE:
-                return new Wire(block.getName(), line, color, drawingPanel);
-            default:
-                return null;
-        }
-    }
-
-    public boolean setClosestBlock(boolean showMessageDialog) 
-    {
-        ArrayList<Block> wires = drawingPanel.getWires();
-        ArrayList<Block> rectangles = drawingPanel.getRectangles();
-    
-        double thresholdDistance = 500.0;
-    
-        for (Block wire : wires) 
-        {
-            Point [] endPoints;
-            Point arrowTip = new Point(((Wire)(wire)).getArrowHead().xpoints[0], ((Wire)(wire)).getArrowHead().ypoints[0]);
-
-            endPoints = new Point []
-            {
-                new Point((int)(wire.getLine().x1), (int)(wire.getLine().y1)),
-                arrowTip
-            };
-
-            for (int i = 0; i < endPoints.length; i++) 
-            {
-                Point endPoint = endPoints[i];
-                boolean isStartPoint = (i == 0);
-                double closestDistance = Double.MAX_VALUE;
-                Block closestBlock = null;
-    
-                for (Block rectangle : rectangles) 
-                {
-                    Rectangle rect = rectangle.getRect();
-                    Point[] rectPoints = 
-                    {
-                        new Point(rect.x, rect.y),
-                        new Point(rect.x + rect.width, rect.y),
-                        new Point(rect.x, rect.y + rect.height),
-                        new Point(rect.x + rect.width, rect.y + rect.height)
-                    };
-    
-                    for (Point rectPoint : rectPoints) 
-                    {
-                        double distance = endPoint.distance(rectPoint);
-                        if (distance < closestDistance) 
-                        {
-                            closestDistance = distance;
-                            closestBlock = rectangle;
-                        }
-                    }
-                }
-    
-                for (Block otherWire : wires) 
-                {
-                    if (otherWire == wire) continue;
-    
-                    Point[] wirePoints = 
-                    {
-                        new Point((int)(otherWire.getLine().x1), (int)(otherWire.getLine().y1)),
-                        new Point((int)(otherWire.getLine().x2), (int)(otherWire.getLine().y2))
-                    };
-    
-                    for (int j = 0; j < wirePoints.length; j++) 
-                    {
-                        Point wirePoint = wirePoints[j];
-                        boolean isOtherStartPoint = (j == 0);
-    
-                        if ((isStartPoint && !isOtherStartPoint) || (!isStartPoint && isOtherStartPoint)) 
-                        {
-                            double distance = endPoint.distance(wirePoint);
-                            if (distance < closestDistance) 
-                            {
-                                closestDistance = distance;
-                                closestBlock = otherWire;
-                            }
-                        }
-                    }
-                }
-    
-                if (closestDistance > thresholdDistance) 
-                {
-                    if(showMessageDialog)
-                        JOptionPane.showMessageDialog(null, "Invalid Connections. Check wire connections.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-                
-                ((Wire)(wire)).setBlock(closestBlock);
-            }
-        }
-    
-        for (Block wire : wires) 
-        {
-            Block currentBlock = ((Wire)(wire)).getStartBlock();
-            Wire currentWire = (Wire)(wire);
-            boolean foundRectangle = !(currentBlock instanceof Wire);
-    
-            while (currentBlock instanceof Wire) 
-            {
-                Wire connection = (Wire) currentBlock;
-                Block endBlock = connection.getStartBlock();
-                currentWire = connection;
-                if (endBlock instanceof RectangleBlock) 
-                {
-                    foundRectangle = true;
-                    currentBlock = endBlock;
-                    break;
-                } 
-                else 
-                {
-                    currentBlock = endBlock;
-                }
-            }
-    
-            if (foundRectangle) 
-            {
-                Wire connection = (Wire) wire;
-                connection.setStartBlock(currentBlock, currentWire);
-            } 
-            else 
-            {
-                if(showMessageDialog)
-                    JOptionPane.showMessageDialog(null, "Invalid Connections. Check wire connections.", "Error", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-        }
-    
-        return true;
-    }
-    
-    public boolean isValidConnections(ArrayList<Block> wires)
-    {
-        for(Block w : wires)
-        {
-            Wire wire = (Wire)(w);
-            if(wire.getStartBlock() instanceof RectangleBlock && wire.getEndBlock() instanceof RectangleBlock)
-            {
-                RectangleBlock startBlock = (RectangleBlock)(wire.getStartBlock());
-                RectangleBlock endBlock = (RectangleBlock)(wire.getEndBlock());
-                
-                if(startBlock.hasOutput() && endBlock.hasInput()) continue;
-                else if(startBlock.hasOutput())
-                {
-                    wires.remove(w);
-                    drawingPanel.repaint();
-                    JOptionPane.showMessageDialog(null, "Invalid wire detected and deleted. " + 
-                        "Note: " + endBlock.getType() + " has no input connections.", "Error.", JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-                else
-                {
-                    wires.remove(w);
-                    drawingPanel.repaint();
-                    JOptionPane.showMessageDialog(null, "Invalid wire detected and deleted. " + 
-                        "Note: " + startBlock.getType() + " has no output connections.", "Error.", JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    public JFrame getFrame()
-    {
-        return this.frame;
-    }
-}
-
+/**
+ * This class handles the information of each Block
+ */
 class InfoPanel extends JPanel 
 {
-    private Map<String, Component> infoMap;
-    private JPanel infoPanel;
-    private JTextArea textArea;
+    private Map<String, Component> infoMap; //this map contains the information where the first element is the header and Component is the component to be drawn
+    private JPanel infoPanel;               //this panel is the main center panel that contains the information
+    private JTextArea textArea;             //this textArea is used for writing the functions
 
-    public InfoPanel(Manager manage) 
+    /**
+     * Creates a new information panel
+     * @param manage : the manager class
+     */
+    public InfoPanel(Manager manage)    
     {
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(350, 0));
 
+        //Header label at the top
         JLabel headerLabel = new JLabel("Right click on block or wire to get information about it");
         headerLabel.setFont(new Font("Arial", Font.BOLD, 13));
         headerLabel.setForeground(Color.BLUE);
@@ -359,6 +164,7 @@ class InfoPanel extends JPanel
 
         this.add(headerLabel, BorderLayout.NORTH);
 
+        //infoPanel containing the information in the center
         infoPanel = new JPanel();
         infoPanel.setLayout(new GridBagLayout());
         infoPanel.setBackground(Color.YELLOW);
@@ -366,6 +172,7 @@ class InfoPanel extends JPanel
 
         this.add(infoPanel, BorderLayout.CENTER);
 
+        //southPanel containing the generate button and the textArea
         JPanel southPanel = new JPanel(new BorderLayout());
 
         JButton generateFile = new JButton("Generate Code");
@@ -374,14 +181,23 @@ class InfoPanel extends JPanel
         generateFile.setHorizontalAlignment(JButton.CENTER);
         generateFile.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
+        //change the color of the button when the mouse is hovering
         generateFile.addMouseListener(new MouseAdapter() 
         {
+            /**
+             * Is called when the mouse enters the button.
+             * @param evt : the mouse event
+             */
             @Override
             public void mouseEntered(MouseEvent evt) 
             {
                 generateFile.setBackground(Color.CYAN);
             }
 
+            /**
+             * Is called when the mouse exits the button.
+             * @param evt : the mouse event
+             */
             @Override
             public void mouseExited(MouseEvent evt) 
             {
@@ -389,8 +205,13 @@ class InfoPanel extends JPanel
             }
         });
 
+        //creates the python file when the button is clicked
         generateFile.addActionListener(new ActionListener() 
         {
+            /**
+             * Is called when the button is clicked.
+             * @param e : the action event
+             */
             @Override
             public void actionPerformed(ActionEvent e) 
             {
@@ -419,13 +240,13 @@ class InfoPanel extends JPanel
 
                         new GenerateFile(manage.getDrawingPanel().getRectangles(), manage.getDrawingPanel().getWires(), getTextArea(), option, number);
                         manage.getFrame().dispatchEvent(new WindowEvent(manage.getFrame(), WindowEvent.WINDOW_CLOSING));
-
                     }
             } 
         });
 
         southPanel.add(generateFile, BorderLayout.SOUTH);
 
+        //center panel for the south panel where the user can write functions
         JPanel centerPanel = new JPanel(new BorderLayout());
 
         JLabel functions = new JLabel("Add Functions Here:");
@@ -452,6 +273,9 @@ class InfoPanel extends JPanel
         infoMap = new LinkedHashMap<>();
     }
 
+    /**
+     * Clears the center panel and removes all information.
+     */
     public void removeInfo()
     {
         infoPanel.removeAll();
@@ -459,6 +283,10 @@ class InfoPanel extends JPanel
         this.repaint();
     }
 
+    /**
+     * Sets the information objects to the one given
+     * @param info : a map containing the label and the component
+     */
     public void updateInfo(Map<String, Component> info) 
     {
         removeInfo();
@@ -496,29 +324,42 @@ class InfoPanel extends JPanel
         this.repaint();
     }
 
+    /**
+     * @return textArea : the functions text area
+     */
     public JTextArea getTextArea()
     {
         return this.textArea;
     }
 }
 
+/**
+ * DrawingPanel in which the user can draw the blocks.
+ */
 class DrawingPanel extends JPanel 
 {
-    public enum Mode { NONE, BOX, LINE}
-    public static final double TOLERANCE = 10.0;
-    
-    private Mode drawingMode = Mode.NONE;
-    private Point startPoint;
-    private ArrayList<Block> rectangles;
-    private ArrayList<Block> wires;
-    private Rectangle currentRect;
-    private Line2D.Double currentLine;
-    private Color currentColor;
-    private Manager.Blocks currentName;
-    private Manager manager;
-    private boolean isDragging;
-    private Block highlightedBlock;
+    /**
+     * Enum which determines whether the user wants to draw a box or a line.
+     */
+    public enum Mode {NONE, BOX, LINE}
 
+    public static final double TOLERANCE = 10.0;    //Tolerance to determine whether the point is near
+    private Mode drawingMode = Mode.NONE;           //The initial drawing mode is None
+    private Point startPoint;                       //The starting point for the box or line
+    private ArrayList<Block> rectangles;            //An ArrayList object that contains all the rectangles
+    private ArrayList<Block> wires;                 //An ArrayList object that contains all the wires
+    private Rectangle currentRect;                  //The current rectangle being drawn
+    private Line2D.Double currentLine;              //The current line being drawn
+    private Color currentColor;                     //The current color of the object being drawm
+    private Manager.Blocks currentName;             //The type of object being drawn
+    private Manager manager;                        //The manager class
+    private boolean isDragging;                     //Whether or not the user is dragging the mouse
+    private Block highlightedBlock;                 //The highlight block (the selected block)
+
+    /**
+     * Creates a new DrawingPanel
+     * @param manager : the Manager object in which this drawing panel is in
+     */
     public DrawingPanel(Manager manager) 
     {
         setBackground(Color.WHITE);
@@ -530,6 +371,10 @@ class DrawingPanel extends JPanel
         
         MouseAdapter mouseAdapter = new MouseAdapter() 
         {
+            /**
+             * Is called when the mouse is pressed
+             * @param e : the mouse event
+             */
             @Override
             public void mousePressed(MouseEvent e) 
             {
@@ -552,6 +397,10 @@ class DrawingPanel extends JPanel
                 }
             }
 
+            /**
+             * Is called when the mouse is dragged.
+             * @param e : the mouse event
+             */
             @Override
             public void mouseDragged(MouseEvent e) 
             {
@@ -569,6 +418,10 @@ class DrawingPanel extends JPanel
                 }
             }
 
+            /**
+             * Is called when the mouse is released.
+             * @param e : the mouse event
+             */
             @Override
             public void mouseReleased(MouseEvent e) 
             {
@@ -615,6 +468,9 @@ class DrawingPanel extends JPanel
         addMouseMotionListener(mouseAdapter);
     }
 
+    /**
+     * Resets the variables.
+     */
     private void reset()
     {
         isDragging = false;
@@ -623,6 +479,10 @@ class DrawingPanel extends JPanel
         repaint();
     }
 
+    /**
+     * Is called to handle right clicked events.
+     * @param point : the point where the mouse is clicked
+     */
     private void handleRightClick(Point point) 
     {
         for(Block block : rectangles) 
@@ -644,13 +504,22 @@ class DrawingPanel extends JPanel
         }
     }
 
+    /**
+     * Is called to handle the clicked events.
+     * @param block : the block which is closest to the point where the mouse clicked.
+     */
     private void handleRightClick(Block block)
     {
         manager.getInfoPanel().updateInfo(block.getMap());
         highlightedBlock = block;
     }
     
-
+    /**
+     * @param line : the line to check if the point is near
+     * @param point : the point to check if the line is near
+     * @param tolerance : the tolerance level
+     * @return true if the point is close to the line within tolerance level; false otherwise
+     */
     private boolean isPointNearLine(Line2D line, Point point, double tolerance) 
     {
         double dx = line.getX2() - line.getX1();
@@ -678,6 +547,12 @@ class DrawingPanel extends JPanel
 
     }
 
+    /**
+     * Sets the drawing mode.
+     * @param mode : the drawing mode
+     * @param color : the current color
+     * @param name : the type of object
+     */
     public void setDrawingMode(Mode mode, Color color, Manager.Blocks name) 
     {
         this.drawingMode = mode;
@@ -685,6 +560,10 @@ class DrawingPanel extends JPanel
         this.currentName = name;
     }
 
+    /**
+     * Updates the current rectangle.
+     * @param endPoint : the other end point of the rectangle
+     */
     private void updateRectangle(Point endPoint) 
     {
         int x = Math.min(startPoint.x, endPoint.x);
@@ -694,11 +573,19 @@ class DrawingPanel extends JPanel
         currentRect.setBounds(x, y, width, height);
     }
 
+    /**
+     * Updates the current line
+     * @param endPoint : the other end point of the line
+     */
     private void updateLine(Point endPoint)
     {
         currentLine.setLine(startPoint, endPoint);
     }
 
+    /**
+     * Paints the drawing panel.
+     * @param g : the Graphics object
+     */
     @Override
     protected void paintComponent(Graphics g) 
     {
@@ -711,6 +598,7 @@ class DrawingPanel extends JPanel
         Graphics2D g2 = (Graphics2D) g;
         g2.setStroke(new BasicStroke(4));
 
+        //paints all the blocks
         for (Block block : rectangles) 
         {
             Rectangle rect = block.getRect();
@@ -718,6 +606,7 @@ class DrawingPanel extends JPanel
 
             g.fillRect(rect.x, rect.y, rect.width, rect.height);
 
+            //is the block the selected block
             if(block == highlightedBlock)
                 g.setColor(Color.MAGENTA);
             else
@@ -730,6 +619,7 @@ class DrawingPanel extends JPanel
             int textX = rect.x + (rect.width - textWidth) / 2;
             int textY = rect.y + (rect.height - textHeight) / 2 + metrics.getAscent();
 
+            //if the user wants to plot the block, then the text color should be black
             if(block.getPlot().equals("True"))
                 g.setColor(Color.BLACK);
             else
@@ -738,6 +628,7 @@ class DrawingPanel extends JPanel
             g.drawString(block.getName(), textX, textY);
         }
 
+        //paints all the wires
         for (Block block : wires)
         {
             ((Wire)(block)).updateBlocks();
@@ -759,6 +650,7 @@ class DrawingPanel extends JPanel
             
             g.drawPolygon(((Wire)(block)).getArrowHead());
 
+            //Draws the bits of the wires
             String startText = ((Wire)(block)).getOutputString();
             FontMetrics metrics = g.getFontMetrics(g.getFont());
 
@@ -787,6 +679,10 @@ class DrawingPanel extends JPanel
         }
     }
 
+    /**
+     * @param r1 : the rectangle to check
+     * @return true if this rectangle intersects with any object; false otherwise
+     */
     public boolean isIntersecting(Rectangle r1) 
     {
         for(Block block:rectangles)
@@ -804,6 +700,10 @@ class DrawingPanel extends JPanel
         return false;
     }
 
+    /**
+     * @param l1 : the line to check
+     * @return true if this line intersects any object; false otherwise
+     */
     public boolean isIntersecting(Line2D l1) 
     {
         int intersectingRectanglesCount = 0;
@@ -858,6 +758,12 @@ class DrawingPanel extends JPanel
         return false;
     }
 
+    /**
+     * Shortens the line's starting point until it no longer intersects the rectangle
+     * @param l1 : the line to shorten
+     * @param rect : the rectangle that this line intersects
+     * @return a new line which does not intersect the rectangle
+     */
     private static Line2D shortenLineStart(Line2D l1, Rectangle rect) 
     {
         double dx = l1.getX2() - l1.getX1();
@@ -872,6 +778,12 @@ class DrawingPanel extends JPanel
         return l1;
     }
 
+    /**
+     * Shortens the line's ending point until it no longer intersects the rectangle
+     * @param l1 : the line to shorten
+     * @param rect : the rectangle that this line intersects
+     * @return a new line which does not intersect the rectangle
+     */
     private static Line2D shortenLineEnd(Line2D l1, Rectangle rect) 
     {
         double dx = l1.getX2() - l1.getX1();
@@ -886,6 +798,11 @@ class DrawingPanel extends JPanel
         return l1;
     }
     
+    /**
+     * @param rect : the rectangle
+     * @param line : the line
+     * @return true if the rectangle touches the border of the line
+     */
     private boolean isTouchingBorder(Rectangle rect, Line2D line) 
     {
         Line2D top = new Line2D.Double(rect.getMinX(), rect.getMinY(), rect.getMaxX(), rect.getMinY());
@@ -896,16 +813,26 @@ class DrawingPanel extends JPanel
         return top.intersectsLine(line) || bottom.intersectsLine(line) || left.intersectsLine(line) || right.intersectsLine(line);
     }
 
+    /**
+     * @return an ArrayList object that contains all the rectangles
+     */
     public ArrayList<Block> getRectangles()
     {
         return rectangles;
     }
 
+    /**
+     * @return an ArrayList object that contains all the wires
+     */
     public ArrayList<Block> getWires()
     {
         return wires;
     }
 
+    /**
+     * Deletes the block from the block list
+     * @param block : the block to remove
+     */
     public void deleteBlock(Block block)
     {
         for(Block b : rectangles)
