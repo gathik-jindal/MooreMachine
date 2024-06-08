@@ -1,3 +1,11 @@
+/**
+ * This is the Block class that stores the information that all blocks needs to have. 
+ * 
+ * @author Aryan, Abhirath, Gathik
+ * @version 1.0
+ * @since 06/08/2024
+ */
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -38,17 +46,27 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
+/**
+ * The Block class stores the information that is inherent to all blockss
+ */
 public class Block 
 {
-    private Rectangle rect;
-    private Line2D.Double line;
-    private Color color;
-    private String name;
-    private Map<String, Component> map;
-    private DrawingPanel drawingPanel;
-    private int currID = 0;
-    private static int id = 0;
+    private Rectangle rect;                 //rectangle object for rectangular blocks
+    private Line2D.Double line;             //line object for wires
+    private Color color;                    //color of the block
+    private String name;                    //name of the block
+    private Map<String, Component> map;     //map that stores all the fields
+    private DrawingPanel drawingPanel;      //drawingPanel in which the block would be drawn
+    private int currID = 0;                 //the id of this block
+    private static int id = 0;              //to assign new id to each new block
 
+    /**
+     * Creates a new block object
+     * @param name : the name of the block
+     * @param rect : the rectangle that is drawn
+     * @param color : the color of the rectangle
+     * @param panel : the DrawingPanel in which the rectangle is drawn
+     */
     public Block(String name, Rectangle rect, Color color, DrawingPanel panel) 
     {
         this.name = name;
@@ -61,6 +79,13 @@ public class Block
         id++;
     }
 
+    /**
+     * Creates a new block object
+     * @param name : the name of the block
+     * @param line : the line that is drawn
+     * @param color : the color of the line
+     * @param panel : the DrawingPanel in which the line is drawn
+     */
     public Block(String name, Line2D.Double line, Color color, DrawingPanel panel)
     {
         this.name = name;
@@ -73,33 +98,55 @@ public class Block
         id++;
     }
 
+    /**
+     * Sets the rectangle object with the given color
+     * @param rect : the new rectangle object
+     * @param color : the color of the rectangle
+     */
     public void setRect(Rectangle rect, Color color) 
     {
         this.rect = rect;
         this.color = color;
     }
 
+    /**
+     * Sets the line object with the given color
+     * @param line : the new line object
+     * @param color : the color of the line
+     */
     public void setLine(Line2D.Double line, Color color)
     {
         this.line = line;
         this.color = color;
     }
 
+    /**
+     * @return the rectangle that is drawn
+     */
     public Rectangle getRect() 
     {
         return this.rect;
     }
 
+    /**
+     * @return the line that is drawn
+     */
     public Line2D.Double getLine()
     {
         return this.line;
     }
 
+    /**
+     * @return the color of the line or the rectangle
+     */
     public Color getColor() 
     {
         return this.color;
     }
 
+    /**
+     * @return name the of the block
+     */
     public String getName() 
     {
         if(map.containsKey("blockID"))
@@ -108,16 +155,27 @@ public class Block
         return this.name;
     }
 
+    /**
+     * @return the map that stores all the fields of the block
+     */
     public Map<String, Component> getMap()
     {
         return this.map;
     }
 
+    /**
+     * Sets the field map to the map given
+     * @param fields the new map containing the fields
+     */
     public void setMap(Map<String, Component> fields)
     {
         this.map = fields;
     }
 
+    /**
+     * Applies formatting to the component given
+     * @param component : the component to apply formatting to
+     */
     private void applyFormatting(Component component)
     {
         component.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -126,6 +184,10 @@ public class Block
         component.setBackground(Color.WHITE);
     }
 
+    /**
+     * @param value : the starting value in the JTextField
+     * @return JTextField object with the starting value specified
+     */
     protected JTextField createTextField(String value)
     {
         JTextField jTextField = new JTextField(value);
@@ -134,6 +196,7 @@ public class Block
         jTextField.setEditable(true);
         jTextField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         
+        //repaint whenever the field is updated
         jTextField.getDocument().addDocumentListener(new DocumentListener() 
         {
             @Override
@@ -159,6 +222,12 @@ public class Block
         return jTextField;
     }
 
+    /**
+     * Creats a new button that can access files
+     * @param value : the text on the button
+     * @param field : the JTextField whose text field would be set to the new path
+     * @return JButton that can access files
+     */
     protected JButton createFileButton(String value, JTextField field)
     {
         JButton button = new JButton(value);
@@ -204,6 +273,13 @@ public class Block
         return button;
     }
 
+    /**
+     * Creates a new Spinner object with the initial value, the minimum value, and the maximum value
+     * @param value : the initial value
+     * @param min : the minimum value
+     * @param max : the maximum value
+     * @return JSpinner object with the above specifications
+     */
     protected JSpinner createIntField(int value, int min, int max)
     {
         SpinnerNumberModel numberModel = new SpinnerNumberModel(value, min, max, 1);
@@ -229,6 +305,11 @@ public class Block
         return spinner;
     }
 
+    /**
+     * Creates a JTextField that only accpets floating point numbers
+     * @param initialValue : the initial value of the JTextField
+     * @return JTextField with the above specifications
+     */
     protected JTextField createFloatField(double initialValue) 
     {
         JTextField numberField = new JTextField(initialValue + "");
@@ -261,6 +342,12 @@ public class Block
         return numberField;
     }
 
+    /**
+     * Creates a JComboBox with the given options and the given starting selected option
+     * @param options : the options of the ComboBox
+     * @param selectedOption : the starting selected options
+     * @return JComboBox<String> with the above specifications
+     */
     protected JComboBox<String> createOptions(String [] options, String selectedOption)
     {
         JComboBox<String> comboBox = new JComboBox<>(options);
@@ -283,6 +370,10 @@ public class Block
         return comboBox;
     }
 
+    /**
+     * Creates a new label
+     * @return JLabel with the above specifications
+     */
     protected JLabel createLabel()
     {
         JLabel label = new JLabel();
@@ -292,6 +383,11 @@ public class Block
         return label;
     }
 
+    /**
+     * Creates a new JButton that deletes this block if pressed after confirmation
+     * @param str : the text on the JButton
+     * @return JButton with the above specifications
+     */
     protected JButton createDeleteButton(String str)
     {
         JButton button = new JButton(str);
@@ -331,31 +427,53 @@ public class Block
         return button;
     }
 
+    /**
+     * @return String representation of the block 
+     */
     @Override
     public String toString()
     {
         return currID + "";
     }
 
+    /**
+     * @return "True" if plot is set to true; "False" otherwise
+     */
     @SuppressWarnings("unchecked")
     public String getPlot()
     {
         return (String)(((JComboBox<String>)(map.get("plot"))).getSelectedItem());
     }
 
+    /**
+     * @return the block id of the block
+     */
     public String getBlockID()
     {
         return (String)(((JTextField)(map.get("blockID"))).getText());
     }
 }
 
+/**
+ * All blocks except for wires are rectangular boxes
+ */
 abstract class RectangleBlock extends Block
 {
+    /**
+     * Creates a new RectangleBox
+     * @param name : the name of the block
+     * @param rect : the rectangle that is to be drawn
+     * @param color : the color of the block
+     * @param panel : the DrawingPanel on which the rectangle is to be drawn
+     */
     public RectangleBlock(String name, Rectangle rect, Color color, DrawingPanel panel)
     {
         super(name, rect, color, panel);
     }
 
+    /**
+     * @return the name of the block that is to be written in the python file
+     */
     public String getObjectName()
     {
         return "rectangle_block" + super.toString();
@@ -368,6 +486,13 @@ abstract class RectangleBlock extends Block
 
 class Moore extends RectangleBlock
 {
+    /**
+     * Creates a Moore machine block.
+     * @param name : the name of the block
+     * @param rect : the rectangle which is to be drawn
+     * @param color : the color of the rectangle
+     * @param panel : the DrawingPanel on which the rectangle is to be drawn
+     */
     public Moore(String name, Rectangle rect, Color color, DrawingPanel panel)
     {
         super(name, rect, color, panel);
@@ -382,6 +507,9 @@ class Moore extends RectangleBlock
         setMap(map);
     }
 
+    /**
+     * @return String representation of the Block
+     */
     @Override
     public String toString()
     {
@@ -389,44 +517,68 @@ class Moore extends RectangleBlock
             ", nsl = " + getNSL() +", ol = " + getOL() + ", startingState = " + getStartingState() + ")";
     }
 
+    /**
+     * @return the maximum output wires of the Moore Machine
+     */
     public Integer getMaxOutSize()
     {
         return (Integer)(((JSpinner)(getMap().get("maxOutSize"))).getValue());
     }
 
+    /**
+     * @return the next state logic of the machine
+     */
     public String getNSL()
     {
         return (String)(((JTextField)(getMap().get("nsl"))).getText());
     }
 
+    /**
+     * @return the output logic of the machine
+     */
     public String getOL()
     {
         return (String)(((JTextField)(getMap().get("ol"))).getText());
     }
 
+    /**
+     * @return the starting state of the machine
+     */
     public Integer getStartingState()
     {
         return (Integer)(((JSpinner)(getMap().get("startingState"))).getValue());
     }
 
+    /**
+     * @return String representation of the object name which will be written in the python file
+     */
     @Override
     public String getObjectName()
     {
         return "moore" + super.toString();
     }
 
+    /**
+     * @return true
+     */
     @Override
     public boolean hasOutput() 
     {
         return true;
     }
-
+    
+    /**
+     * @return true
+     */
     @Override
     public boolean hasInput() 
     {
         return true;
     }
 
+    /**
+     * @return the type of the block ("Moore")
+     */
     @Override
     public String getType() 
     {
@@ -436,6 +588,13 @@ class Moore extends RectangleBlock
 
 class Input extends RectangleBlock
 {
+    /**
+     * Creates a new Input block
+     * @param name : the name of the block
+     * @param rect : the Rectangle object which is to be drawn
+     * @param color : the color of the Rectangle
+     * @param panel : the DrawignPanel on which the rectangle would be drawn
+     */
     public Input(String name, Rectangle rect, Color color, DrawingPanel panel)
     {
         super(name, rect, color, panel);
@@ -448,35 +607,53 @@ class Input extends RectangleBlock
         setMap(map);
     }
 
+    /**
+     * @return String representation of the block
+     */
     @Override
     public String toString()
     {
         return getObjectName() + " = pysim.source(filePath = \""+getFilePath() + "\", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\")";
-    }
+    }   
 
+    /**
+     * @return the filePath
+     */
     public String getFilePath()
     {
         return (String)(((JTextField)(getMap().get("filePath"))).getText()).replaceAll("\\", "\\\\");
     }
 
+    /**
+     * @return String object name that would be printed in the python file
+     */
     @Override
     public String getObjectName()
     {
         return "input" + super.toString();
     }
 
+    /**
+     * @return true
+     */
     @Override
     public boolean hasOutput() 
     {
         return true;
     }
 
+    /**
+     * @return false
+     */
     @Override
     public boolean hasInput() 
     {
         return false;
     }
 
+    /**
+     * @return the type of the block ("Input Block")
+     */
     @Override
     public String getType() 
     {
@@ -486,6 +663,13 @@ class Input extends RectangleBlock
 
 class Clock extends RectangleBlock
 {
+    /**
+     * Creates a Clock object
+     * @param name : the name of the clock
+     * @param rect : the Rectangle which is to be drawn
+     * @param color : the color of the Rectangle
+     * @param panel : the DrawingPanel upon which the Rectangle would be drawn
+     */
     public Clock(String name, Rectangle rect, Color color, DrawingPanel panel)
     {
         super(name, rect, color, panel);
@@ -499,6 +683,9 @@ class Clock extends RectangleBlock
         setMap(map);
     }
 
+    /**
+     * @return String representation of the block
+     */
     @Override
     public String toString()
     {
@@ -506,39 +693,60 @@ class Clock extends RectangleBlock
             ", timePeriod = " + getTimePeriod() +", onTime = " + getOnTime() + ", initialValue = " + getInitialValue() + ")";
     }
 
+    /**
+     * @return String object name that would be printed in the python file
+     */
     @Override
     public String getObjectName()
     {
         return "clock" + super.toString();
     }
 
+    /**
+     * @return String representation of the time period of the clock
+     */
     public String getTimePeriod()
     {
         return (String)(((JTextField)(getMap().get("timePeriod"))).getText());
     }
 
+    /**
+     * @return String representation of the on time of the clock
+     */
     public String getOnTime()
     {
         return (String)(((JTextField)(getMap().get("onTime"))).getText());
     }
 
+    /**
+     * @return the initial value of the clock
+     */
     public String getInitialValue()
     {
         return ((JSpinner)(getMap().get("initialValue"))).getValue().toString();
     }
 
+    /**
+     * @return true
+     */
     @Override
     public boolean hasOutput() 
     {
         return true;
     }
 
+    /**
+     * @return false
+     */
     @Override
     public boolean hasInput() 
     {
         return false;
     }
 
+    /**
+     * @return the type of the object "Clock"
+     */
     @Override
     public String getType() 
     {
@@ -548,6 +756,13 @@ class Clock extends RectangleBlock
 
 class Output extends RectangleBlock
 {
+    /**
+     * Creates a new Output object
+     * @param name : the name of the block
+     * @param rect : the rectangle which is to be drawn
+     * @param color : the color of the rectangle
+     * @param panel : the DrawingPanel upon which the rectangle would be drawn
+     */
     public Output(String name, Rectangle rect, Color color, DrawingPanel panel)
     {
         super(name, rect, color, panel);
@@ -558,30 +773,45 @@ class Output extends RectangleBlock
         setMap(map);
     }
 
+    /**
+     * @return String representation of the block
+     */
     @Override
     public String toString()
     {
         return getObjectName() + " = pysim.output(plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" + ")";
     }
 
+    /**
+     * @return String object name that would be printed in the python file
+     */
     @Override
     public String getObjectName()
     {
         return "output" + super.toString();
     }
 
+    /**
+     * @return false
+     */
     @Override
     public boolean hasOutput() 
     {
         return false;
     }
 
+    /**
+     * @return true
+     */
     @Override
     public boolean hasInput() 
     {
         return true;
     }
 
+    /**
+     * @return type of the object "Output Block"
+     */
     @Override
     public String getType() 
     {
@@ -591,6 +821,13 @@ class Output extends RectangleBlock
 
 class Combinational extends RectangleBlock
 {
+    /**
+     * Creates a new combinational object
+     * @param name : the name of the block
+     * @param rect : the rectangle which is to be drawn
+     * @param color : the color of the rectangle
+     * @param panel : the DrawingPanel upon which the rectangle would be drawn
+     */
     public Combinational(String name, Rectangle rect, Color color, DrawingPanel panel)
     {
         super(name, rect, color, panel);
@@ -605,6 +842,9 @@ class Combinational extends RectangleBlock
         setMap(map);
     }
 
+    /**
+     * @return String representation of the block
+     */
     @Override
     public String toString()
     {
@@ -612,44 +852,68 @@ class Combinational extends RectangleBlock
             ", func = " + getFunc() +", delay = " + getDelay() + ", initialValue = " + getInitialValue() + ")";
     }
 
+    /**
+     * @return the maximum number of output wires
+     */
     public Integer getMaxOutSize()
     {
         return (Integer)(((JSpinner)(getMap().get("maxOutSize"))).getValue());
     }
 
-    public String getFunc()
+    /**
+     * @return String representation of the function of the combinational block
+     */
+    public String getFunc() 
     {
         return (String)(((JTextField)(getMap().get("func"))).getText());
     }
 
+    /**
+     * @return String representation of the delay
+     */
     public String getDelay()
     {
         return ((JSpinner)(getMap().get("delay"))).getValue().toString();
     }
 
+    /**
+     * @return String representation of the initial value
+     */
     public String getInitialValue()
     {
         return ((JSpinner)(getMap().get("initialValue"))).getValue().toString();
     }
 
+    /**
+     * @return String object name that would be printed in the python file
+     */
     @Override
     public String getObjectName()
     {
         return "comb" + super.toString();
     }
 
+    /**
+     * @return true
+     */
     @Override
     public boolean hasOutput() 
     {
         return true;
     }
 
+    /**
+     * @return true
+     */
     @Override
     public boolean hasInput() 
     {
         return true;
     }
 
+    /**
+     * @return the type of the block "Combinational Block"
+     */
     @Override
     public String getType() 
     {
@@ -663,6 +927,13 @@ class Wire extends Block
     private JLabel startLabel, endLabel;
     private Polygon arrowHead;
 
+    /**
+     * Creates a new wire object
+     * @param name : the name of the wire
+     * @param line : the Line object which is to be drawn
+     * @param color : the color of the wire
+     * @param panel : the DrawingPanel on which the Wire would be drawn
+     */
     public Wire(String name, Line2D.Double line, Color color, DrawingPanel panel)
     {
         super(name, line, color, panel);
@@ -687,6 +958,7 @@ class Wire extends Block
         map.put("Delete", createDeleteButton("Delete Wire"));
         setMap(map);
 
+        //Creates the arrow object at the tip of the wire
         int x1 = (int)(line.x1), y1 = (int)(line.y1), x2 = (int)(line.x2), y2 = (int)(line.y2);
     
         double angle = Math.atan2(y2 - y1, x2 - x1);
@@ -710,6 +982,10 @@ class Wire extends Block
         panel.repaint();
     }
 
+    /**
+     * Sets the starting block/ending block of the Wire
+     * @param block : the starting block/ending block
+     */
     public void setBlock(Block block)
     {
         if(startBlock == null) 
@@ -719,11 +995,19 @@ class Wire extends Block
         else endBlock = block;
     }
 
+    /**
+     * Sets the starting block of the wire
+     * @param block : the new staring block
+     * @param inputWire : the input wire
+     */
     public void setStartBlock(Block block, Wire inputWire)
     {
         startBlock = block;
     }
 
+    /**
+     * @return true if the wire is a clock wire
+     */
     @SuppressWarnings("unchecked")
     public boolean isClocked()
     {
@@ -733,16 +1017,25 @@ class Wire extends Block
         return false;
     }
 
+    /**
+     * @return the starting block
+     */
     public Block getStartBlock()
     {
         return startBlock;
     }
 
+    /**
+     * @return the ending block
+     */
     public Block getEndBlock()
     {
         return endBlock;
     }
 
+    /**
+     * @return get the output wire's MSB
+     */
     public String getOutputMSB()
     {
         try
@@ -755,6 +1048,9 @@ class Wire extends Block
         }
     }
 
+    /**
+     * @return get the output wire's LSB
+     */
     public String getOutputLSB()
     {
         try
@@ -767,6 +1063,9 @@ class Wire extends Block
         }
     }
 
+    /**
+     * @return get the output String
+     */
     public String getOutputString()
     {
         String outputMSB = getOutputMSB(), outputLSB = getOutputLSB();
@@ -777,11 +1076,17 @@ class Wire extends Block
         return outputLSB + ":" + outputMSB;
     }
 
+    /**
+     * @return Polygon arrowhead of the end of the block
+     */
     public Polygon getArrowHead()
     {
         return arrowHead;
     }
 
+    /**
+     * Updates the start label and end label
+     */
     public void updateBlocks()
     {
         startLabel.setText(getStartBlock() == null ? "None" : getStartBlock().getName());
