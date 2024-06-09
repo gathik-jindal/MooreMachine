@@ -8,14 +8,26 @@
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+
 import java.awt.geom.Line2D;
+
+import java.awt.image.BufferedImage;
+
+import java.io.File;
+
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
+
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Manager extends JPanel 
 {
@@ -301,6 +313,43 @@ public class Manager extends JPanel
         return true;
     }
 
+    /**
+     * Allows the user to save the image.
+     */
+    public void saveImage() 
+    {
+        JFileChooser fileChooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Images", "png");
+        fileChooser.setFileFilter(filter);
+        int returnValue = fileChooser.showSaveDialog(this);
+
+        if (returnValue == JFileChooser.APPROVE_OPTION) 
+        {
+            File file = fileChooser.getSelectedFile();
+            if (!file.getName().toLowerCase().endsWith(".png")) 
+            {
+                file = new File(file.getAbsolutePath() + ".png");
+            }
+            try 
+            {
+                BufferedImage image = new BufferedImage(drawingPanel.getWidth(), drawingPanel.getHeight(), BufferedImage.TYPE_INT_RGB);
+                Graphics2D g2d = image.createGraphics();
+                drawingPanel.paint(g2d);
+                g2d.dispose();
+                ImageIO.write(image, "png", file);
+                JOptionPane.showMessageDialog(null, "Image saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } 
+            catch (Exception ex) 
+            {
+                JOptionPane.showMessageDialog(null, "Failed to save image: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(null, "Failed to save image.", "Error", JOptionPane.ERROR_MESSAGE);
+        }   
+    }
+    
     /**
      * @return the frame object that this class is part of
      */

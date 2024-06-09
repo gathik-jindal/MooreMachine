@@ -17,7 +17,7 @@ import java.io.File;
 
 public class GenerateFile 
 {
-    private PrintWriter pw; //PrintWrite object to write in "simulation.py"
+    private PrintWriter pw; //PrintWrite object to write in the path specified by the user
 
     /**
      * Creates a GenerateFile object.
@@ -26,18 +26,12 @@ public class GenerateFile
      * @param area : the JTextArea object with funtions
      * @param generateCSV : 0 to generate csv; otherwise, csv would not be generated
      * @param time : the time duration to run the simulation for
+     * @throws IOException : if File IO resulted in an error
      */
-    public GenerateFile(ArrayList<Block> block, ArrayList<Block> wires, JTextArea area, int generateCSV, int time)
+    public GenerateFile(String path, ArrayList<Block> block, ArrayList<Block> wires, JTextArea area, int generateCSV, int time) throws IOException
     {
-        try
-        {
-            pw = new PrintWriter(new FileWriter(new File("simulation.py")));
-        }
-        catch(IOException e)
-        {
-            System.err.println("Cannot edit simulation.py");
-        }
-
+        pw = new PrintWriter(new FileWriter(new File(path)));
+        
         writeImport();
         writeFunctions(area);
         writeBlock(block);

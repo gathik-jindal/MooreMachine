@@ -32,12 +32,16 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
+import java.io.File;
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -48,6 +52,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * The DrawingApp class manages the frame and allows one to run the program.
@@ -85,15 +91,24 @@ public class DrawingApp extends JFrame
 
 class MenuBar extends JMenuBar 
 {
-    private JMenu drawMenu;                                 //the draw menu allows the user to draw on the pannel
+    private JMenu drawMenu, fileMenu;                       //the draw menu allows the user to draw on the pannel, and the file menu allows the user to save the project
     private Item input, clock, moore, comb, output, wire;   //these items are what the user can draw on the pannel
-    
+    private JMenuItem saveImage;                            //this item allows the user to save the image
+
     /**
      * Creates a Menubar and add the different items.
      * @param manage : The Manager JPanel object in which the bar would be placed
      */
     public MenuBar(Manager manage) 
     {
+        fileMenu = new JMenu("File");
+        saveImage = new JMenuItem("Save Image");
+
+        saveImage.addActionListener(e -> manage.saveImage());
+        fileMenu.add(saveImage);
+        
+        this.add(fileMenu);
+
         drawMenu = new JMenu("Add Component");
         input = new Item(Manager.Blocks.INPUT, DrawingPanel.Mode.BOX, Color.ORANGE, manage);
         clock = new Item(Manager.Blocks.CLOCK, DrawingPanel.Mode.BOX, Color.BLUE, manage);
@@ -238,8 +253,26 @@ class InfoPanel extends JPanel
                             }
                         }
 
-                        new GenerateFile(manage.getDrawingPanel().getRectangles(), manage.getDrawingPanel().getWires(), getTextArea(), option, number);
-                        manage.getFrame().dispatchEvent(new WindowEvent(manage.getFrame(), WindowEvent.WINDOW_CLOSING));
+                        JFileChooser fileChooser = new JFileChooser();
+                        fileChooser.setDialogTitle("Choose/Create a Python File");
+
+                        FileNameExtensionFilter filter = new FileNameExtensionFilter("Python Files", "py");
+                        fileChooser.setFileFilter(filter);
+
+                        int returnValue = fileChooser.showOpenDialog(null);
+
+                        try
+                        {
+                            if(returnValue != JFileChooser.APPROVE_OPTION)
+                                throw new IOException("Could not generate the code");
+                            File selectedFile = fileChooser.getSelectedFile();
+                            new GenerateFile(selectedFile.getAbsolutePath(), manage.getDrawingPanel().getRectangles(), manage.getDrawingPanel().getWires(), getTextArea(), option, number);
+                            manage.getFrame().dispatchEvent(new WindowEvent(manage.getFrame(), WindowEvent.WINDOW_CLOSING));
+                        }
+                        catch(IOException exp)
+                        {
+                            JOptionPane.showMessageDialog(null, "Could not generate the code.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
             } 
         });

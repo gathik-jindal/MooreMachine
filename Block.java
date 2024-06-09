@@ -49,7 +49,7 @@ import javax.swing.text.NumberFormatter;
 /**
  * The Block class stores the information that is inherent to all blockss
  */
-public class Block 
+public abstract class Block 
 {
     private Rectangle rect;                 //rectangle object for rectangular blocks
     private Line2D.Double line;             //line object for wires
@@ -472,16 +472,24 @@ abstract class RectangleBlock extends Block
     }
 
     /**
-     * @return the name of the block that is to be written in the python file
+     * @return true if the block has output connections; false otherwise
      */
-    public String getObjectName()
-    {
-        return "rectangle_block" + super.toString();
-    }
-
     public abstract boolean hasOutput();
+
+    /**
+     * @return true if the block has input connections; false otherwise
+     */
     public abstract boolean hasInput();
+
+    /**
+     * @return String representation of the type of object
+     */
     public abstract String getType();
+
+    /**
+     * @return String representation of the object name which will be written in the python file
+     */
+    public abstract String getObjectName();
 }
 
 class Moore extends RectangleBlock
@@ -621,7 +629,7 @@ class Input extends RectangleBlock
      */
     public String getFilePath()
     {
-        return (String)(((JTextField)(getMap().get("filePath"))).getText()).replaceAll("\\", "\\\\");
+        return (String)(((JTextField)(getMap().get("filePath"))).getText()).replaceAll("\\\\", "\\\\\\\\");
     }
 
     /**
