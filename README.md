@@ -41,6 +41,11 @@ This project implements a Moore Machine in Python and a Moore Machine Graphical 
     - [Clock Block Methods](#clock-block-methods)
     - [Output Block Methods](#output-block-methods)
 - [Graphical User Interface](#graphical-user-interface)
+    - [Getting Started](#getting-started)
+    - [Creating Blocks](#creating-blocks)
+    - [Creating Connections](#creating-connections)
+    - [Saving the Drawing](#saving-the-drawing)
+    - [Generating the Code](#generating-the-code)
 
 ## <ins>Introduction</ins>
 
@@ -763,6 +768,45 @@ In order to run the program, type the following command in the command window.
 java -jar MooreMachineSimulator.jar
 ```
 
-The following window would then open up: 
+## <ins>Creating Blocks</ins>
+
+The following window opens up when one runs the above command: 
 
 ![Main Window](Images/MainWindow.png)
+
+At the top, the window contains a Menubar with the options for "File" and "Add Component". If "File" is pressed, there is an option to save the image that the user has drawn in the center panel. If "Add Component" is pressed, different components such as Moore Machine, Input Block, Clock, Combinational Block, Output Block, and Wires can be drawn in the center panel. 
+
+On the left, the information relating to the block can be seen and on the bottom left, the user can type functions in python that he or she may want such as the next state logic or the output logic. Finally, there is a button to generate the python code wich would allow the user to generate a python code that represents the drawings that they have created. This python code would be made using the above mentioned format and the user can run the program to see the plots.
+
+When a block is added, in this case a Moore Machine, the window would look something like the following. 
+
+![Block Added](Images/AddedBlock.png)
+
+The fields pertaining to the block are shown on the left and mean the same as explained above in the code section. The information that is shown refers to the block/wire that has a magenta outline. The rest of the blocks would have a black outline. If plot is set as "False", the color of the text in the block would be white, and if plot is set as "True", the color of the text in the block would be black. The block ID is the name of the block that is displayed in the center of the square. 
+
+Note for fields such as nsl and ol for Moore Machine and func for Combinational Block, the value written must be valid python code. If the function is too long to fit in the field specified, one can type the function in the text box at the bottom, and write the name of the function in the field specified. 
+
+## <ins>Creating Connections</ins>
+
+To add connections, click on "Add Component" and press "Wire" to add wire connections. A sample configuration is shown below:
+
+![Added Connections](Images/Connections.png)
+
+A wire has the properties as shown in the diagram in the left panel. The output LSB and the output MSB are the bits that leave a block. For example, in the above diagram bits 0 (inclusive) to 2 (exclusive) are sent from the input block to the moore machine. 
+
+NOTE : These LSB and the MSB's must be set on the last wire (i.e., the wire whose arrow points to a block and not another wire.) All other wires would be ignored.
+
+If the wire is a clock wire, the color of the wire becomes orange. Again the last wire (i.e., the wire whose arrow points to a block and not another wire should be set as the clock wire.) All other wires would be ignored. If the wire does not connect a clock to a moore machine, but is set as the clock wire, that wire would be considered as a normal wire.
+In the example shown above, the orange wire connects the clock to the moore machine as a clock and the black wire connects the clock to the moore machine as an input to the machine. 
+
+Finally, the blocks which the wire connects are also shown on the left. Whenever one makes a connection, one should look at these fields first to see if that is the intended connection. 
+
+## <ins>Saving the Drawing</ins>
+
+To save the image, click "File" and "Save Image". 
+
+![Final Image](Images/FinalImage.png)
+
+## <ins>Generating the Code</ins>
+
+After the user is done, he or she can click on generate code which would generate the python version of the code. Then he or she can run the code to view the plots required.
