@@ -765,5 +765,4 @@ java -jar MooreMachineSimulator.jar
 
 The following window would then open up: 
 
-```markdown
 ![Main Window](Images/MainWindow.png)
