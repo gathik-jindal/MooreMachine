@@ -1,6 +1,6 @@
-# <ins>Moore Machine in Python</ins>
+# <ins>Moore Machine</ins>
 
-This project implements a Moore Machine in Python. A Moore Machine is a finite state machine where the outputs depend only on the current state.
+This project implements a Moore Machine in Python and a Moore Machine Graphical User Interface implemented in Java. A Moore Machine is a finite state machine where the outputs depend only on the current state.
 
 ## <ins>Table of Contents</ins>
 
@@ -40,6 +40,7 @@ This project implements a Moore Machine in Python. A Moore Machine is a finite s
     - [Combinational Block Methods](#combinational-block-methods)
     - [Clock Block Methods](#clock-block-methods)
     - [Output Block Methods](#output-block-methods)
+- [Graphical User Interface](#graphical-user-interface)
 
 ## <ins>Introduction</ins>
 
@@ -749,3 +750,20 @@ The following methods are available for the user :
     2) `.input()` (@return object): return the object itself.
     3) `.getScopeDump()` (@return dict): return a dictionary of all the values along with a label.
     4) `.getBlockID()` (@return str): return the blockID of the object.
+
+# <ins>Graphical User Interface</ins>
+
+The Graphical User Interface (GUI) is implemented in python and allows the user to make interact with the blocks that they are making.
+
+## <ins>Getting started</ins>
+
+In order to run the program, type the following command in the command window.
+
+```
+java -jar MooreMachineSimulator.jar
+```
+
+The following window would then open up: 
+
+```markdown
+![Main Window](Images/MainWindow.png)
