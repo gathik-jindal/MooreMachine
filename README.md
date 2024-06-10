@@ -758,7 +758,7 @@ The following methods are available for the user :
 
 # <ins>Graphical User Interface</ins>
 
-The Graphical User Interface (GUI) is implemented in python and allows the user to make interact with the blocks that they are making.
+The Graphical User Interface (GUI) is implemented in java and allows the user to make interact with the blocks that they are making.
 
 ## <ins>Getting started</ins>
 
