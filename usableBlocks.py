@@ -1,7 +1,5 @@
 from blocks import *
 from utilities import checkType, printErrorAndExit
-import simpy
-from scope import Plotter, ScopeDump
 
 
 class Machine(HasInputConnections, HasOutputConnections):
@@ -22,12 +20,12 @@ class Machine(HasInputConnections, HasOutputConnections):
         """
         self.nsl = kwargs.get("nsl")
         self.ol = kwargs.get("ol")
-        self.clkVal = kwargs.get("clk", [])  # make it always []
-        self._clkObj = None
-        self._isClock = 0
+        self.__clkVal = kwargs.get("clk", [])  # make it always []
+        self.__clkObj = None
+        self.__isClock = 0
         startingState = kwargs.get("startingState", 0)
-        self.presentState = startingState
-        self.nextState = startingState
+        self.__presentState = startingState
+        self.__nextState = startingState
         super().__init__(**kwargs)
         self._scopeDump.add(f"Input to {self.getBlockID()}", 0, self._output[0])
 
@@ -35,7 +33,7 @@ class Machine(HasInputConnections, HasOutputConnections):
         """
         @return str : a string representation of this machine.
         """
-        return f"Machine ID {self._blockID}"
+        return f"Machine ID {self.getBlockID()}"
 
     def __runNSL(self):
         """
@@ -45,22 +43,22 @@ class Machine(HasInputConnections, HasOutputConnections):
         self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self.getInputVal())
 
         # running the NSL
-        tempout = self.nsl(self.presentState, self.getInputVal())
+        tempout = self.nsl(self.__presentState, self.getInputVal())
         yield self._env.timeout(timeout)
 
         # updating the next State
-        self.nextState = tempout
-        self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.nextState)
+        self.__nextState = tempout
+        self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.__nextState)
 
     def __runReg(self):
         """
         Registers run based on clock.
         """
-        if (self.clkVal[0]):
-            if self.presentState != self.nextState:
+        if (self.__clkVal[0]):
+            if self.__presentState != self.__nextState:
                 yield self._env.timeout(timeout)
-                self.presentState = self.nextState
-                self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.presentState)
+                self.__presentState = self.__nextState
+                self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.__presentState)
                 self._env.process(self.__runOL())
                 self._env.process(self.__runNSL())
 
@@ -69,7 +67,7 @@ class Machine(HasInputConnections, HasOutputConnections):
         Output logic runs when the output value is changed.
         """
 
-        temp = self.ol(self.presentState)
+        temp = self.ol(self.__presentState)
         yield self._env.timeout(timeout)
         self._output[0] = temp
         self._scopeDump.add(f"output of {self.getBlockID()}", self._env.now, self._output[0])
@@ -92,14 +90,14 @@ class Machine(HasInputConnections, HasOutputConnections):
         """
         @return bool : True if this block is connected to everything, False otherwise.
         """
-        return self.clkVal != [] and self.nsl != None and self.ol != None and self.isConnectedToInput()
+        return self.__clkVal != [] and self.nsl != None and self.ol != None and self.isConnectedToInput()
 
     def clock(self):
         """
         Connects the next clock object to the Register
         @return Machine : the instance of this class for connection purposes.
         """
-        self._isClock = 1  # 1 for clock, 0 for clock as input and -1 for not being used
+        self.__isClock = 1  # 1 for clock, 0 for clock as input and -1 for not being used
         return self
 
     # left, right are for future versions. NOT USED IN CURRENT VERSION.
@@ -107,14 +105,14 @@ class Machine(HasInputConnections, HasOutputConnections):
         """
         @return Machine : the instance of this class for connection purposes.
         """
-        self._isClock = 0  # 1 for clock, 0 for clock as input and -1 for not being used
+        self.__isClock = 0  # 1 for clock, 0 for clock as input and -1 for not being used
         return self
 
     def getScopeDump(self):
         """
         @return dict : the scope dump values for this block.
         """
-        dic = self._clkObj.getScopeDump()
+        dic = self.__clkObj.getScopeDump()
         dic.update(self._scopeDump.getValues())
         return dic
 
@@ -127,10 +125,10 @@ class Machine(HasInputConnections, HasOutputConnections):
         @return : bool
         """
         # state 1 means clock, 0 means clock (but as input)
-        if (isinstance(other, Clock) and self._isClock == 1):
-            self.clkVal = other._output
+        if (isinstance(other, Clock) and self.__isClock == 1):
+            self.__clkVal = other._output
             other.addFanOut(self, 1)
-            self._clkObj = other
+            self.__clkObj = other
             return True
         else:
             return super().__le__(other)
@@ -159,7 +157,7 @@ class Input(HasOnlyOutputConnections):
                 maxOutSize = len(bin(i[1]))
         maxOutSize -= 2
 
-        self._input = inputList
+        self.__input = inputList
         super().__init__(maxOutSize=maxOutSize, **kwargs)
         self._scopeDump.add(f"Input to {self.getBlockID()}", 0, self._output[0])
 
@@ -167,13 +165,13 @@ class Input(HasOnlyOutputConnections):
         """
         @return str : the string representation of this input block.
         """
-        return f"Input ID {self._blockID}"
+        return f"Input ID {self.getBlockID()}"
 
     def _go(self):
         """
         Runs the input at every change in input value specified by inputList.
         """
-        for i in self._input:
+        for i in self.__input:
             yield self._env.timeout(i[0]-self._env.now)
 
             self._output[0] = i[1]
@@ -233,7 +231,7 @@ class Clock(HasOnlyOutputConnections):
         """
         @return str : the string representation of this clock block.
         """
-        return f"Clock ID {self._blockID}"
+        return f"Clock ID {self.getBlockID()}"
 
     def _go(self):
         """
@@ -241,7 +239,6 @@ class Clock(HasOnlyOutputConnections):
         """
         while True:
             yield self._env.timeout((1-self._output[0])*(self.__timePeriod - self.__onTime)+self._output[0]*(self.__onTime))
-
             self._output[0] = 1 - self._output[0]
             self._scopeDump.add(f"Clock {self.getBlockID()}", self._env.now, self._output[0])
             self.triggerReg()
@@ -269,7 +266,7 @@ class Output(HasInputConnections):
         """
         @return str : a string representation of the output block.
         """
-        return f"Output ID {self._blockID}"
+        return f"Output ID {self.getBlockID()}"
 
     def __give(self):
         """
@@ -316,7 +313,7 @@ class Combinational(HasInputConnections, HasOutputConnections):
         self.__value = initialValue
         super().__init__(**kwargs)
         self._output[0] = initialValue
-        self._scopeDump.add(f"{self._blockID} output", 0, self._output[0])
+        self._scopeDump.add(f"{self.getBlockID()} output", 0, self._output[0])
 
     def __runFunc(self):
         """
@@ -329,7 +326,7 @@ class Combinational(HasInputConnections, HasOutputConnections):
         yield self._env.timeout(self.__delay)
         self._output[0] = self.__value
 
-        self._scopeDump.add(f"{self._blockID} output", self._env.now, self._output[0])
+        self._scopeDump.add(f"{self.getBlockID()} output", self._env.now, self._output[0])
 
         self.processFanOut()
 
@@ -337,7 +334,7 @@ class Combinational(HasInputConnections, HasOutputConnections):
         """
         @return str : a string representation of the block.
         """
-        return f"Combinational ID {self._blockID}"
+        return f"Combinational ID {self.getBlockID()}"
 
     def run(self):
         """
