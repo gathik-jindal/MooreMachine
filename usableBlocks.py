@@ -61,8 +61,7 @@ class Machine(HasInputConnections, HasOutputConnections):
             if self.presentState != self.nextState:
                 yield self._env.timeout(timeout)
                 self.presentState = self.nextState
-                self._scopeDump.add(
-                    f"PS of {self.getBlockID()}", self._env.now, self.presentState)
+                self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.presentState)
                 self._env.process(self.__runOL())
                 self._env.process(self.__runNSL())
 
@@ -130,7 +129,7 @@ class Machine(HasInputConnections, HasOutputConnections):
         # state 1 means clock, 0 means clock (but as input)
         if (isinstance(other, Clock) and self._isClock == 1):
             self.clkVal = other._output
-            other.addFanout(self, 1)
+            other.addFanOut(self, 1)
             self._clkObj = other
             return True
         else:
@@ -216,13 +215,13 @@ class Clock(HasOnlyOutputConnections):
 
     def addFanOut(self, other, val=0):
         if isinstance(other, Machine) and val == 1:
-            self.regList.append(other)
+            self.__regList.append(other)
         else:
             super().addFanOut(other)
 
     def triggerReg(self):
         for i in self.__regList:
-            self._env.process(i.runReg())
+            i.runReg()
 
     # left, right are for future versions. NOT USED IN CURRENT VERSION.
     def output(self, left=None, right=None):
@@ -241,15 +240,13 @@ class Clock(HasOnlyOutputConnections):
         """
         Runs the clock at every time period.
         """
-
         while True:
             yield self._env.timeout((1-self._output[0])*(self.__timePeriod - self.__onTime)+self._output[0]*(self.__onTime))
 
             self._output[0] = 1 - self._output[0]
-            self._scopeDump.add(
-                f"Clock {self.getBlockID()}", self._env.now, self._output[0])
-            self.processFanOut()
+            self._scopeDump.add(f"Clock {self.getBlockID()}", self._env.now, self._output[0])
             self.triggerReg()
+            self.processFanOut()
 
 
 class Output(HasInputConnections):
