@@ -6,9 +6,9 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-from utilities import printErrorAndExit, checkType, bitCount
+from utilities import checkType, bitCount
 from pydig import pydig as pd
-from blocks import Combinational as Comb
+from usableBlocks import Combinational as Comb
 import random
 
 

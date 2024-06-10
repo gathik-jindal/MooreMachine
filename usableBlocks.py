@@ -85,7 +85,8 @@ class Machine(HasInputConnections, HasOutputConnections):
         Runs this block.
         """
         self._env.process(self.__runNSL())
-        self._env.process(self.__runOL())
+        if self._env.now == 0:
+            self._env.process(self.__runOL())
 
     def isConnected(self):
         """
