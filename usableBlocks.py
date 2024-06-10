@@ -29,8 +29,7 @@ class Machine(HasInputConnections, HasOutputConnections):
         self.presentState = startingState
         self.nextState = startingState
         super().__init__(**kwargs)
-        self._scopeDump.add(
-            f"Input to {self.getBlockID()}", 0, self._output[0])
+        self._scopeDump.add(f"Input to {self.getBlockID()}", 0, self._output[0])
 
     def __str__(self):
         """
@@ -177,8 +176,7 @@ class Input(HasOnlyOutputConnections):
             yield self._env.timeout(i[0]-self._env.now)
 
             self._output[0] = i[1]
-            self._scopeDump.add(
-                f"Input to {self.getBlockID()}", self._env.now, self._output[0])
+            self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self._output[0])
             self.processFanOut()
 
 
@@ -330,8 +328,7 @@ class Combinational(HasInputConnections, HasOutputConnections):
         yield self._env.timeout(self.__delay)
         self._output[0] = self.__value
 
-        self._scopeDump.add(f"{self._blockID} output",
-                            self._env.now, self._output[0])
+        self._scopeDump.add(f"{self._blockID} output", self._env.now, self._output[0])
 
         self.processFanOut()
 
