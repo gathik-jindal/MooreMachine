@@ -130,7 +130,7 @@ class HasInputConnections(Block):
         self._inputSizes.append((other.getLeft(), other.getRight(), other.getWidth()))
         self._inputCount += 1
         self._isConnected = True
-        other.addFanout(self)
+        other.addFanOut(self)
         other.resetState()
         return True
 
@@ -240,7 +240,7 @@ class HasOutputConnections(Block):
         self._fanOutList = []
         self._output = [0]
 
-    def addFanout(self, other, val = 0):
+    def addFanOut(self, other, val = 0):
         """
         Adds an output wire to this block.
         @return int : the number of output components connected to this block.
