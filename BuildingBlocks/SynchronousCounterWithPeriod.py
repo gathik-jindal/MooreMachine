@@ -22,7 +22,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 from utilities import checkType, printErrorAndExit, bitCount
-from blocks import Clock, Combinational as Comb
+from usableBlocks import Clock, Combinational as Comb
 from pydig import pydig as pd
 
 class SynchronousCounterWithPeriod(Comb):

@@ -19,7 +19,7 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-from blocks import Combinational as Comb, HasOutputConnections as HOC, Clock
+from usableBlocks import Combinational as Comb, HasOutputConnections as HOC, Clock
 from pydig import pydig as pd
 from utilities import checkType
 
@@ -131,7 +131,7 @@ class DLatch(Comb):
 if __name__ == "__main__":
 
     pydig = pd()
-    i = pydig.source(filePath="..\\Tests\\DLatch.csv", plot=False, blockID=f"D Latch")
+    i = pydig.source(filePath=".\\Tests\\DLatch.csv", plot=False, blockID=f"D Latch")
     clk = pydig.clock(plot=False, blockID="Clock", timePeriod=6, onTime=3, initialValue = 1)
     output1 = DLatch(pydig, clk, i, plot=True)
 

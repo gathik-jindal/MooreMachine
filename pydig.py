@@ -11,12 +11,6 @@ pip install openxl
 @version 1.6
 """
 
-from utilities import printErrorAndExit, checkType, dumpVars
-from scope import Plotter
-from blocks import *
-from usableBlocks import *
-from pwlSource import InputGenerator
-import simpy
 import os
 import sys
 
@@ -25,6 +19,12 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
+from utilities import printErrorAndExit, checkType, dumpVars
+from scope import Plotter
+from blocks import *
+from usableBlocks import *
+from pwlSource import InputGenerator
+import simpy
 
 timeout = 0.1
 
@@ -94,12 +94,12 @@ class pydig:
 
         checkType([(combObj, Combinational)])
 
-        if combObj._blockID in self.__uniqueIDlist:
-            id = self.__makeUniqueID(combObj._blockID)
-            print(f"{combObj._blockID} is already used so changing to {id}")
-            combObj._blockID = id
+        if combObj.getBlockID() in self.__uniqueIDlist:
+            id = self.__makeUniqueID(combObj.getBlockID())
+            print(f"{combObj.getBlockID()} is already used so changing to {id}")
+            combObj.setBlockID(id)
 
-        self.__uniqueIDlist.append(combObj._blockID)
+        self.__uniqueIDlist.append(combObj.getBlockID())
         self.__components.append(combObj)
         return combObj
 

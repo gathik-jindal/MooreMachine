@@ -45,14 +45,23 @@ class Block(ABC):
         self._env = kwargs.get("env", None)
         self._scopeDump = ScopeDump()
         self.__plot = kwargs.get("plot", False)
-        self._blockID = kwargs.get("blockID", 0)
+        self.__blockID = kwargs.get("blockID", 0)
 
     def getBlockID(self):
         """
         Returns the block ID of the current block.
         @return str : blockID
         """
-        return self._blockID
+        return self.__blockID
+
+    def setBlockID(self, i):
+        """
+        Changes the block ID of the current block.
+        @return str : blockID
+        """
+        self.__blockID = i
+        return self.__blockID
+
 
     def getScopeDump(self):
         """
@@ -68,7 +77,7 @@ class Block(ABC):
         @return : None
         """
         if self.__plot:
-            Block.plotter.plot(self.getScopeDump(), f"Plot of {self._blockID}")
+            Block.plotter.plot(self.getScopeDump(), f"Plot of {self.getBlockID()}")
 
     @abstractmethod
     def __str__(self):
@@ -108,13 +117,10 @@ class HasInputConnections(Block):
         @param blockID : is the id of this input block. If blockID is a duplicate
                          or is not given, then new unique ID is given.
         """
-        self._trigger = simpy.Store(kwargs.get("env", None))
-        self._input = []
-        self._inputSizes = []
-        self._inputCount = 0
-        self._isConnected = False
-        self._connectedID = []
-        self._clockID = None
+        self.__input = []
+        self.__inputSizes = []
+        self.__inputCount = 0
+        self.__isConnected = False
         super().__init__(**kwargs)
 
     def __le__(self, other):
@@ -127,11 +133,11 @@ class HasInputConnections(Block):
         """
 
         checkType([(other, (HasOutputConnections))])
-        self._input.append(other._output)
-        self._inputSizes.append((other.getLeft(), other.getRight(), other.getWidth()))
-        self._inputCount += 1
-        self._connectedID.append(other.addFanout())
-        self._isConnected = True
+        self.__input.append(other._output)
+        self.__inputSizes.append((other.getLeft(), other.getRight(), other.getWidth()))
+        self.__inputCount += 1
+        self.__isConnected = True
+        other.addFanOut(self)
         other.resetState()
         return True
 
@@ -139,9 +145,9 @@ class HasInputConnections(Block):
         """
         @return int: the number of inputs connected to this block.
         """
-        return self._inputCount
+        return self.__inputCount
 
-    def _strip(self, val, left, right):
+    def __strip(self, val, left, right):
         """
         Strips the value to get the required bits.
         @param val : the value to be stripped.
@@ -161,16 +167,16 @@ class HasInputConnections(Block):
         """
         ans = 0
         factor = 1
-        for i in range(self._inputCount):
-            ans += self._strip(self._input[i][0], self._inputSizes[i][0], self._inputSizes[i][1]) * factor
-            factor = factor * (2 ** self._inputSizes[i][2])
+        for i in range(self.__inputCount):
+            ans += self.__strip(self.__input[i][0], self.__inputSizes[i][0], self.__inputSizes[i][1]) * factor
+            factor = factor * (2 ** self.__inputSizes[i][2])
         return ans
 
     def isConnectedToInput(self):
         """
         @return bool : True if this block is connected to input, False otherwise.
         """
-        return self._isConnected
+        return self.__isConnected
 
     @abstractmethod
     def isConnected(self):
@@ -178,24 +184,6 @@ class HasInputConnections(Block):
         @return bool : True if this block is connected to everything, False otherwise.
         """
         pass
-
-    def runTriggers(self):
-        """
-        Readys all the triggering processes.
-        """
-        for i in range(self.getInputCount()):
-            self._env.process(self.__runTriggers(self._trigger, self._input[i][self._connectedID[i]]))
-
-    def __runTriggers(self, triggerObj, checkObj):
-        """
-        A private method that runs the triggers for the connected blocks.
-        @param triggerObj : simpy.Store() object waiting to be triggered
-        @param checkObj : simpy.Store() object to be checked for triggering
-        """
-        while True:
-            yield checkObj.get()
-            if (len(triggerObj.items) < 1):
-                triggerObj.put(True)
 
     # left, right are for future versions. NOT USED IN CURRENT VERSION.
     def input(self, left=None, right=None):
@@ -221,7 +209,8 @@ class HasOutputConnections(Block):
         maxOutSize = kwargs.get("maxOutSize", None)
         self.__maxOutSize = maxOutSize
         self.__state = (0, maxOutSize, maxOutSize)
-        self.defineFanOut()
+        self.__fanOutList = []
+        self._output = [0]
         super().__init__(**kwargs)
 
     def resetState(self):
@@ -248,26 +237,22 @@ class HasOutputConnections(Block):
         """
         return self.__state[2]
 
-    def defineFanOut(self):
+    def defineFanOut(self):  # delete it most likely
         """
         Defines the fan out variables.
         Fan out represents the blocks which
         are connected to this block.
         """
 
-        self._fanOutCount = 0
-        # here the first element is the value itself, and the rest of the elements will be the simpy.Store() objects for the other machines connected to it
+        self.__fanOutList = []
         self._output = [0]
 
-    def addFanout(self):
+    def addFanOut(self, other, val=0):
         """
         Adds an output wire to this block.
         @return int : the number of output components connected to this block.
         """
-        self._fanOutCount += 1
-        self._output.append(simpy.Store(self._env))
-        self._output[-1].put(True)
-        return self._fanOutCount
+        self.__fanOutList.append(other)
 
     def __gt__(self, other):
         """
@@ -284,6 +269,10 @@ class HasOutputConnections(Block):
             right = self.__maxOutSize
         self.__state = (left, right, right - left)
         return self
+
+    def processFanOut(self):
+        for i in self.__fanOutList:
+            i.run()
 
 
 class HasOnlyOutputConnections(HasOutputConnections):
@@ -321,8 +310,6 @@ class HasOnlyOutputConnections(HasOutputConnections):
         Runs this block.
         """
         self._env.process(self._go())
-
-
 
 
 if __name__ == "__main__":

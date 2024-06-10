@@ -19,7 +19,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 from pydig import pydig as pd
-from blocks import Clock as Clock, Combinational as Comb, HasOutputConnections as HOC
+from usableBlocks import Clock as Clock, Combinational as Comb, HasOutputConnections as HOC
 from utilities import checkType, bitCount
 
 
@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     pydig = pd()
     clock = pydig.clock(blockID="", plot=False, timePeriod=1, onTime=0.5)
-    i = pydig.source(filePath="..\\Tests\\SyncCounter.csv", plot=False, blockID=f"Sync Reset")
+    i = pydig.source(filePath=".\\Tests\\SyncCounter.csv", plot=False, blockID=f"Sync Reset")
     output1 = SynchronousCounter(pydig, 6, i, clock, plot=True)
 
     pydig.generateCSV()

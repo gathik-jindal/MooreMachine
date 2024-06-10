@@ -20,7 +20,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 from utilities import checkType
-from blocks import Clock, Combinational as Comb, HasOutputConnections as HOC
+from usableBlocks import Clock, Combinational as Comb, HasOutputConnections as HOC
 from pydig import pydig as pd
 
 class Enabled1BitCounterWithTC(Comb):
@@ -291,8 +291,7 @@ if __name__ == "__main__":
 
     pydig = pd()
     clock = pydig.clock(blockID="", plot=False, timePeriod=1, onTime=0.5)
-    input1 = pydig.source(filePath="..\\Tests\\BitCounter.csv",
-                          plot=False, blockID="Input")
+    input1 = pydig.source(filePath=".\\Tests\\BitCounter.csv", plot=False, blockID="Input")
     output1 = Enabled4BitCounterWithTC(pydig, input1, clock, plot=True)
 
     pydig.generateCSV()
