@@ -240,7 +240,7 @@ class HasOutputConnections(Block):
         self._fanOutList = []
         self._output = [0]
 
-    def addFanout(self, other):
+    def addFanout(self, other, val = 0):
         """
         Adds an output wire to this block.
         @return int : the number of output components connected to this block.
@@ -265,7 +265,7 @@ class HasOutputConnections(Block):
 
     def processFanOut(self):
         for i in self._fanOutList:
-            self._env.process(i.run())
+            i.run()
             
 
 class HasOnlyOutputConnections(HasOutputConnections):
