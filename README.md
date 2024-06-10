@@ -1,6 +1,6 @@
 # <ins>Moore Machine</ins>
 
-This project implements a Moore Machine in Python and a Moore Machine Graphical User Interface implemented in Java. A Moore Machine is a finite state machine where the outputs depend only on the current state.
+This project implements a Moore Machine in Python and a Moore Machine Graphical User Interface in Java. A Moore Machine is a finite state machine where the outputs depend only on the current state.
 
 ## <ins>Table of Contents</ins>
 
