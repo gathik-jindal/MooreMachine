@@ -776,7 +776,7 @@ The following window opens up when one runs the above command:
 
 At the top, the window contains a Menubar with the options for "File" and "Add Component". If "File" is pressed, there is an option to save the image that the user has drawn in the center panel. If "Add Component" is pressed, different components such as Moore Machine, Input Block, Clock, Combinational Block, Output Block, and Wires can be drawn in the center panel. 
 
-On the left, the information relating to the block can be seen and on the bottom left, the user can type functions in python that he or she may want such as the next state logic or the output logic. Finally, there is a button to generate the python code wich would allow the user to generate a python code that represents the drawings that they have created. This python code would be made using the above mentioned format and the user can run the program to see the plots.
+On the left, the information relating to the block can be seen, and, on the bottom left, the user can type functions in python that he or she may want such as the next state logic or the output logic. Finally, there is a button to generate the python code that represents the drawings that he or she has created. This python code would be made using the above mentioned format and the user can run the program to see the plots.
 
 When a block is added, in this case a Moore Machine, the window would look something like the following. 
 
