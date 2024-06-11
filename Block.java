@@ -56,7 +56,7 @@ public abstract class Block
     private Color color;                    //color of the block
     private String name;                    //name of the block
     private Map<String, Component> map;     //map that stores all the fields
-    private DrawingPanel drawingPanel;      //drawingPanel in which the block would be drawn
+    private DrawCircuit drawingPanel;      //drawingPanel in which the block would be drawn
     private int currID = 0;                 //the id of this block
     private static int id = 0;              //to assign new id to each new block
 
@@ -65,9 +65,9 @@ public abstract class Block
      * @param name : the name of the block
      * @param rect : the rectangle that is drawn
      * @param color : the color of the rectangle
-     * @param panel : the DrawingPanel in which the rectangle is drawn
+     * @param panel : the DrawCircuit in which the rectangle is drawn
      */
-    public Block(String name, Rectangle rect, Color color, DrawingPanel panel) 
+    public Block(String name, Rectangle rect, Color color, DrawCircuit panel) 
     {
         this.name = name;
         this.rect = rect;
@@ -79,14 +79,19 @@ public abstract class Block
         id++;
     }
 
+    public static void reset()
+    {
+        id = 0;
+    }
+
     /**
      * Creates a new block object
      * @param name : the name of the block
      * @param line : the line that is drawn
      * @param color : the color of the line
-     * @param panel : the DrawingPanel in which the line is drawn
+     * @param panel : the DrawCircuit in which the line is drawn
      */
-    public Block(String name, Line2D.Double line, Color color, DrawingPanel panel)
+    public Block(String name, Line2D.Double line, Color color, DrawCircuit panel)
     {
         this.name = name;
         this.line = line;
@@ -464,9 +469,9 @@ abstract class RectangleBlock extends Block
      * @param name : the name of the block
      * @param rect : the rectangle that is to be drawn
      * @param color : the color of the block
-     * @param panel : the DrawingPanel on which the rectangle is to be drawn
+     * @param panel : the DrawCircuit on which the rectangle is to be drawn
      */
-    public RectangleBlock(String name, Rectangle rect, Color color, DrawingPanel panel)
+    public RectangleBlock(String name, Rectangle rect, Color color, DrawCircuit panel)
     {
         super(name, rect, color, panel);
     }
@@ -499,9 +504,9 @@ class Moore extends RectangleBlock
      * @param name : the name of the block
      * @param rect : the rectangle which is to be drawn
      * @param color : the color of the rectangle
-     * @param panel : the DrawingPanel on which the rectangle is to be drawn
+     * @param panel : the DrawCircuit on which the rectangle is to be drawn
      */
-    public Moore(String name, Rectangle rect, Color color, DrawingPanel panel)
+    public Moore(String name, Rectangle rect, Color color, DrawCircuit panel)
     {
         super(name, rect, color, panel);
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
@@ -601,9 +606,9 @@ class Input extends RectangleBlock
      * @param name : the name of the block
      * @param rect : the Rectangle object which is to be drawn
      * @param color : the color of the Rectangle
-     * @param panel : the DrawignPanel on which the rectangle would be drawn
+     * @param panel : the DrawCircuitignPanel on which the rectangle would be drawn
      */
-    public Input(String name, Rectangle rect, Color color, DrawingPanel panel)
+    public Input(String name, Rectangle rect, Color color, DrawCircuit panel)
     {
         super(name, rect, color, panel);
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
@@ -676,9 +681,9 @@ class Clock extends RectangleBlock
      * @param name : the name of the clock
      * @param rect : the Rectangle which is to be drawn
      * @param color : the color of the Rectangle
-     * @param panel : the DrawingPanel upon which the Rectangle would be drawn
+     * @param panel : the DrawCircuit upon which the Rectangle would be drawn
      */
-    public Clock(String name, Rectangle rect, Color color, DrawingPanel panel)
+    public Clock(String name, Rectangle rect, Color color, DrawCircuit panel)
     {
         super(name, rect, color, panel);
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
@@ -769,9 +774,9 @@ class Output extends RectangleBlock
      * @param name : the name of the block
      * @param rect : the rectangle which is to be drawn
      * @param color : the color of the rectangle
-     * @param panel : the DrawingPanel upon which the rectangle would be drawn
+     * @param panel : the DrawCircuit upon which the rectangle would be drawn
      */
-    public Output(String name, Rectangle rect, Color color, DrawingPanel panel)
+    public Output(String name, Rectangle rect, Color color, DrawCircuit panel)
     {
         super(name, rect, color, panel);
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
@@ -834,9 +839,9 @@ class Combinational extends RectangleBlock
      * @param name : the name of the block
      * @param rect : the rectangle which is to be drawn
      * @param color : the color of the rectangle
-     * @param panel : the DrawingPanel upon which the rectangle would be drawn
+     * @param panel : the DrawCircuit upon which the rectangle would be drawn
      */
-    public Combinational(String name, Rectangle rect, Color color, DrawingPanel panel)
+    public Combinational(String name, Rectangle rect, Color color, DrawCircuit panel)
     {
         super(name, rect, color, panel);
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
@@ -940,9 +945,9 @@ class Wire extends Block
      * @param name : the name of the wire
      * @param line : the Line object which is to be drawn
      * @param color : the color of the wire
-     * @param panel : the DrawingPanel on which the Wire would be drawn
+     * @param panel : the DrawCircuit on which the Wire would be drawn
      */
-    public Wire(String name, Line2D.Double line, Color color, DrawingPanel panel)
+    public Wire(String name, Line2D.Double line, Color color, DrawCircuit panel)
     {
         super(name, line, color, panel);
 
