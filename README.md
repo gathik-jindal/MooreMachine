@@ -249,7 +249,7 @@ The parameters that it accepts are listed below in order:
     2) blockID (str): the id of this input block. If None, then new unique ID is given.
 
 The above command creates a Output Block object.
-The methods available for the user are at [Clock Block Methods](#output-block-methods).
+The methods available for the user are at [Output Block Methods](#output-block-methods).
 
 #### <ins>Building Blocks</ins>
 
