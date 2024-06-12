@@ -213,7 +213,16 @@ class HasOutputConnections(Block):
         self.__state = (0, maxOutSize, maxOutSize)
         self.__fanOutList = []
         self._output = [0]
+        self.__regList = []
         super().__init__(**kwargs)
+
+
+    def addFanOut(self, other, val=0):
+        if isinstance(other, Machine) and val == 1:
+            self.__regList.append(other)
+        else:
+            self.__fanOutList.append(other)
+
 
     def resetState(self):
         """
@@ -239,22 +248,6 @@ class HasOutputConnections(Block):
         """
         return self.__state[2]
 
-    def defineFanOut(self):  # delete it most likely
-        """
-        Defines the fan out variables.
-        Fan out represents the blocks which
-        are connected to this block.
-        """
-
-        self.__fanOutList = []
-        self._output = [0]
-
-    def addFanOut(self, other, val=0):
-        """
-        Adds an output wire to this block.
-        @return int : the number of output components connected to this block.
-        """
-        self.__fanOutList.append(other)
 
     def __gt__(self, other):
         """
@@ -275,7 +268,8 @@ class HasOutputConnections(Block):
     def processFanOut(self):
         for i in self.__fanOutList:
             i.run()
-
+        for i in self.__regList:
+            i.runReg()
 
 class HasOnlyOutputConnections(HasOutputConnections):
     """
