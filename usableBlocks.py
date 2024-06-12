@@ -37,12 +37,12 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self.getInputVal())
 
         # running the NSL
-        tempout = self.nsl(self.__presentState, self.getInputVal())#########
+        tempout = self.nsl(self.getPS(), self.getInputVal())
         yield self._env.timeout(timeout)
 
         # updating the next State
-        self.__nextState = tempout#######
-        self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.__nextState)########
+        self.setNS(tempout)
+        self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.getNS())
 
 
     def __runOL(self):
@@ -50,7 +50,7 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         Output logic runs when the output value is changed.
         """
 
-        temp = self.ol(self.__presentState)#######
+        temp = self.ol(self.getPS())
         yield self._env.timeout(timeout)
         self._output[0] = temp
         self._scopeDump.add(f"output of {self.getBlockID()}", self._env.now, self._output[0])
