@@ -58,8 +58,6 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         # triggering events for the connected machines
         self.processFanOut()
 
-    def runReg(self):
-        self._env.process(self.__runReg())
 
     def run(self):
         """
