@@ -44,17 +44,6 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         self.__nextState = tempout
         self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.__nextState)
 
-    def __runReg(self):
-        """
-        Registers run based on clock.
-        """
-        if (self.__clkVal[0]):
-            if self.__presentState != self.__nextState:
-                yield self._env.timeout(timeout)
-                self.__presentState = self.__nextState
-                self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.__presentState)
-                self._env.process(self.__runOL())
-                self._env.process(self.__runNSL())
 
     def __runOL(self):
         """
