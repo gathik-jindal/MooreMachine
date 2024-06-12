@@ -108,6 +108,110 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         return dic
 
 
+class MealyMachine(HasInputConnections, HasOutputConnections, HasRegisters):
+    """
+    A machine is both a HasInputConnections block and a HasOutputConnections block.
+    This represents the Moore Machine.
+    """
+
+    def __init__(self, **kwargs):
+        """
+        Use keyword arguments to pass the following parameters:
+        @param : env must be a simpy environment.
+        @param : clock must be of type Clock.
+        @param : nsl must be a valid function specifying next state logic.
+        @param : ol must be a valid function specifying output logic.
+        @param : blockID is the id of this input block. If blockId is a duplicate
+                 or None, then new unique ID is given.
+        """
+        self.nsl = kwargs.get("nsl")
+        self.ol = kwargs.get("ol")
+        super().__init__(**kwargs)
+        self._scopeDump.add(f"Input to {self.getBlockID()}", 0, self._output[0])
+
+    def __str__(self):
+        """
+        @return str : a string representation of this machine.
+        """
+        return f"Mealy Machine ID {self.getBlockID()}"
+
+    def __runNSL(self):
+        """
+        Runs the next state logic if the input to this machine changed.
+        """
+        # adding the inputs to scopedump
+        self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self.getInputVal())
+
+        # running the NSL
+        tempout = self.nsl(self.getPS(), self.getInputVal())
+        yield self._env.timeout(timeout)
+
+        # updating the next State
+        self.setNS(tempout)
+        self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.getNS())
+
+
+    def __runOL(self):
+        """
+        Output logic runs when the output value is changed.
+        """
+
+        temp = self.ol(self.getPS(), self.getInputVal())
+        yield self._env.timeout(timeout)
+        self._output[0] = temp
+        self._scopeDump.add(f"output of {self.getBlockID()}", self._env.now, self._output[0])
+
+        # triggering events for the connected machines
+        self.processFanOut()
+
+    def runNSL(self):
+        self._env.process(self.__runNSL())      
+
+    def runOL(self):
+        self._env.process(self.__runOL())        
+
+    def run(self):
+        """
+        Runs this block.
+        """
+        self._env.process(self.__runNSL())
+        self._env.process(self.__runOL())
+
+    def isConnected(self):
+        """
+        @return bool : True if this block is connected to everything, False otherwise.
+        """
+        return self._clkVal != [] and self.nsl != None and self.ol != None and self.isConnectedToInput()
+
+    def clock(self):
+        """
+        Connects the next clock object to the Register
+        @return Machine : the instance of this class for connection purposes.
+        """
+        self._isClock = 1  # 1 for clock, 0 for clock as input and -1 for not being used
+        return self
+
+    # left, right are for future versions. NOT USED IN CURRENT VERSION.
+    def input(self, left=None, right=None):
+        """
+        @return Machine : the instance of this class for connection purposes.
+        """
+        self._isClock = 0  # 1 for clock, 0 for clock as input and -1 for not being used
+        return self
+
+    def resetClockFlag(self):
+        self._isClock = 0
+        self.resetState()
+        return self
+
+    def getScopeDump(self):
+        """
+        @return dict : the scope dump values for this block.
+        """
+        dic = self._clkObj.getScopeDump()
+        dic.update(self._scopeDump.getValues())
+        return dic
+
 class Input(HasOnlyOutputConnections):
     """
     An input is a HasOutputConnections block.
