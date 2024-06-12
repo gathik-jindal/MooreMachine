@@ -37,12 +37,12 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self.getInputVal())
 
         # running the NSL
-        tempout = self.nsl(self.__presentState, self.getInputVal())
+        tempout = self.nsl(self.__presentState, self.getInputVal())#########
         yield self._env.timeout(timeout)
 
         # updating the next State
-        self.__nextState = tempout
-        self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.__nextState)
+        self.__nextState = tempout#######
+        self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.__nextState)########
 
 
     def __runOL(self):
@@ -50,7 +50,7 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         Output logic runs when the output value is changed.
         """
 
-        temp = self.ol(self.__presentState)
+        temp = self.ol(self.__presentState)#######
         yield self._env.timeout(timeout)
         self._output[0] = temp
         self._scopeDump.add(f"output of {self.getBlockID()}", self._env.now, self._output[0])
@@ -58,6 +58,7 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         # triggering events for the connected machines
         self.processFanOut()
 
+    ##### make nsl and ol runners
 
     def run(self):
         """
@@ -71,14 +72,14 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         """
         @return bool : True if this block is connected to everything, False otherwise.
         """
-        return self.__clkVal != [] and self.nsl != None and self.ol != None and self.isConnectedToInput()
+        return self._clkVal != [] and self.nsl != None and self.ol != None and self.isConnectedToInput()
 
     def clock(self):
         """
         Connects the next clock object to the Register
         @return Machine : the instance of this class for connection purposes.
         """
-        self.__isClock = 1  # 1 for clock, 0 for clock as input and -1 for not being used
+        self._isClock = 1  # 1 for clock, 0 for clock as input and -1 for not being used
         return self
 
     # left, right are for future versions. NOT USED IN CURRENT VERSION.
@@ -86,33 +87,20 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         """
         @return Machine : the instance of this class for connection purposes.
         """
-        self.__isClock = 0  # 1 for clock, 0 for clock as input and -1 for not being used
+        self._isClock = 0  # 1 for clock, 0 for clock as input and -1 for not being used
+        return self
+
+    def resetClockFlag(self):
+        self._isClock = 0
         return self
 
     def getScopeDump(self):
         """
         @return dict : the scope dump values for this block.
         """
-        dic = self.__clkObj.getScopeDump()
+        dic = self._clkObj.getScopeDump()
         dic.update(self._scopeDump.getValues())
         return dic
-
-    def __le__(self, other):
-        """
-        The output of other goes into the input of self.
-        If the inputs of self are already connected, then error is generated.
-
-        @param other : must be of type HasOutputConnections.
-        @return : bool
-        """
-        # state 1 means clock, 0 means clock (but as input)
-        if (self.__isClock == 1):
-            self.__clkVal = other._output
-            other.addFanOut(self, 1)
-            self.__clkObj = other
-            return True
-        else:
-            return super().__le__(other)
 
 
 class Input(HasOnlyOutputConnections):
