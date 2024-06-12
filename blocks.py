@@ -320,6 +320,18 @@ class HasRegisters(Block):
         super().__init__(**kwargs)
     ### we can change rising and falling edge
 
+    def __runReg(self):
+        """
+        Registers run based on clock.
+        """
+        if (self.__clkVal[0]):
+            if self.__presentState != self.__nextState:
+                yield self._env.timeout(timeout)
+                self.__presentState = self.__nextState
+                self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.__presentState)
+                self._env.process(self.__runOL())
+                self._env.process(self.__runNSL())
+
     
 
 if __name__ == "__main__":
