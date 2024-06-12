@@ -92,6 +92,7 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
 
     def resetClockFlag(self):
         self._isClock = 0
+        self.resetState()
         return self
 
     def getScopeDump(self):
