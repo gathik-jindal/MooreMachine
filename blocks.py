@@ -133,8 +133,16 @@ class HasInputConnections(Block):
         @param other : must be of type HasOutputConnections.
         @return bool : True
         """
-
+        
         checkType([(other, (HasOutputConnections))])
+        
+        if (isinstance(self, HasRegisters) and self._isClock == 1):
+            self._clkVal = other._output
+            other.addFanOut(self, 1)
+            self._clkObj = other
+            self.resetClockFlag()
+            return True
+
         self.__input.append(other._output)
         self.__inputSizes.append((other.getLeft(), other.getRight(), other.getWidth()))
         self.__inputCount += 1
