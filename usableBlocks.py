@@ -20,12 +20,6 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         """
         self.nsl = kwargs.get("nsl")
         self.ol = kwargs.get("ol")
-        self.__clkVal = kwargs.get("clk", [])  # make it always []
-        self.__clkObj = None
-        self.__isClock = 0
-        startingState = kwargs.get("startingState", 0)
-        self.__presentState = startingState
-        self.__nextState = startingState
         super().__init__(**kwargs)
         self._scopeDump.add(f"Input to {self.getBlockID()}", 0, self._output[0])
 
