@@ -218,7 +218,7 @@ class HasOutputConnections(Block):
 
 
     def addFanOut(self, other, val=0):
-        if isinstance(other, Machine) and val == 1:
+        if isinstance(other, HasRegisters) and val == 1:
             self.__regList.append(other)
         else:
             self.__fanOutList.append(other)
@@ -307,6 +307,12 @@ class HasOnlyOutputConnections(HasOutputConnections):
         """
         self._env.process(self._go())
 
+
+class HasRegisters(Block):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    ### we can change rising and falling edge
 
 if __name__ == "__main__":
 
