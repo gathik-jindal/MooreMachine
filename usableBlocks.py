@@ -125,7 +125,7 @@ class Machine(HasInputConnections, HasOutputConnections):
         @return : bool
         """
         # state 1 means clock, 0 means clock (but as input)
-        if (isinstance(other, Clock) and self.__isClock == 1):
+        if (self.__isClock == 1):
             self.__clkVal = other._output
             other.addFanOut(self, 1)
             self.__clkObj = other
@@ -208,17 +208,7 @@ class Clock(HasOnlyOutputConnections):
         super().__init__(**kwargs)
         self._output[0] = initialValue
         self._scopeDump.add(f"Clock {self.getBlockID()}", 0, self._output[0])
-        self.__regList = []
 
-    def addFanOut(self, other, val=0):
-        if isinstance(other, Machine) and val == 1:
-            self.__regList.append(other)
-        else:
-            super().addFanOut(other)
-
-    def triggerReg(self):
-        for i in self.__regList:
-            i.runReg()
 
     # left, right are for future versions. NOT USED IN CURRENT VERSION.
     def output(self, left=None, right=None):
@@ -241,7 +231,6 @@ class Clock(HasOnlyOutputConnections):
             yield self._env.timeout((1-self._output[0])*(self.__timePeriod - self.__onTime)+self._output[0]*(self.__onTime))
             self._output[0] = 1 - self._output[0]
             self._scopeDump.add(f"Clock {self.getBlockID()}", self._env.now, self._output[0])
-            self.triggerReg()
             self.processFanOut()
 
 
