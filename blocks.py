@@ -329,8 +329,11 @@ class HasRegisters(Block):
                 yield self._env.timeout(timeout)
                 self.__presentState = self.__nextState
                 self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.__presentState)
-                self._env.process(self.__runOL())
-                self._env.process(self.__runNSL())
+                self._env.process(self.__runOL())##########
+                self._env.process(self.__runNSL())######
+
+    def runReg(self):
+        self._env.process(self.__runReg())
 
     
 
