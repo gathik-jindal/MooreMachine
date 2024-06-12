@@ -319,14 +319,16 @@ class HasOnlyOutputConnections(HasOutputConnections):
 class HasRegisters(Block):
 
     def __init__(self, **kwargs):
-        self._clkVal = kwargs.get("clk", [])  #### make this better
-        self._clkObj = None
+        self._clkObj = kwargs.get("clk", None) ### fix isConnected most likely working already
+        self._clkVal = []
+        if self._clkObj:
+            self._clkVal =  self._clkObj._output
         self._isClock = 0
         startingState = kwargs.get("startingState", 0)
         self.__presentState = startingState
         self.__nextState = startingState
         super().__init__(**kwargs)
-    ### we can change rising and falling edge
+        ### we can change rising and falling edge
 
     def __runReg(self):
         """
