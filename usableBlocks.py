@@ -58,7 +58,11 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         # triggering events for the connected machines
         self.processFanOut()
 
-    ##### make nsl and ol runners
+    def runNSL(self):
+        self._env.process(self.__runNSL())      
+
+    def runOL(self):
+        self._env.process(self.__runOL())        
 
     def run(self):
         """
