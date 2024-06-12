@@ -339,8 +339,6 @@ class HasRegisters(Block):
                 self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.__presentState)
                 self.runOL()
                 self.runNSL()
-                #self._env.process(self.__runOL())##########
-                #self._env.process(self.__runNSL())######
 
     def runReg(self):
         self._env.process(self.__runReg())
