@@ -53,7 +53,7 @@ PWM_Input = pysim.source(filePath=PWM_Path, plot=False, blockID="PWM Input")
 clk = pysim.clock(plot=False, blockID="clk", timePeriod=1, onTime=0.5)
 
 # Creating the moore machine
-mod4Counter = pysim.moore(maxOutSize=2, plot=False, blockID="Mod 4 Counter", startingState=0)
+mod4Counter = pysim.moore(maxOutSize=2, plot=True, blockID="Mod 4 Counter", startingState=0)
 mod4Counter.nsl = nsl
 mod4Counter.ol = ol
 
