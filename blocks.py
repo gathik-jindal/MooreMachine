@@ -311,9 +311,9 @@ class HasOnlyOutputConnections(HasOutputConnections):
 class HasRegisters(Block):
 
     def __init__(self, **kwargs):
-        self.__clkVal = kwargs.get("clk", [])  #### make this better
-        self.__clkObj = None
-        self.__isClock = 0
+        self._clkVal = kwargs.get("clk", [])  #### make this better
+        self._clkObj = None
+        self._isClock = 0
         startingState = kwargs.get("startingState", 0)
         self.__presentState = startingState
         self.__nextState = startingState
@@ -324,7 +324,7 @@ class HasRegisters(Block):
         """
         Registers run based on clock.
         """
-        if (self.__clkVal[0]):
+        if (self._clkVal[0]):
             if self.__presentState != self.__nextState:
                 yield self._env.timeout(timeout)
                 self.__presentState = self.__nextState
@@ -335,7 +335,10 @@ class HasRegisters(Block):
     def runReg(self):
         self._env.process(self.__runReg())
 
+
+
     
+        ########## make set state and get state
 
 if __name__ == "__main__":
 
