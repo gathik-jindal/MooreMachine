@@ -2,7 +2,7 @@ from blocks import *
 from utilities import checkType, printErrorAndExit
 
 
-class Machine(HasInputConnections, HasOutputConnections):
+class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
     """
     A machine is both a HasInputConnections block and a HasOutputConnections block.
     This represents the Moore Machine.
