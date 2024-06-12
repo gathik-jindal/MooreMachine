@@ -311,8 +311,16 @@ class HasOnlyOutputConnections(HasOutputConnections):
 class HasRegisters(Block):
 
     def __init__(self, **kwargs):
+        self.__clkVal = kwargs.get("clk", [])  #### make this better
+        self.__clkObj = None
+        self.__isClock = 0
+        startingState = kwargs.get("startingState", 0)
+        self.__presentState = startingState
+        self.__nextState = startingState
         super().__init__(**kwargs)
     ### we can change rising and falling edge
+
+    
 
 if __name__ == "__main__":
 
