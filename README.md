@@ -765,7 +765,7 @@ The Graphical User Interface (GUI) is implemented in java and allows the user to
 In order to run the program, type the following command in the command window.
 
 ```
-java -jar MooreMachineSimulator.jar
+java -jar FiniteStateMachineSimulation.jar
 ```
 
 ## <ins>Creating Blocks</ins>
