@@ -103,7 +103,7 @@ class pydig:
         self.__components.append(combObj)
         return combObj
 
-    def moore(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState=0):
+    def moore(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState=0, clock  = None):
         """
         Adds a moore machine to this class. 
         @param maxOutSize : the maximum number of output wires
@@ -125,7 +125,33 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = Machine(env=self.__env, maxOutSize=maxOutSize, nsl=nsl, ol=ol, plot=plot, blockID=blockID, startingState=startingState)
+        temp = Machine(env=self.__env, maxOutSize=maxOutSize, nsl=nsl, ol=ol, plot=plot, blockID=blockID, startingState=startingState, clk = clock)
+        self.__components.append(temp)
+        return temp
+
+    def mealy(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState=0, clock = None):
+        """
+        Adds a mealy machine to this class. 
+        @param maxOutSize : the maximum number of output wires
+        @param plot : boolean value whether to plot this moore machine or not
+        @para blockID : the id of this machine. If None, then new unique ID is given.  
+        @param nsl : next state logic function
+        @param ol : output logic function
+        @param startingState : the starting state of the moore machine
+        @return MealyMachine : the mealy machine instance. 
+        """
+        checkType([(plot, bool), (startingState, int)])
+
+        self.__count += 1
+        if (blockID == None):
+            blockID = self.__makeUniqueID("Mealy")
+        elif blockID in self.__uniqueIDlist:
+            id = self.__makeUniqueID("Mealy")
+            print(f"{blockID} is already used so changing to {id}")
+            blockID = id
+
+        self.__uniqueIDlist.append(blockID)
+        temp = MealyMachine(env=self.__env, maxOutSize=maxOutSize, nsl=nsl, ol=ol, plot=plot, blockID=blockID, startingState=startingState, clk = clock)
         self.__components.append(temp)
         return temp
 
