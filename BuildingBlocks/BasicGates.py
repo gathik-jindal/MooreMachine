@@ -66,10 +66,11 @@ class AND(Comb):
         @param val (int): The value that's going to be used to AND
         @return (int): The result of the AND operation
         """
-        numBits = bitCount(val)
-        val1 = val >> (numBits // 2)
-        val2 = val & ((1 << (numBits // 2)) - 1)
-        return val1 & val2
+        ans = 1
+        while val:
+            ans = ans & (val%2)
+            val = val >> 1
+        return ans
 
 
 class OR(Comb):
