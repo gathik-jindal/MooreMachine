@@ -78,14 +78,6 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         """
         return self._clkVal != [] and self.nsl != None and self.ol != None and self.isConnectedToInput()
 
-    def clock(self):
-        """
-        Connects the next clock object to the Register
-        @return Machine : the instance of this class for connection purposes.
-        """
-        self._isClock = 1  # 1 for clock, 0 for clock as input and -1 for not being used
-        return self
-
     # left, right are for future versions. NOT USED IN CURRENT VERSION.
     def input(self, left=None, right=None):
         """
@@ -93,20 +85,6 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         """
         self._isClock = 0  # 1 for clock, 0 for clock as input and -1 for not being used
         return self
-
-    def resetClockFlag(self):
-        self._isClock = 0
-        self.resetState()
-        return self
-
-    def getScopeDump(self):
-        """
-        @return dict : the scope dump values for this block.
-        """
-        dic = self._clkObj.getScopeDump()
-        dic.update(self._scopeDump.getValues())
-        return dic
-
 
 class MealyMachine(HasInputConnections, HasOutputConnections, HasRegisters):
     """
@@ -183,14 +161,6 @@ class MealyMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         """
         return self._clkVal != [] and self.nsl != None and self.ol != None and self.isConnectedToInput()
 
-    def clock(self):
-        """
-        Connects the next clock object to the Register
-        @return Machine : the instance of this class for connection purposes.
-        """
-        self._isClock = 1  # 1 for clock, 0 for clock as input and -1 for not being used
-        return self
-
     # left, right are for future versions. NOT USED IN CURRENT VERSION.
     def input(self, left=None, right=None):
         """
@@ -199,18 +169,6 @@ class MealyMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         self._isClock = 0  # 1 for clock, 0 for clock as input and -1 for not being used
         return self
 
-    def resetClockFlag(self):
-        self._isClock = 0
-        self.resetState()
-        return self
-
-    def getScopeDump(self):
-        """
-        @return dict : the scope dump values for this block.
-        """
-        dic = self._clkObj.getScopeDump()
-        dic.update(self._scopeDump.getValues())
-        return dic
 
 class Input(HasOnlyOutputConnections):
     """
