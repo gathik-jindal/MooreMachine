@@ -319,7 +319,7 @@ class HasOnlyOutputConnections(HasOutputConnections):
 class HasRegisters(Block):
 
     def __init__(self, **kwargs):
-        self._clkObj = kwargs.get("clk", None) ### fix isConnected most likely working already
+        self._clkObj = kwargs.get("clk", None)
         self._clkVal = []
         if self._clkObj:
             self._clkVal =  self._clkObj._output
@@ -353,6 +353,28 @@ class HasRegisters(Block):
 
     def setNS(self,val):
         self.__nextState = val
+
+    def clock(self):
+        """
+        Connects the next clock object to the Register
+        @return Machine : the instance of this class for connection purposes.
+        """
+        self._isClock = 1  # 1 for clock, 0 for clock as input and -1 for not being used
+        return self
+
+    def resetClockFlag(self):
+        self._isClock = 0
+        self.resetState()
+        return self
+
+    def getScopeDump(self):
+        """
+        @return dict : the scope dump values for this block.
+        """
+        dic = self._clkObj.getScopeDump()
+        dic.update(self._scopeDump.getValues())
+        return dic
+
 
 if __name__ == "__main__":
 
