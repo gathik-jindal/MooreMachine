@@ -302,7 +302,7 @@ class DMUX(Comb):
     If the selection bit is 0, then val is sent as first value, else val is sent as second value.
 
     The first bit is the selectin bit, and the rest of the bits are the values.
-    For example, if the input is 11, then the selection bit is 1, and the val is 10, the output will be
+    For example, if the input is 11, then the selection bit is 1, and the val is 1, the output will be
     10, if selection bit was 0, then the output would have been 01.
     """
 
