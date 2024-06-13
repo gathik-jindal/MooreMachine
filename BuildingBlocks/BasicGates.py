@@ -301,47 +301,39 @@ class MUX(Comb):
         return (val1 & n(mask)) | (val2 & mask)
 
 
-# class DMUX(Comb):
-#     """
-#     This class represents the DMUX gate.
-#     If the selection bit is 0, then the first value is selected, else the second value is selected.
+class DMUX(Comb):
+    """
+    This class represents the DMUX gate.
+    If the selection bit is 0, then val is sent as first value, else val is sent as second value.
 
-#     The first bit is the selectin bit, and the rest of the bits are the values.
-#     For example, if the input is 110, then the selection bit is 1, the first value is 1 and the second value is 0.
-#     """
+    The first bit is the selectin bit, and the rest of the bits are the values.
+    For example, if the input is 11, then the selection bit is 1, and the val is 10, the output will be
+    10, if selection bit was 0, then the output would have been 01.
+    """
 
-#     def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
-#         """
-#         @param pydig : pydig object
-#         @param delay : the time delay for the DMUX gate
-#         @param initialValue : The initial output value given by this block at t = 0 while running
-#         @param plot : boolean value whether to plot this block or not
-#         @param blockID : the id of this block. If None, then new unique ID is given.
-#         """
-#         checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
-#         super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID, maxOutSize=2, delay=delay, plot=plot, initialValue=initialValue)
+    def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
+        """
+        @param pydig : pydig object
+        @param delay : the time delay for the DMUX gate
+        @param initialValue : The initial output value given by this block at t = 0 while running
+        @param plot : boolean value whether to plot this block or not
+        @param blockID : the id of this block. If None, then new unique ID is given.
+        """
+        checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
+        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID, maxOutSize=2, delay=delay, plot=plot, initialValue=initialValue)
 
-#         pydig.combinationalFromObject(self)  # make this object a part of the pydig object
+        pydig.combinationalFromObject(self)  # make this object a part of the pydig object
 
-#     def __func(self, val):
-#         """
-#         @param val (int): The value to be demultiplexed
-#         @return (int, int): The demultiplexed values
-#         """
-#         sel = val >> 1
-#         val = val & 1
-
-#         return (val & n(sel), val & sel)
-# def DMUX(sel, val):
-#     """
-#     @param sel (int): The selection bit (0 or 1)
-#     @param val (int): The value to be demultiplexed (0 or 1)
-#     @return (int, int): The demultiplexed values (2 bits)
-#     """
-#     if (sel > 1 and val):
-#         printErrorAndExit("selection, val can only be 0 or 1")
-
-#     return (MUX(sel, val, 0) << 1) & MUX(NOT(sel), val, 0)
+    def __func(self, val):
+        """
+        @param val (int): The value to be demultiplexed
+        @return (int, int): The demultiplexed values
+        """
+        sel = val >> 1
+        val = val & 1
+        val = val | (val << 1)
+        ans = (sel << 1) & n(sel)
+        return ans & val
 
 
 def n(val):
