@@ -332,7 +332,7 @@ class HasRegisters(Block):
         """
         Registers run based on clock.
         """
-        if (bool(self._clkVal[0]) ^ self.__posEdge):
+        if (not (bool(self._clkVal[0]) ^ self.__posEdge)):
             if self.__presentState != self.__nextState:
                 yield self._env.timeout(timeout)
                 self.__presentState = self.__nextState
