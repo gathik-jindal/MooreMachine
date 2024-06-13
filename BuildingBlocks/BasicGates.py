@@ -266,8 +266,7 @@ class MUX(Comb):
     This class represents the MUX gate.
     If the selection bit is 0, then the first value is selected, else the second value is selected.
 
-    The first bit is the selectin bit, and from rest of the bits, the first half is the first value and the second half is the second value.
-    For example, if the input is 110101100, then the selection bit is 1, the first value is 1010 and the second value is 1100.
+    The first bit is the selectin bit, and the second and third bits are values (Counted from left to right).
     """
 
     def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
@@ -288,16 +287,12 @@ class MUX(Comb):
         @param val (int): The value to be MUXed
         @return (int): The result of the MUX operation
         """
-        length = bitCount(val)
-        sel = val >> (length - 1) # getting selection bit
-        val = val & ((1 << (length - 1)) - 1) # removing selection bit
-        length -= 1
-        val1 = val >> (length // 2) # getting first value
-        val2 = val & ((1 << (length // 2)) - 1) # getting second value
+        sel = val >> 2
+        val = val & 3
+        val1 = val >> 1
+        val2 = val & 1
+        mask = n(sel)
 
-        mask = 1 << ((length // 2) + 1) # obtaining the mask
-        mask -= sel # subtracting sel from the mask, this decides which value to select
-        
         return (val1 & n(mask)) | (val2 & mask)
 
 
@@ -332,7 +327,7 @@ class DMUX(Comb):
         sel = val >> 1
         val = val & 1
         val = val | (val << 1)
-        ans = (sel << 1) & n(sel)
+        ans = (sel << 1) | n(sel)
         return ans & val
 
 
@@ -342,28 +337,37 @@ def n(val):
     @return (int): The negated value
     """
     
-    mask = (1 << bitCount(val)) - 1
+    mask = 1 if val == 0 else (1 << bitCount(val)) - 1
     return mask & ~val
 
 if __name__ == "__main__":
     
     pysim = pd("Basic Gates")
-    notGate = NOT(pysim, 0, 1, True, "Not Gate")
-    andGate = AND(pysim, 0, 1, True, "And Gate")
-    orGate = OR(pysim, 0, 1, True, "Or Gate")
-    xorGate = XOR(pysim, 0, 1, True, "Xor Gate")
-    nandGate = NAND(pysim, 0, 1, True, "Nand Gate")
-    norGate = NOR(pysim, 0, 1, True, "Nor Gate")
-    xnor = XNOR(pysim, 0, 1, True, "Xnor Gate")
+    # notGate = NOT(pysim, 0, 1, True, "Not Gate")
+    # andGate = AND(pysim, 0, 1, True, "And Gate")
+    # orGate = OR(pysim, 0, 1, True, "Or Gate")
+    # xorGate = XOR(pysim, 0, 1, True, "Xor Gate")
+    # nandGate = NAND(pysim, 0, 1, True, "Nand Gate")
+    # norGate = NOR(pysim, 0, 1, True, "Nor Gate")
+    # xnor = XNOR(pysim, 0, 1, True, "Xnor Gate")
+    mux = MUX(pysim, 0, 1, True, "Mux Gate")
+    dmux = DMUX(pysim, 0, 1, True, "Dmux Gate")
 
     clock = pysim.clock(plot=True)
+    clock2 = pysim.clock(plot=True, onTime=2, timePeriod=4)
 
-    clock.output() > notGate.input()
-    clock.output() > andGate.input()
-    clock.output() > orGate.input()
-    clock.output() > xorGate.input()
-    clock.output() > nandGate.input()
-    clock.output() > norGate.input()
-    clock.output() > xnor.input()
+    # clock.output() > notGate.input()
+    # clock.output() > andGate.input()
+    # clock.output() > orGate.input()
+    # clock.output() > xorGate.input()
+    # clock.output() > nandGate.input()
+    # clock.output() > norGate.input()
+    # clock.output() > xnor.input()
+
+    clock.output() > mux.input()
+    clock2.output() > mux.input()
+    
+    clock.output() > dmux.input()
+    clock2.output() > dmux.input()
 
     pysim.run(10)
