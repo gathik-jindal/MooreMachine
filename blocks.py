@@ -325,14 +325,14 @@ class HasRegisters(Block):
         startingState = kwargs.get("startingState", 0)
         self.__presentState = startingState
         self.__nextState = startingState
+        self.__posEdge = kwargs.get("posEdge", True)
         super().__init__(**kwargs)
-        ### we can change rising and falling edge
 
     def __runReg(self):
         """
         Registers run based on clock.
         """
-        if (self._clkVal[0]):
+        if (bool(self._clkVal[0]) ^ self.__posEdge):
             if self.__presentState != self.__nextState:
                 yield self._env.timeout(timeout)
                 self.__presentState = self.__nextState
