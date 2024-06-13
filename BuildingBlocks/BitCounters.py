@@ -36,7 +36,7 @@ class Enabled1BitCounterWithTC(Comb):
         """
         This creates an enabled 1 bit counter with terminal count object.
         @param pydig : a pydig object that you want to add this counter to.
-        @param enable: a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
+        @param enable: a HasOutputConnection object (an Input object, a MooreMachine object, or a Combinational object).
         @param clock : a clock object
         @param plot : a boolean value whether to plot this object or not
         """
@@ -45,15 +45,12 @@ class Enabled1BitCounterWithTC(Comb):
 
         Enabled1BitCounterWithTC.__counter += 1
 
-        super().__init__(func=lambda x: x & 1, env=pydig.getEnv(), blockID=f"Enabled 1 Bit Counter {
-            Enabled1BitCounterWithTC.__counter}", maxOutSize=1, delay=0, plot=plot, state=0)
+        super().__init__(func=lambda x: x & 1, env=pydig.getEnv(), blockID=f"Enabled 1 Bit Counter {Enabled1BitCounterWithTC.__counter}", maxOutSize=1, delay=0, plot=plot, state=0)
 
         o = pydig.combinationalFromObject(self)
-        self.__tc = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 1 Bit Counter TC {
-                                        Enabled1BitCounterWithTC.__counter}", func=lambda x: (x & 2) >> 1)
+        self.__tc = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 1 Bit Counter TC {Enabled1BitCounterWithTC.__counter}", func=lambda x: (x & 2) >> 1)
         i = enable
-        m = pydig.moore(plot=False, maxOutSize=2, blockID=f"Moore {
-                        Enabled1BitCounterWithTC.__counter}")
+        m = pydig.moore(plot=False, maxOutSize=2, blockID=f"Moore {Enabled1BitCounterWithTC.__counter}")
         self.__clk = clock
 
         m.nsl = self.__nsl
@@ -113,7 +110,7 @@ class Enabled2BitCounterWithTC(Comb):
         """
         This creates an enabled 2 bit counter with terminal count object.
         @param pydig : a pydig object that you want to add this counter to.
-        @param enable: a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
+        @param enable: a HasOutputConnection object (an Input object, a MooreMachine object, or a Combinational object).
         @param clock : a clock object
         @param plot : a boolean value whether to plot this object or not
         """
@@ -122,20 +119,15 @@ class Enabled2BitCounterWithTC(Comb):
 
         Enabled2BitCounterWithTC.__counter += 1
 
-        self.__c1 = Enabled1BitCounterWithTC(
-            pydig, enable, clock, plot=False)
+        self.__c1 = Enabled1BitCounterWithTC(pydig, enable, clock, plot=False)
 
-        temp = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 2 Bit Counter And{
-                                   Enabled2BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
+        temp = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 2 Bit Counter And{Enabled2BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
 
-        self.__c2 = Enabled1BitCounterWithTC(
-            pydig, temp.output(), clock, plot=False)
+        self.__c2 = Enabled1BitCounterWithTC(pydig, temp.output(), clock, plot=False)
 
-        super().__init__(func=lambda x: x, env=pydig.getEnv(), blockID=f"Enabled 2 Bit Counter {
-            Enabled2BitCounterWithTC.__counter}", maxOutSize=2, delay=0, plot=plot, state=0)
+        super().__init__(func=lambda x: x, env=pydig.getEnv(), blockID=f"Enabled 2 Bit Counter {Enabled2BitCounterWithTC.__counter}", maxOutSize=2, delay=0, plot=plot, state=0)
         o = pydig.combinationalFromObject(self)
-        self.__tc = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 2 Bit Counter TC{
-                                        Enabled2BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
+        self.__tc = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 2 Bit Counter TC{Enabled2BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
 
         self.__clk = clock
 
@@ -176,7 +168,7 @@ class Enabled3BitCounterWithTC(Comb):
         """
         This creates an enabled 3 bit counter with terminal count object.
         @param pydig : a pydig object that you want to add this counter to.
-        @param enable: a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
+        @param enable: a HasOutputConnection object (an Input object, a MooreMachine object, or a Combinational object).
         @param clock : a clock object
         @param plot : a boolean value whether to plot this object or not
         """
@@ -187,17 +179,13 @@ class Enabled3BitCounterWithTC(Comb):
 
         self.__c1 = Enabled1BitCounterWithTC(pydig, enable, clock, plot=False)
 
-        temp = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 3 Bit Counter And{
-                                   Enabled3BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
+        temp = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 3 Bit Counter And {Enabled3BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
 
-        self.__c2 = Enabled2BitCounterWithTC(
-            pydig, temp.output(), clock, plot=False)
+        self.__c2 = Enabled2BitCounterWithTC(pydig, temp.output(), clock, plot=False)
 
-        super().__init__(func=lambda x: x, env=pydig.getEnv(), blockID=f"Enabled 3 Bit Counter {
-            Enabled3BitCounterWithTC.__counter}", maxOutSize=3, delay=0, plot=plot, state=0)
+        super().__init__(func=lambda x: x, env=pydig.getEnv(), blockID=f"Enabled 3 Bit Counter {Enabled3BitCounterWithTC.__counter}", maxOutSize=3, delay=0, plot=plot, state=0)
         o = pydig.combinationalFromObject(self)
-        self.__tc = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 3 Bit Counter TC{
-                                        Enabled3BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
+        self.__tc = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 3 Bit Counter TC {Enabled3BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
 
         self.__clk = clock
 
@@ -238,7 +226,7 @@ class Enabled4BitCounterWithTC(Comb):
         """
         This creates an enabled 4 bit counter with terminal count object.
         @param pydig : a pydig object that you want to add this counter to.
-        @param enable: a HasOutputConnection object (an Input object, a Machine object, or a Combinational object).
+        @param enable: a HasOutputConnection object (an Input object, a MooreMachine object, or a Combinational object).
         @param clock : a clock object
         @param plot : a boolean value whether to plot this object or not
         """
@@ -249,17 +237,13 @@ class Enabled4BitCounterWithTC(Comb):
 
         self.__c1 = Enabled2BitCounterWithTC(pydig, enable, clock, plot=False)
 
-        temp = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 4 Bit Counter And{
-                                   Enabled4BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
+        temp = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 4 Bit Counter And{Enabled4BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
 
-        self.__c2 = Enabled2BitCounterWithTC(
-            pydig, temp.output(), clock, plot=False)
+        self.__c2 = Enabled2BitCounterWithTC(pydig, temp.output(), clock, plot=False)
 
-        super().__init__(func=lambda x: x, env=pydig.getEnv(), blockID=f"Enabled 4 Bit Counter {
-            Enabled4BitCounterWithTC.__counter}", maxOutSize=4, delay=0, plot=plot, state=0)
+        super().__init__(func=lambda x: x, env=pydig.getEnv(), blockID=f"Enabled 4 Bit Counter {Enabled4BitCounterWithTC.__counter}", maxOutSize=4, delay=0, plot=plot, state=0)
         o = pydig.combinationalFromObject(self)
-        self.__tc = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 4 Bit Counter TC{
-                                        Enabled4BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
+        self.__tc = pydig.combinational(maxOutSize=1, plot=False, blockID=f"Enabled 4 Bit Counter TC{Enabled4BitCounterWithTC.__counter}", func=lambda x: (x >> 1 & 1) & (x & 1))
 
         self.__clk = clock
 

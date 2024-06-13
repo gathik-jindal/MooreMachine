@@ -38,19 +38,16 @@ class FreezeCounter(Comb):
         @param clock : the clock signal
         @param plot : boolean value whether to plot this moore machine or not
         """
-        checkType([(pydig, pd), (modValue, int),
-                  (freeze, HOC), (clock, Clock), (plot, bool)])
+        checkType([(pydig, pd), (modValue, int), (freeze, HOC), (clock, Clock), (plot, bool)])
         maxOutSize = bitCount(modValue)
         self.__modValue = modValue
         FreezeCounter.__counter += 1
 
-        super().__init__(func=lambda x: x, env=pydig.getEnv(), blockID=f"Mod {modValue} Freeze Counter {
-            FreezeCounter.__counter}", maxOutSize=maxOutSize, delay=0, plot=plot, state=0)
+        super().__init__(func=lambda x: x, env=pydig.getEnv(), blockID=f"Mod {modValue} Freeze Counter {FreezeCounter.__counter}", maxOutSize=maxOutSize, delay=0, plot=plot, state=0)
 
         o = pydig.combinationalFromObject(self)
         i = freeze
-        m = pydig.moore(plot=False, maxOutSize=maxOutSize,
-                        blockID=f"Moore {FreezeCounter.__counter}")
+        m = pydig.moore(plot=False, maxOutSize=maxOutSize, blockID=f"Moore {FreezeCounter.__counter}")
         self.__clk = clock
 
         m.nsl = self.__nsl

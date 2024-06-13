@@ -26,7 +26,7 @@ def ol(ps):
     # This is the output logic for the PWM
     return ps
 
-input0 = pysim.source(filePath = "C:\\Users\\ARYAN\\Desktop\\Moore Machine Simulator\\Tests\\PWM.csv", plot = False, blockID = "PWM Input")
+input0 = pysim.source(filePath = "C:\\Users\\ARYAN\\Desktop\\Moore MooreMachine Simulator\\Tests\\PWM.csv", plot = False, blockID = "PWM Input")
 clock1 = pysim.clock(plot = False, blockID = "clk", timePeriod = 1.2, onTime = 0.6, initialValue = 0)
 moore2 = pysim.moore(maxOutSize = 2, plot = True, blockID = "Mod 4 Counter", nsl = nsl, ol = ol, startingState = 0)
 comb3 = pysim.combinational(maxOutSize = 1, plot = False, blockID = "Output Comparator", func = lambda x: int((x & 3) > (x >> 2)), delay = 0, initialValue = 0)

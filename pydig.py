@@ -112,7 +112,7 @@ class pydig:
         @param nsl : next state logic function
         @param ol : output logic function
         @param startingState : the starting state of the moore machine
-        @return Machine : the moore machine instance. 
+        @return MooreMachine : the moore machine instance. 
         """
         checkType([(plot, bool), (startingState, int)])
 
@@ -125,7 +125,7 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = Machine(env=self.__env, maxOutSize=maxOutSize, nsl=nsl, ol=ol, plot=plot, blockID=blockID, startingState=startingState, clk = clock, posEdge = raisingEdge)
+        temp = MooreMachine(env=self.__env, maxOutSize=maxOutSize, nsl=nsl, ol=ol, plot=plot, blockID=blockID, startingState=startingState, clk = clock, posEdge = raisingEdge)
         self.__components.append(temp)
         return temp
 

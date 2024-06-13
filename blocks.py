@@ -8,7 +8,7 @@ The objects that it defines are:
     HasInputConnections: A HasInputConnections block is a block that has input connection wires.
     HasOutputConnections: A HasOutputConnections block is a block that has output connection wires.
     HasOnlyOutputConnections: Class used by only those classes that only have output connections.
-    Machine: The Moore Machine object.
+    MooreMachine: The Moore MooreMachine object.
     Input: A block that generates an input signal.
     Clock: A block that generates a clock signal.
     Output: An output block that generates an output signal.
@@ -204,7 +204,7 @@ class HasInputConnections(Block):
 class HasOutputConnections(Block):
     """
     A HasOutputConnections block is a block that has output connection wires.
-    Examples include Machine, Combinational and Input.
+    Examples include MooreMachine, Combinational and Input.
     """
 
     def __init__(self, **kwargs):
@@ -355,7 +355,7 @@ class HasRegisters(Block):
     def clock(self):
         """
         Connects the next clock object to the Register
-        @return Machine : the instance of this class for connection purposes.
+        @return MooreMachine : the instance of this class for connection purposes.
         """
         self._isClock = 1  # 1 for clock, 0 for clock as input and -1 for not being used
         return self

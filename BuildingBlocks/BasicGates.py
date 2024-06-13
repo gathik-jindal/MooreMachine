@@ -24,7 +24,7 @@ class NOT(Comb):
         @param delay : the time delay for the NOT gate
         @param initialValue : The initial output value given by this block at t = 0 while running
         @param plot : boolean value whether to plot this moore machine or not
-        @param blockID : the id of this machine. If None, then new unique ID is given.
+        @param blockID : the id of this moore machine. If None, then new unique ID is given.
         """
         checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
         super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID, maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)

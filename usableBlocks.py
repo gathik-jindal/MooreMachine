@@ -2,7 +2,7 @@ from blocks import *
 from utilities import checkType, printErrorAndExit
 
 
-class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
+class MooreMachine(HasInputConnections, HasOutputConnections, HasRegisters):
     """
     A machine is both a HasInputConnections block and a HasOutputConnections block.
     This represents the Moore Machine.
@@ -27,7 +27,7 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
         """
         @return str : a string representation of this machine.
         """
-        return f"Machine ID {self.getBlockID()}"
+        return f"MooreMachine ID {self.getBlockID()}"
 
     def __runNSL(self):
         """
@@ -81,7 +81,7 @@ class Machine(HasInputConnections, HasOutputConnections, HasRegisters):
     # left, right are for future versions. NOT USED IN CURRENT VERSION.
     def input(self, left=None, right=None):
         """
-        @return Machine : the instance of this class for connection purposes.
+        @return MooreMachine : the instance of this class for connection purposes.
         """
         self._isClock = 0  # 1 for clock, 0 for clock as input and -1 for not being used
         return self
@@ -164,7 +164,7 @@ class MealyMachine(HasInputConnections, HasOutputConnections, HasRegisters):
     # left, right are for future versions. NOT USED IN CURRENT VERSION.
     def input(self, left=None, right=None):
         """
-        @return Machine : the instance of this class for connection purposes.
+        @return MooreMachine : the instance of this class for connection purposes.
         """
         self._isClock = 0  # 1 for clock, 0 for clock as input and -1 for not being used
         return self
