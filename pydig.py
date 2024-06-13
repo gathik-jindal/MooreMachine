@@ -103,7 +103,7 @@ class pydig:
         self.__components.append(combObj)
         return combObj
 
-    def moore(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState=0, clock  = None):
+    def moore(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState = 0, raisingEdge = True, clock  = None):
         """
         Adds a moore machine to this class. 
         @param maxOutSize : the maximum number of output wires
@@ -125,11 +125,11 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = Machine(env=self.__env, maxOutSize=maxOutSize, nsl=nsl, ol=ol, plot=plot, blockID=blockID, startingState=startingState, clk = clock)
+        temp = Machine(env=self.__env, maxOutSize=maxOutSize, nsl=nsl, ol=ol, plot=plot, blockID=blockID, startingState=startingState, clk = clock, posEdge = raisingEdge)
         self.__components.append(temp)
         return temp
 
-    def mealy(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState=0, clock = None):
+    def mealy(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState=0, raisingEdge = True, clock = None):
         """
         Adds a mealy machine to this class. 
         @param maxOutSize : the maximum number of output wires
@@ -151,7 +151,7 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = MealyMachine(env=self.__env, maxOutSize=maxOutSize, nsl=nsl, ol=ol, plot=plot, blockID=blockID, startingState=startingState, clk = clock)
+        temp = MealyMachine(env=self.__env, maxOutSize=maxOutSize, nsl=nsl, ol=ol, plot=plot, blockID=blockID, startingState=startingState, clk = clock, posEdge = raisingEdge)
         self.__components.append(temp)
         return temp
 
