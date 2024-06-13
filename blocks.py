@@ -131,8 +131,16 @@ class HasInputConnections(Block):
         @param other : must be of type HasOutputConnections.
         @return bool : True
         """
-
+        
         checkType([(other, (HasOutputConnections))])
+        
+        if (isinstance(self, HasRegisters) and self._isClock == 1):
+            self._clkVal = other._output
+            other.addFanOut(self, 1)
+            self._clkObj = other
+            self.resetClockFlag()
+            return True
+
         self.__input.append(other._output)
         self.__inputSizes.append((other.getLeft(), other.getRight(), other.getWidth()))
         self.__inputCount += 1
@@ -211,7 +219,16 @@ class HasOutputConnections(Block):
         self.__state = (0, maxOutSize, maxOutSize)
         self.__fanOutList = []
         self._output = [0]
+        self.__regList = []
         super().__init__(**kwargs)
+
+
+    def addFanOut(self, other, val=0):
+        if isinstance(other, HasRegisters) and val == 1:
+            self.__regList.append(other)
+        else:
+            self.__fanOutList.append(other)
+
 
     def resetState(self):
         """
@@ -237,22 +254,6 @@ class HasOutputConnections(Block):
         """
         return self.__state[2]
 
-    def defineFanOut(self):  # delete it most likely
-        """
-        Defines the fan out variables.
-        Fan out represents the blocks which
-        are connected to this block.
-        """
-
-        self.__fanOutList = []
-        self._output = [0]
-
-    def addFanOut(self, other, val=0):
-        """
-        Adds an output wire to this block.
-        @return int : the number of output components connected to this block.
-        """
-        self.__fanOutList.append(other)
 
     def __gt__(self, other):
         """
@@ -273,7 +274,8 @@ class HasOutputConnections(Block):
     def processFanOut(self):
         for i in self.__fanOutList:
             i.run()
-
+        for i in self.__regList:
+            i.runReg()
 
 class HasOnlyOutputConnections(HasOutputConnections):
     """
@@ -310,6 +312,66 @@ class HasOnlyOutputConnections(HasOutputConnections):
         Runs this block.
         """
         self._env.process(self._go())
+
+
+class HasRegisters(Block):
+
+    def __init__(self, **kwargs):
+        self._clkObj = kwargs.get("clk", None)
+        self._clkVal = []
+        if self._clkObj:
+            self._clkVal =  self._clkObj._output
+        self._isClock = 0
+        startingState = kwargs.get("startingState", 0)
+        self.__presentState = startingState
+        self.__nextState = startingState
+        self.__posEdge = kwargs.get("posEdge", True)
+        super().__init__(**kwargs)
+
+    def __runReg(self):
+        """
+        Registers run based on clock.
+        """
+        if (not (bool(self._clkVal[0]) ^ self.__posEdge)):
+            if self.__presentState != self.__nextState:
+                yield self._env.timeout(timeout)
+                self.__presentState = self.__nextState
+                self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.__presentState)
+                self.runOL()
+                self.runNSL()
+
+    def runReg(self):
+        self._env.process(self.__runReg())
+
+    def getNS(self):
+        return self.__nextState
+
+    def getPS(self):
+        return self.__presentState
+
+    def setNS(self,val):
+        self.__nextState = val
+
+    def clock(self):
+        """
+        Connects the next clock object to the Register
+        @return Machine : the instance of this class for connection purposes.
+        """
+        self._isClock = 1  # 1 for clock, 0 for clock as input and -1 for not being used
+        return self
+
+    def resetClockFlag(self):
+        self._isClock = 0
+        self.resetState()
+        return self
+
+    def getScopeDump(self):
+        """
+        @return dict : the scope dump values for this block.
+        """
+        dic = self._clkObj.getScopeDump()
+        dic.update(self._scopeDump.getValues())
+        return dic
 
 
 if __name__ == "__main__":
