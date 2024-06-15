@@ -12,6 +12,16 @@ from usableBlocks import Combinational as Comb
 import random
 
 
+def n(val):
+    """
+    @param val (int): The value to be negated
+    @return (int): The negated value
+    """
+    
+    mask = 1 if val == 0 else (1 << bitCount(val)) - 1
+    return mask & ~val
+
+
 class NOT(Comb):
     """
     This class represents the NOT gate.
@@ -100,10 +110,11 @@ class OR(Comb):
         @param val (int): The value to be ORed
         @return (int): The result of the OR operation
         """
-        numBits = bitCount(val)
-        val1 = val >> (numBits // 2)
-        val2 = val & ((1 << (numBits // 2)) - 1)
-        return val1 | val2
+        ans = 1
+        while val:
+            ans = ans | (val%2)
+            val = val >> 1
+        return ans
 
 
 class XOR(Comb):
@@ -133,10 +144,11 @@ class XOR(Comb):
         @param val (int): The value to be XORed
         @return (int): The result of the XOR operation
         """
-        numBits = bitCount(val)
-        val1 = val >> (numBits // 2)
-        val2 = val & ((1 << (numBits // 2)) - 1)
-        return val1 ^ val2
+        ans = 1
+        while val:
+            ans = ans ^ (val%2)
+            val = val >> 1
+        return ans
 
 
 class NAND(Comb):
@@ -332,43 +344,62 @@ class DMUX(Comb):
         return ans & val
 
 
-def n(val):
+class SISO:
     """
-    @param val (int): The value to be negated
-    @return (int): The negated value
+    This class represents the SISO gate.
     """
+
+    def __init__(self, pydig: pd, clock, delay: float, num: int, initialValue: int, plot: bool, blockID: str):
+        """
+        @param pydig : pydig object
+        @param delay : the time delay for each register in the SISO block.
+        @param num : the number of registers in the SISO block
+        @param initialValue : The initial output value given by each register in the block at t = 0 while running
+        @param plot : boolean value whether to plot this block or not
+        @param blockID : the id of this block. If None, then new unique ID is given.
+        """
+        checkType([(pydig, pd), (delay, (float, int)), (num, (int)), (initialValue, int), (plot, bool), (blockID, str)])
+
+        self.__registers = [pd.moore(pydig, 1, True, blockID + f" - {str(i)}", lambda x, y: y, lambda x : x, initialValue, True) for i in range(num)]
+
+        for i in range(num - 1):
+            self.__registers[i].output() > self.__registers[i+1].input()
     
-    mask = 1 if val == 0 else (1 << bitCount(val)) - 1
-    return mask & ~val
+    def input(self, left=None, right=None):
+        """
+        @return obj : instance of the first register object
+        """
+        return self.__registers[0].input(left, right)
+    
+    def output(self, left=0, right=None):
+        """
+        @return obj : instance of the last register object
+        """
+        return self.__registers[-1].output(left, right)
+
+    def clock(self):
+        """
+        @return obj : instance of the clock object
+        """
+        return self
+    
+    def __le__(self, other):
+        """
+        @param other : the other object to which the clock is connected to
+        """
+        for i in self.__registers:
+            other > i.clock()
 
 if __name__ == "__main__":
     
     pysim = pd("Basic Gates")
-    # notGate = NOT(pysim, 0, 1, True, "Not Gate")
-    # andGate = AND(pysim, 0, 1, True, "And Gate")
-    # orGate = OR(pysim, 0, 1, True, "Or Gate")
-    # xorGate = XOR(pysim, 0, 1, True, "Xor Gate")
-    # nandGate = NAND(pysim, 0, 1, True, "Nand Gate")
-    # norGate = NOR(pysim, 0, 1, True, "Nor Gate")
-    # xnor = XNOR(pysim, 0, 1, True, "Xnor Gate")
-    mux = MUX(pysim, 0, 1, True, "Mux Gate")
-    dmux = DMUX(pysim, 0, 1, True, "Dmux Gate")
 
-    clock = pysim.clock(plot=True)
+    clock = pysim.clock(plot=True, onTime=0.5, timePeriod=1)
     clock2 = pysim.clock(plot=True, onTime=2, timePeriod=4)
 
-    # clock.output() > notGate.input()
-    # clock.output() > andGate.input()
-    # clock.output() > orGate.input()
-    # clock.output() > xorGate.input()
-    # clock.output() > nandGate.input()
-    # clock.output() > norGate.input()
-    # clock.output() > xnor.input()
+    siso = SISO(pysim, None, 0, 3, 0, True, "SISO")
 
-    clock.output() > mux.input()
-    clock2.output() > mux.input()
-    
-    clock.output() > dmux.input()
-    clock2.output() > dmux.input()
+    clock.output() > siso.clock()
+    clock2.output() > siso.input()
 
-    pysim.run(10)
+    pysim.run(13)
