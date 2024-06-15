@@ -45,7 +45,7 @@ def bitCount(num):
         @param num : the number to find the bit count
         @return int : the number of bits in the number
         """
-        a = 0
+        a = 0 if num > 0 else 1
         while (num):
             a += 1
             num = num >> 1
