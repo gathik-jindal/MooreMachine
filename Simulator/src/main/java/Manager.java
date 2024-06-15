@@ -41,16 +41,16 @@ public abstract class Manager extends JPanel
 {
     private MenuBar bar;                //The MenuBar that goes at the top of the Panel
     private JSlider zoomSlider;         //Controls the level of zooming in and out
-    private DrawCircuit drawingPanel;  //The drawing panel that goes in the center of the Panel
+    private DrawCircuit drawingPanel;   //The drawing panel that goes in the center of the Panel
     private InfoPanel infoPanel;        //The information panel that allows the user to look at information regarding the blocks 
-    private DrawingApp frame;               //The frame object.
+    private DrawingApp frame;           //The frame object.
 
     /**
      * The blocks enum which stores the name of the blocks.
      */
     public enum Blocks
     {
-        INPUT("Input Block"), MOORE("Moore Machine"), COMB("Combinational Block"), 
+        INPUT("Input Block"), MOORE("Moore Machine"), MEALY("Mealy Machine"), COMB("Combinational Block"), 
         OUTPUT("Output Block"), CLOCK("Clock"), WIRE("Wire");
 
         private String name;            //The name of the block
@@ -134,11 +134,18 @@ public abstract class Manager extends JPanel
         return infoPanel;
     }
 
+    /**
+     * @return the zoom value
+     */
     public int getZoomValue()
     {
         return zoomSlider.getValue();
     }
 
+    /**
+     * Sets the zoom value to the one specified
+     * @param val : the new zoom value
+     */
     public void setZoomValue(int val)
     {
         if(zoomSlider.getValue() + val <= zoomSlider.getMaximum() && zoomSlider.getValue() + val >= zoomSlider.getMinimum())
@@ -166,6 +173,8 @@ public abstract class Manager extends JPanel
                 return new Output(block.getName(), rect, color, drawingPanel);
             case MOORE:
                 return new Moore(block.getName(), rect, color, drawingPanel);
+            case MEALY:
+                return new Mealy(block.getName(), rect, color, drawingPanel);
             case CLOCK:
                 return new Clock(block.getName(), rect, color, drawingPanel);
             case COMB:
@@ -397,6 +406,11 @@ public abstract class Manager extends JPanel
         }   
     }
 
+    /**
+     * Uses JOptionPane to get an integer input
+     * @param message : the message to be shown
+     * @return int : the integer value entered
+     */
     protected int getIntegerInput(String message)
     {
         boolean validInput = false;
@@ -419,6 +433,12 @@ public abstract class Manager extends JPanel
         return number;
     }
 
+    /**
+     * Uses JOptionPane to get a String input
+     * @param message : the message to be shown
+     * @param title : the title of the JOptionPane
+     * @return String : the message entered
+     */ 
     protected String getStringInput(String message, String title)
     {
         String ans = JOptionPane.showInputDialog(null, message, title, JOptionPane.QUESTION_MESSAGE);
@@ -439,29 +459,27 @@ public abstract class Manager extends JPanel
         return this.frame;
     }
 
-    public void goHome()
-    {
-        int option = JOptionPane.showInternalConfirmDialog(null, "Do you want to go back to home page?", "Go home", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
-
-        if(option == 0)
-        {
-            drawingPanel.clear();
-            frame.change(DrawingApp.HOME);
-        }
-    }
-
     protected abstract Item [] getItems();
     protected abstract void generateFile(JTextArea area);
     protected abstract String getFunctionLabel();
 }
 
+/**
+ * This class is used for managing the main circuit diagram
+ */
 class ManageMainCircuit extends Manager
 {
+    /**
+     * @param frame : The DrawingApp in which this object is to be placed in
+     */
     public ManageMainCircuit(DrawingApp frame)
     {
         super(frame);
     }
 
+    /**
+     * @return Item [] returns the items that are to be added to the JMenuBar
+     */
     protected Item [] getItems()
     {
         Item [] items = 
@@ -469,6 +487,7 @@ class ManageMainCircuit extends Manager
             new Item(Manager.Blocks.INPUT, DrawCircuit.Mode.BOX, Color.ORANGE, this),
             new Item(Manager.Blocks.CLOCK, DrawCircuit.Mode.BOX, Color.BLUE, this),
             new Item(Manager.Blocks.MOORE, DrawCircuit.Mode.BOX, Color.GREEN, this),
+            new Item(Manager.Blocks.MEALY, DrawCircuit.Mode.BOX, Color.GREEN, this),
             new Item(Manager.Blocks.COMB, DrawCircuit.Mode.BOX, Color.RED, this),
             new Item(Manager.Blocks.OUTPUT, DrawCircuit.Mode.BOX, Color.PINK, this),
             new Item(Manager.Blocks.WIRE, DrawCircuit.Mode.LINE, Color.BLACK, this),
@@ -477,6 +496,10 @@ class ManageMainCircuit extends Manager
         return items;
     }
 
+    /**
+     * Generates the python file.
+     * @param area : the JTextArea with all the functions
+     */
     protected void generateFile(JTextArea area)
     {
         int option = JOptionPane.showInternalConfirmDialog(null, "Do you want to generate a CSV file?", 
@@ -506,6 +529,9 @@ class ManageMainCircuit extends Manager
         }
     }
 
+    /**
+     * @return String: the label on top of the JTextArea
+     */
     protected String getFunctionLabel()
     {
         return "Add Functions Here:";
@@ -518,7 +544,7 @@ class ManageMainCircuit extends Manager
 class MenuBar extends JMenuBar 
 {
     private JMenu drawMenu, fileMenu;                       //the draw menu allows the user to draw on the pannel, and the file menu allows the user to save the project
-    private JMenuItem saveImage, home;                      //this item allows the user to save the image
+    private JMenuItem saveImage;                            //this item allows the user to save the image
 
     /**
      * Creates a Menubar and add the different items.
@@ -528,14 +554,10 @@ class MenuBar extends JMenuBar
     {
         fileMenu = new JMenu("File");
         saveImage = new JMenuItem("Save Image");
-        home = new JMenuItem("Go to Home Page");
 
         saveImage.addActionListener(e -> manage.saveImage());
         fileMenu.add(saveImage);
         
-        home.addActionListener(e -> manage.goHome());
-        fileMenu.add(home);
-
         this.add(fileMenu);
 
         drawMenu = new JMenu("Add Component");
@@ -543,6 +565,10 @@ class MenuBar extends JMenuBar
         this.add(drawMenu);
     }
 
+    /**
+     * Adds a menu item to the draw menu
+     * @param item : the menu item
+     */
     public void addMenuItem(JMenuItem item)
     {
         drawMenu.add(item);

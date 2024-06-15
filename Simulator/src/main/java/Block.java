@@ -516,6 +516,7 @@ class Moore extends RectangleBlock
         map.put("nsl", createTextField("lambda ps, i: 0"));
         map.put("ol", createTextField("lambda ps, i: 0"));
         map.put("startingState", createIntField(0, 0, Integer.MAX_VALUE));
+        map.put("risingEdge", createOptions(new String [] {"True", "False"}, "True"));
         map.put("Delete", createDeleteButton("Delete Moore Machine"));
         setMap(map);
     }
@@ -527,7 +528,7 @@ class Moore extends RectangleBlock
     public String toString()
     {
         return getObjectName() + " = pysim.moore(maxOutSize = "+getMaxOutSize() + ", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +  
-            ", nsl = " + getNSL() +", ol = " + getOL() + ", startingState = " + getStartingState() + ")";
+            ", nsl = " + getNSL() +", ol = " + getOL() + ", startingState = " + getStartingState() + ", risingEdge = " + getRisingEdge() +")";
     }
 
     /**
@@ -560,6 +561,15 @@ class Moore extends RectangleBlock
     public Integer getStartingState()
     {
         return (Integer)(((JSpinner)(getMap().get("startingState"))).getValue());
+    }
+
+    /**
+     * @return true if the registers should change on the rising edge of the clock; false otherwise
+     */
+    @SuppressWarnings("unchecked")
+    public String getRisingEdge()
+    {
+        return (String)(((JComboBox<String>)(getMap().get("risingEdge"))).getSelectedItem());
     }
 
     /**
@@ -596,6 +606,39 @@ class Moore extends RectangleBlock
     public String getType() 
     {
         return "Moore";
+    }
+}
+
+class Mealy extends Moore
+{
+     /**
+     * Creates a Mealy machine block.
+     * @param name : the name of the block
+     * @param rect : the rectangle which is to be drawn
+     * @param color : the color of the rectangle
+     * @param panel : the DrawCircuit on which the rectangle is to be drawn
+     */
+    public Mealy(String name, Rectangle rect, Color color, DrawCircuit panel)
+    {
+        super(name, rect, color, panel);
+    }
+
+    /**
+     * @return String representation of the Block
+     */
+    @Override
+    public String toString()
+    {
+        return getObjectName() + " = pysim.mealy(maxOutSize = "+getMaxOutSize() + ", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +  
+            ", nsl = " + getNSL() +", ol = " + getOL() + ", startingState = " + getStartingState() + ", risingEdge = " + getRisingEdge() +")";
+    }
+
+    /**
+     * @return the type of the block ("Mealy")
+     */
+    public String getType()
+    {
+        return "Mealy";
     }
 }
 

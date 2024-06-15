@@ -765,7 +765,7 @@ The Graphical User Interface (GUI) is implemented in java and allows the user to
 In order to run the program, type the following command in the command window.
 
 ```
-java -jar MooreMachineSimulator.jar
+java -jar FiniteStateMachineSimulation.jar
 ```
 
 ## <ins>Creating Blocks</ins>
@@ -777,6 +777,8 @@ The following window opens up when one runs the above command:
 At the top, the window contains a Menubar with the options for "File" and "Add Component". If "File" is pressed, there is an option to save the image that the user has drawn in the center panel. If "Add Component" is pressed, different components such as Moore Machine, Input Block, Clock, Combinational Block, Output Block, and Wires can be drawn in the center panel. 
 
 On the left, the information relating to the block can be seen, and, on the bottom left, the user can type functions in python that he or she may want such as the next state logic or the output logic. Finally, there is a button to generate the python code that represents the drawings that he or she has created. This python code would be made using the above mentioned format and the user can run the program to see the plots.
+
+On the bottom, there is a slider with which you can zoom in and out. You can also zoom in and out using your mousepad.
 
 When a block is added, in this case a Moore Machine, the window would look something like the following. 
 
@@ -796,7 +798,7 @@ A wire has the properties as shown in the diagram in the left panel. The output 
 
 NOTE : These LSB and the MSB's must be set on the last wire (i.e., the wire whose arrow points to a block and not another wire.) All other wires would be ignored.
 
-If the wire is a clock wire, the color of the wire becomes orange. Again the last wire (i.e., the wire whose arrow points to a block and not another wire should be set as the clock wire.) All other wires would be ignored. If the wire does not connect a clock to a moore machine, but is set as the clock wire, that wire would be considered as a normal wire.
+If the wire is a clock wire, the color of the wire becomes orange. Again the last wire (i.e., the wire whose arrow points to a block and not another wire should be set as the clock wire.) All other wires would be ignored. If the wire does not connect a to a moore/mealy machine, but is set as the clock wire, that wire would be considered as a normal wire.
 In the example shown above, the orange wire connects the clock to the moore machine as a clock and the black wire connects the clock to the moore machine as an input to the machine. 
 
 Finally, the blocks which the wire connects are also shown on the left. Whenever one makes a connection, one should look at these fields first to see if that is the intended connection. 

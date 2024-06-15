@@ -1,3 +1,11 @@
+/**
+ * This is the DrawCircuit file which allows the user to draw different components on the panel. 
+ * 
+ * @author Aryan, Abhirath, Gathik
+ * @version 1.0
+ * @since 06/08/2024
+ */
+
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -50,7 +58,7 @@ public class DrawCircuit extends JPanel
     public static final double TOLERANCE = 10.0;    //Tolerance to determine whether the point is near
     private double zoom, translateX, translateY;    //Allows for zooming in and out
     private int baseWidth, baseHeight;              //The initial widths and heights of the panel
-    private Mode drawingMode;           //The initial drawing mode is None
+    private Mode drawingMode;                       //The initial drawing mode is None
     private Point startPoint;                       //The starting point for the box or line
     private ArrayList<Block> rectangles;            //An ArrayList object that contains all the rectangles
     private ArrayList<Block> wires;                 //An ArrayList object that contains all the wires
@@ -195,6 +203,11 @@ public class DrawCircuit extends JPanel
 
         addMouseWheelListener(new MouseWheelListener() 
         {
+            /**
+             * Is called when the mouse wheel moves.
+             * 
+             * @param e : the mouse wheel event
+             */
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) 
             {
@@ -218,6 +231,10 @@ public class DrawCircuit extends JPanel
         addMouseMotionListener(mouseAdapter);
     }
 
+    /**
+     * Sets the zoom value to the one given.
+     * @param zoom : the new zoom value
+    */
     public void setZoom(double zoom)
     {
         this.zoom = zoom;
@@ -225,6 +242,13 @@ public class DrawCircuit extends JPanel
         repaint();
     }
 
+    /**
+     * Sets the zoom value to the one given taking into considerations the previous zoom value.
+     * @param newZoom : the new zoom value
+     * @param x : the old translateX coordinate
+     * @param y : the old translateY coordinate
+     * @param oldZoom : the old zoom value
+     */
     private void setZoom(double newZoom, int x, int y, double oldZoom)
     {
         double oldZoomX = (x - translateX) / oldZoom;
@@ -630,6 +654,9 @@ public class DrawCircuit extends JPanel
         }
     }
 
+    /**
+     * Resets everything
+     */
     public void clear()
     {
         Block.reset();
@@ -649,6 +676,9 @@ public class DrawCircuit extends JPanel
         setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }   
 
+    /**
+     * Used to change the width and height of the panel
+     */
     @Override
     public void addNotify()
     {
@@ -657,18 +687,33 @@ public class DrawCircuit extends JPanel
         baseHeight = getHeight();
     }
 
+    /**
+     * Adjusts the preferred size of the window after a rectangle is drawn
+     * @param rect : the drawn rectangle
+     */
     private void adjustPreferredSize(Rectangle rect)
     {
         int x1 = rect.x, y1 = rect.y, x2 = rect.x + rect.width, y2 = rect.y + rect.height;
         adjustPreferredSize(x1, y1, x2, y2);
     }
 
+    /**
+     * Adjusts the preferred size of the window after a line is drawn
+     * @param line : the drawn line
+     */
     private void adjustPreferredSize(Line2D line)
     {
         int x1 = (int)(line.getX1()), y1 = (int)(line.getY1()), x2 = (int)(line.getX2()), y2 = (int)(line.getY2());
         adjustPreferredSize(x1, y1, x2, y2);
     }
 
+    /**
+     * Adjusts the preferred size of the window after somethign is drawn
+     * @param x1 : x1 coordinate
+     * @param y1 : y1 coordinate
+     * @param x2 : x2 coordinate
+     * @param y2 : y2 coordinate
+     */
     private void adjustPreferredSize(int x1, int y1, int x2, int y2)
     {
         int maxX = (int) (Math.max(x1, x2) / zoom);
@@ -679,6 +724,9 @@ public class DrawCircuit extends JPanel
         revalidate();
     }
 
+    /**
+     * @return Dimension: the preferred size of this panel
+     */
     @Override
     public Dimension getPreferredSize() 
     {

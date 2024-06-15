@@ -9,6 +9,7 @@
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import java.util.ArrayList;
 
 import javax.swing.JTextArea;
@@ -17,6 +18,8 @@ import java.io.File;
 
 public class FileIO 
 {
+    public static final String README = "/README.md";
+
     private FileIO(){}
 
     /**
@@ -31,7 +34,6 @@ public class FileIO
     public static void generateCircuitFile(String path, ArrayList<Block> block, ArrayList<Block> wires, JTextArea area, int generateCSV, int time) throws IOException
     {
         PrintWriter pw = new PrintWriter(new FileWriter(new File(path)));
-        
         writeImport(pw);
         writeFunctions(pw,  area);
         writeBlock(pw, block);
@@ -43,7 +45,7 @@ public class FileIO
 
         pw.close();
 
-    }    
+    }  
 
     /**
      * Write the import statements in the file.
@@ -92,7 +94,7 @@ public class FileIO
                 String outputString = ".output";
                 String inputString = ".input";
                 
-                if(startBlock instanceof Clock && endBlock instanceof Moore && wire.isClocked())
+                if(endBlock instanceof Moore && wire.isClocked())
                     inputString = ".clock";
 
                 if(outputMSB == null || outputLSB == null)
