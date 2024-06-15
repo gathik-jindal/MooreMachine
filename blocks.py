@@ -321,6 +321,7 @@ class HasRegisters(Block):
         self._clkVal = []
         if self._clkObj:
             self._clkVal =  self._clkObj._output
+            self._clkObj.addFanOut(self, 1)
         self._isClock = 0
         startingState = kwargs.get("startingState", 0)
         self.__presentState = startingState
