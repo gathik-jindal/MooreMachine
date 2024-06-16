@@ -183,9 +183,9 @@ public abstract class Block
      */
     private void applyFormatting(Component component)
     {
-        component.setFont(new Font("Arial", Font.PLAIN, 12));
-        component.setPreferredSize(new Dimension(200, 25));
-        component.setMaximumSize(new Dimension(200, 25));
+        component.setFont(new Font("Arial", Font.PLAIN, 9));
+        component.setPreferredSize(new Dimension(200, 20));
+        component.setMaximumSize(new Dimension(200, 20));
         component.setBackground(Color.WHITE);
     }
 
@@ -517,6 +517,10 @@ class Moore extends RectangleBlock
         map.put("ol", createTextField("lambda ps, i: 0"));
         map.put("startingState", createIntField(0, 0, Integer.MAX_VALUE));
         map.put("risingEdge", createOptions(new String [] {"True", "False"}, "True"));
+        map.put("nsl_delay", createTextField("0.01"));
+        map.put("ol_delay", createTextField("0.01"));
+        map.put("register_delay", createTextField("0.01"));
+
         map.put("Delete", createDeleteButton("Delete Moore Machine"));
         setMap(map);
     }
@@ -528,7 +532,8 @@ class Moore extends RectangleBlock
     public String toString()
     {
         return getObjectName() + " = pysim.moore(maxOutSize = "+getMaxOutSize() + ", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +  
-            ", nsl = " + getNSL() +", ol = " + getOL() + ", startingState = " + getStartingState() + ", risingEdge = " + getRisingEdge() +")";
+            ", nsl = " + getNSL() +", ol = " + getOL() + ", startingState = " + getStartingState() + ", risingEdge = " + getRisingEdge() +
+            "nsl_delay = " + getNSLDelay() + "ol_delay = " + getOLDelay() + "register_delay = " + getRegisterDelay()  + ")";
     }
 
     /**
@@ -570,6 +575,30 @@ class Moore extends RectangleBlock
     public String getRisingEdge()
     {
         return (String)(((JComboBox<String>)(getMap().get("risingEdge"))).getSelectedItem());
+    }
+
+    /**
+     * @return the next state logic delay of the machine
+     */
+    public String getNSLDelay()
+    {
+        return (String)(((JTextField)(getMap().get("nsl_delay"))).getText());
+    }
+
+    /**
+     * @return the output logic delay of the machine
+     */
+    public String getOLDelay()
+    {
+        return (String)(((JTextField)(getMap().get("ol_delay"))).getText());
+    }
+
+    /**
+     * @return the register delay of the machine
+     */
+    public String getRegisterDelay()
+    {
+        return (String)(((JTextField)(getMap().get("register_delay"))).getText());
     }
 
     /**
@@ -630,7 +659,17 @@ class Mealy extends Moore
     public String toString()
     {
         return getObjectName() + " = pysim.mealy(maxOutSize = "+getMaxOutSize() + ", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +  
-            ", nsl = " + getNSL() +", ol = " + getOL() + ", startingState = " + getStartingState() + ", risingEdge = " + getRisingEdge() +")";
+            ", nsl = " + getNSL() +", ol = " + getOL() + ", startingState = " + getStartingState() + ", risingEdge = " + getRisingEdge() +
+            "nsl_delay = " + getNSLDelay() + "ol_delay = " + getOLDelay() + "register_delay = " + getRegisterDelay()  + ")";
+    }
+
+    /**
+     * @return String representation of the object name which will be written in the python file
+     */
+    @Override
+    public String getObjectName()
+    {
+        return "mealy" + super.toString();
     }
 
     /**

@@ -846,7 +846,7 @@ class InfoPanel extends JPanel
         textArea.setTabSize(4);
 
         JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new Dimension(200, 200));
+        scrollPane.setPreferredSize(new Dimension(200, 100));
 
         centerPanel.add(functions, BorderLayout.NORTH);
         centerPanel.add(scrollPane, BorderLayout.CENTER);
@@ -879,7 +879,7 @@ class InfoPanel extends JPanel
         for (String label : info.keySet()) 
         {
             JLabel jLabel = new JLabel(label);
-            jLabel.setFont(new Font("Arial", Font.BOLD, 12));
+            jLabel.setFont(new Font("Arial", Font.BOLD, 9));
             jLabel.setForeground(Color.DARK_GRAY);
             jLabel.setHorizontalAlignment(JLabel.CENTER);
 
