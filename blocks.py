@@ -24,8 +24,6 @@ from utilities import checkType, printErrorAndExit
 import simpy
 from scope import Plotter, ScopeDump
 
-timeout = 0.1
-
 
 class Block(ABC):
     """
@@ -327,6 +325,7 @@ class HasRegisters(Block):
         self.__presentState = startingState
         self.__nextState = startingState
         self.__posEdge = kwargs.get("posEdge", True)
+        self.regDelay = kwargs.get("register_delay", 0.1)
         super().__init__(**kwargs)
 
     def __runReg(self):
@@ -335,7 +334,7 @@ class HasRegisters(Block):
         """
         if (not (bool(self._clkVal[0]) ^ self.__posEdge)):
             if self.__presentState != self.__nextState:
-                yield self._env.timeout(timeout)
+                yield self._env.timeout(self.regDelay)
                 self.__presentState = self.__nextState
                 self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.__presentState)
                 self.runOL()

@@ -26,8 +26,6 @@ from usableBlocks import *
 from pwlSource import InputGenerator
 import simpy
 
-timeout = 0.1
-
 
 class pydig:
     """
@@ -103,7 +101,7 @@ class pydig:
         self.__components.append(combObj)
         return combObj
 
-    def moore(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState = 0, risingEdge = True, clock  = None):
+    def moore(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState = 0, risingEdge = True, clock  = None, nsl_delay = 0.1, ol_delay = 0.1, register_delay = 0.1):
         """
         Adds a moore machine to this class. 
         @param maxOutSize : the maximum number of output wires
@@ -112,9 +110,14 @@ class pydig:
         @param nsl : next state logic function
         @param ol : output logic function
         @param startingState : the starting state of the moore machine
+        @param risingEdge : boolean value if the block works on rising edge or falling edge
+        @param clock : the clock object for this moore machine
+        @param nsl_delay : the delay in the next state logic
+        @param ol_delay : the delay in the output logic
+        @param register_delay : the delay in the register
         @return MooreMachine : the moore machine instance. 
         """
-        checkType([(plot, bool), (startingState, int)])
+        checkType([(plot, bool), (startingState, int), (risingEdge, bool), (nsl_delay, (int, float)), (ol_delay, (int, float))])
 
         self.__count += 1
         if (blockID == None):
@@ -125,11 +128,11 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = MooreMachine(env=self.__env, maxOutSize=maxOutSize, nsl=nsl, ol=ol, plot=plot, blockID=blockID, startingState=startingState, clk = clock, posEdge = risingEdge)
+        temp = MooreMachine(env=self.__env, maxOutSize=maxOutSize, nsl=nsl, ol=ol, plot=plot, blockID=blockID, startingState=startingState, clk = clock, posEdge = risingEdge, nsl_delay = nsl_delay, ol_delay = ol_delay, register_delay = register_delay)
         self.__components.append(temp)
         return temp
 
-    def mealy(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState=0, risingEdge = True, clock = None):
+    def mealy(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState=0, risingEdge = True, clock = None, nsl_delay = 0.1, ol_delay = 0.1, register_delay = 0.1):
         """
         Adds a mealy machine to this class. 
         @param maxOutSize : the maximum number of output wires
@@ -138,9 +141,14 @@ class pydig:
         @param nsl : next state logic function
         @param ol : output logic function
         @param startingState : the starting state of the moore machine
+        @param risingEdge : boolean value if the block works on rising edge or falling edge
+        @param clock : the clock object for this mealy machine
+        @param nsl_delay : the delay in the next state logic
+        @param ol_delay : the delay in the output logic
+        @param register_delay : the delay in the register
         @return MealyMachine : the mealy machine instance. 
         """
-        checkType([(plot, bool), (startingState, int)])
+        checkType([(plot, bool), (startingState, int), (risingEdge, bool), (nsl_delay, (int, float)), (ol_delay, (int, float))])
 
         self.__count += 1
         if (blockID == None):
@@ -151,7 +159,7 @@ class pydig:
             blockID = id
 
         self.__uniqueIDlist.append(blockID)
-        temp = MealyMachine(env=self.__env, maxOutSize=maxOutSize, nsl=nsl, ol=ol, plot=plot, blockID=blockID, startingState=startingState, clk = clock, posEdge = risingEdge)
+        temp = MealyMachine(env=self.__env, maxOutSize=maxOutSize, nsl=nsl, ol=ol, plot=plot, blockID=blockID, startingState=startingState, clk = clock, posEdge = risingEdge, nsl_delay = nsl_delay, ol_delay = ol_delay, register_delay = register_delay)
         self.__components.append(temp)
         return temp
 

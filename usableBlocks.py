@@ -14,12 +14,17 @@ class MooreMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         @param : env must be a simpy environment.
         @param : clock must be of type Clock.
         @param : nsl must be a valid function specifying next state logic.
+        @param : nsl_delay is the time taken by the NSL to run.
         @param : ol must be a valid function specifying output logic.
+        @param : ol_delay is the time taken by the OL to run.
         @param : blockID is the id of this input block. If blockId is a duplicate
                  or None, then new unique ID is given.
+        @param : register_delay is the time taken by the register to update.
         """
         self.nsl = kwargs.get("nsl")
         self.ol = kwargs.get("ol")
+        self.nsl_delay = kwargs.get("nsl_delay", 0.1)
+        self.ol_delay = kwargs.get("ol_delay", 0.1)
         super().__init__(**kwargs)
         self._scopeDump.add(f"Input to {self.getBlockID()}", 0, self._output[0])
 
@@ -38,7 +43,7 @@ class MooreMachine(HasInputConnections, HasOutputConnections, HasRegisters):
 
         # running the NSL
         tempout = self.nsl(self.getPS(), self.getInputVal())
-        yield self._env.timeout(timeout)
+        yield self._env.timeout(self.nsl_delay)
 
         # updating the next State
         self.setNS(tempout)
@@ -51,7 +56,7 @@ class MooreMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         """
 
         temp = self.ol(self.getPS())
-        yield self._env.timeout(timeout)
+        yield self._env.timeout(self.ol_delay)
         self._output[0] = temp
         self._scopeDump.add(f"output of {self.getBlockID()}", self._env.now, self._output[0])
 
@@ -98,12 +103,17 @@ class MealyMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         @param : env must be a simpy environment.
         @param : clock must be of type Clock.
         @param : nsl must be a valid function specifying next state logic.
+        @param : nsl_delay is the time taken by the NSL to run.
         @param : ol must be a valid function specifying output logic.
+        @param : ol_delay is the time taken by the OL to run.
         @param : blockID is the id of this input block. If blockId is a duplicate
                  or None, then new unique ID is given.
+        @param : register_delay is the time taken by the register to update.
         """
         self.nsl = kwargs.get("nsl")
+        self.nsl_delay = kwargs.get("nsl_delay", 0.1)
         self.ol = kwargs.get("ol")
+        self.ol_delay = kwargs.get("ol_delay", 0.1)
         super().__init__(**kwargs)
         self._scopeDump.add(f"Input to {self.getBlockID()}", 0, self._output[0])
 
@@ -122,7 +132,7 @@ class MealyMachine(HasInputConnections, HasOutputConnections, HasRegisters):
 
         # running the NSL
         tempout = self.nsl(self.getPS(), self.getInputVal())
-        yield self._env.timeout(timeout)
+        yield self._env.timeout(self.nsl_delay)
 
         # updating the next State
         self.setNS(tempout)
@@ -135,7 +145,7 @@ class MealyMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         """
 
         temp = self.ol(self.getPS(), self.getInputVal())
-        yield self._env.timeout(timeout)
+        yield self._env.timeout(self.ol_delay)
         self._output[0] = temp
         self._scopeDump.add(f"output of {self.getBlockID()}", self._env.now, self._output[0])
 

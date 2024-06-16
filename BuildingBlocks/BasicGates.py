@@ -360,7 +360,7 @@ class SISO:
         """
         checkType([(pydig, pd), (delay, (float, int)), (num, (int)), (initialValue, int), (plot, bool), (blockID, str)])
 
-        self.__registers = [pd.moore(pydig, 1, True, blockID + f" - {str(i)}", lambda x, y: y, lambda x : x, initialValue, True) for i in range(num)]
+        self.__registers = [pd.moore(pydig, 1, True, blockID + f" - {str(i)}", lambda x, y: y, lambda x : x, initialValue, True, clock, 0, 0, delay) for i in range(num)]
 
         for i in range(num - 1):
             self.__registers[i].output() > self.__registers[i+1].input()
@@ -394,7 +394,7 @@ if __name__ == "__main__":
     
     pysim = pd("Basic Gates")
 
-    clock = pysim.clock(plot=True, onTime=0.5, timePeriod=1)
+    clock = pysim.clock(plot=True, onTime=0.5, timePeriod=1, initialValue=1)
     clock2 = pysim.clock(plot=True, onTime=2, timePeriod=4)
 
     siso = SISO(pysim, None, 0, 3, 0, True, "SISO")
