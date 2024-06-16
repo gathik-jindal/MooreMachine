@@ -60,7 +60,6 @@ class Block(ABC):
         self.__blockID = i
         return self.__blockID
 
-
     def getScopeDump(self):
         """
         Returns the scope dump values for this block.
@@ -75,7 +74,8 @@ class Block(ABC):
         @return : None
         """
         if self.__plot:
-            Block.plotter.plot(self.getScopeDump(), f"Plot of {self.getBlockID()}")
+            Block.plotter.plot(self.getScopeDump(),
+                               f"Plot of {self.getBlockID()}")
 
     @abstractmethod
     def __str__(self):
@@ -129,9 +129,9 @@ class HasInputConnections(Block):
         @param other : must be of type HasOutputConnections.
         @return bool : True
         """
-        
+
         checkType([(other, (HasOutputConnections))])
-        
+
         if (isinstance(self, HasRegisters) and self._isClock == 1):
             self._clkVal = other._output
             other.addFanOut(self, 1)
@@ -140,7 +140,8 @@ class HasInputConnections(Block):
             return True
 
         self.__input.append(other._output)
-        self.__inputSizes.append((other.getLeft(), other.getRight(), other.getWidth()))
+        self.__inputSizes.append(
+            (other.getLeft(), other.getRight(), other.getWidth()))
         self.__inputCount += 1
         self.__isConnected = True
         other.addFanOut(self)
@@ -174,7 +175,8 @@ class HasInputConnections(Block):
         ans = 0
         factor = 1
         for i in range(self.__inputCount):
-            ans += self.__strip(self.__input[i][0], self.__inputSizes[i][0], self.__inputSizes[i][1]) * factor
+            ans += self.__strip(self.__input[i][0], self.__inputSizes[i]
+                                [0], self.__inputSizes[i][1]) * factor
             factor = factor * (2 ** self.__inputSizes[i][2])
         return ans
 
@@ -220,13 +222,11 @@ class HasOutputConnections(Block):
         self.__regList = []
         super().__init__(**kwargs)
 
-
     def addFanOut(self, other, val=0):
         if isinstance(other, HasRegisters) and val == 1:
             self.__regList.append(other)
         else:
             self.__fanOutList.append(other)
-
 
     def resetState(self):
         """
@@ -252,7 +252,6 @@ class HasOutputConnections(Block):
         """
         return self.__state[2]
 
-
     def __gt__(self, other):
         """
         Makes it possible to do the following connection:
@@ -274,6 +273,7 @@ class HasOutputConnections(Block):
             i.run()
         for i in self.__regList:
             i.runReg()
+
 
 class HasOnlyOutputConnections(HasOutputConnections):
     """
@@ -318,14 +318,14 @@ class HasRegisters(Block):
         self._clkObj = kwargs.get("clk", None)
         self._clkVal = []
         if self._clkObj:
-            self._clkVal =  self._clkObj._output
+            self._clkVal = self._clkObj._output
             self._clkObj.addFanOut(self, 1)
         self._isClock = 0
         startingState = kwargs.get("startingState", 0)
         self.__presentState = startingState
         self.__nextState = startingState
         self.__posEdge = kwargs.get("posEdge", True)
-        self.regDelay = kwargs.get("register_delay", 0.1)
+        self.regDelay = kwargs.get("register_delay", 0.01)
         super().__init__(**kwargs)
 
     def __runReg(self):
@@ -336,7 +336,8 @@ class HasRegisters(Block):
             if self.__presentState != self.__nextState:
                 yield self._env.timeout(self.regDelay)
                 self.__presentState = self.__nextState
-                self._scopeDump.add(f"PS of {self.getBlockID()}", self._env.now, self.__presentState)
+                self._scopeDump.add(
+                    f"PS of {self.getBlockID()}", self._env.now, self.__presentState)
                 self.runOL()
                 self.runNSL()
 
@@ -349,7 +350,7 @@ class HasRegisters(Block):
     def getPS(self):
         return self.__presentState
 
-    def setNS(self,val):
+    def setNS(self, val):
         self.__nextState = val
 
     def clock(self):
@@ -409,19 +410,23 @@ if __name__ == "__main__":
 
     # Creating an source object and connecting it to the required file
     PWM_Path = "Tests\\PWM.csv"
-    PWM_Input = pysim.source(filePath=PWM_Path, plot=False, blockID="PWM Input")
+    PWM_Input = pysim.source(
+        filePath=PWM_Path, plot=False, blockID="PWM Input")
 
     # Creating the clock
     clk = pysim.clock(plot=False, blockID="clk", timePeriod=1, onTime=0.5)
 
     # Creating the moore machine
-    mod4Counter = pysim.moore(maxOutSize=2, plot=True, blockID="Mod 4 Counter", startingState=0)
+    mod4Counter = pysim.moore(maxOutSize=2, plot=True,
+                              blockID="Mod 4 Counter", startingState=0)
     mod4Counter.nsl = nsl
     mod4Counter.ol = ol
 
     # Creating the comparators
-    syncResetComparator = pysim.combinational(maxOutSize=1, plot=False, blockID="Sync Reset Comparator", func=lambda x: int((x & 3) == (x >> 2)), delay=0)
-    outputComparator = pysim.combinational(maxOutSize=1, plot=False, blockID="Output Comparator", func=lambda x: int((x & 3) > (x >> 2)), delay=0)
+    syncResetComparator = pysim.combinational(
+        maxOutSize=1, plot=False, blockID="Sync Reset Comparator", func=lambda x: int((x & 3) == (x >> 2)), delay=0)
+    outputComparator = pysim.combinational(
+        maxOutSize=1, plot=False, blockID="Output Comparator", func=lambda x: int((x & 3) > (x >> 2)), delay=0)
 
     # Final output object
     finalOutput = pysim.output(plot=True, blockID="PWM Output")

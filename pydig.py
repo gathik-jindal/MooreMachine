@@ -101,7 +101,7 @@ class pydig:
         self.__components.append(combObj)
         return combObj
 
-    def moore(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState = 0, risingEdge = True, clock  = None, nsl_delay = 0.1, ol_delay = 0.1, register_delay = 0.1):
+    def moore(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState = 0, risingEdge = True, clock  = None, nsl_delay = 0.01, ol_delay = 0.01, register_delay = 0.01):
         """
         Adds a moore machine to this class. 
         @param maxOutSize : the maximum number of output wires
@@ -132,7 +132,7 @@ class pydig:
         self.__components.append(temp)
         return temp
 
-    def mealy(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState=0, risingEdge = True, clock = None, nsl_delay = 0.1, ol_delay = 0.1, register_delay = 0.1):
+    def mealy(self, maxOutSize, plot=False, blockID=None, nsl=lambda ps, i: 0, ol=lambda ps: 0, startingState=0, risingEdge = True, clock = None, nsl_delay = 0.01, ol_delay = 0.01, register_delay = 0.01):
         """
         Adds a mealy machine to this class. 
         @param maxOutSize : the maximum number of output wires

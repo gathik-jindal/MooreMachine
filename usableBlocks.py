@@ -23,10 +23,11 @@ class MooreMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         """
         self.nsl = kwargs.get("nsl")
         self.ol = kwargs.get("ol")
-        self.nsl_delay = kwargs.get("nsl_delay", 0.1)
-        self.ol_delay = kwargs.get("ol_delay", 0.1)
+        self.nsl_delay = kwargs.get("nsl_delay", 0.01)
+        self.ol_delay = kwargs.get("ol_delay", 0.01)
         super().__init__(**kwargs)
-        self._scopeDump.add(f"Input to {self.getBlockID()}", 0, self._output[0])
+        self._scopeDump.add(
+            f"Input to {self.getBlockID()}", 0, self._output[0])
 
     def __str__(self):
         """
@@ -39,7 +40,8 @@ class MooreMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         Runs the next state logic if the input to this machine changed.
         """
         # adding the inputs to scopedump
-        self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self.getInputVal())
+        self._scopeDump.add(
+            f"Input to {self.getBlockID()}", self._env.now, self.getInputVal())
 
         # running the NSL
         tempout = self.nsl(self.getPS(), self.getInputVal())
@@ -47,8 +49,8 @@ class MooreMachine(HasInputConnections, HasOutputConnections, HasRegisters):
 
         # updating the next State
         self.setNS(tempout)
-        self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.getNS())
-
+        self._scopeDump.add(
+            f"NS of {self.getBlockID()}", self._env.now, self.getNS())
 
     def __runOL(self):
         """
@@ -58,16 +60,17 @@ class MooreMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         temp = self.ol(self.getPS())
         yield self._env.timeout(self.ol_delay)
         self._output[0] = temp
-        self._scopeDump.add(f"output of {self.getBlockID()}", self._env.now, self._output[0])
+        self._scopeDump.add(
+            f"output of {self.getBlockID()}", self._env.now, self._output[0])
 
         # triggering events for the connected machines
         self.processFanOut()
 
     def runNSL(self):
-        self._env.process(self.__runNSL())      
+        self._env.process(self.__runNSL())
 
     def runOL(self):
-        self._env.process(self.__runOL())        
+        self._env.process(self.__runOL())
 
     def run(self):
         """
@@ -91,6 +94,7 @@ class MooreMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         self._isClock = 0  # 1 for clock, 0 for clock as input and -1 for not being used
         return self
 
+
 class MealyMachine(HasInputConnections, HasOutputConnections, HasRegisters):
     """
     A machine is both a HasInputConnections block and a HasOutputConnections block.
@@ -111,11 +115,12 @@ class MealyMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         @param : register_delay is the time taken by the register to update.
         """
         self.nsl = kwargs.get("nsl")
-        self.nsl_delay = kwargs.get("nsl_delay", 0.1)
+        self.nsl_delay = kwargs.get("nsl_delay", 0.01)
         self.ol = kwargs.get("ol")
-        self.ol_delay = kwargs.get("ol_delay", 0.1)
+        self.ol_delay = kwargs.get("ol_delay", 0.01)
         super().__init__(**kwargs)
-        self._scopeDump.add(f"Input to {self.getBlockID()}", 0, self._output[0])
+        self._scopeDump.add(
+            f"Input to {self.getBlockID()}", 0, self._output[0])
 
     def __str__(self):
         """
@@ -128,7 +133,8 @@ class MealyMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         Runs the next state logic if the input to this machine changed.
         """
         # adding the inputs to scopedump
-        self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self.getInputVal())
+        self._scopeDump.add(
+            f"Input to {self.getBlockID()}", self._env.now, self.getInputVal())
 
         # running the NSL
         tempout = self.nsl(self.getPS(), self.getInputVal())
@@ -136,8 +142,8 @@ class MealyMachine(HasInputConnections, HasOutputConnections, HasRegisters):
 
         # updating the next State
         self.setNS(tempout)
-        self._scopeDump.add(f"NS of {self.getBlockID()}", self._env.now, self.getNS())
-
+        self._scopeDump.add(
+            f"NS of {self.getBlockID()}", self._env.now, self.getNS())
 
     def __runOL(self):
         """
@@ -147,16 +153,17 @@ class MealyMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         temp = self.ol(self.getPS(), self.getInputVal())
         yield self._env.timeout(self.ol_delay)
         self._output[0] = temp
-        self._scopeDump.add(f"output of {self.getBlockID()}", self._env.now, self._output[0])
+        self._scopeDump.add(
+            f"output of {self.getBlockID()}", self._env.now, self._output[0])
 
         # triggering events for the connected machines
         self.processFanOut()
 
     def runNSL(self):
-        self._env.process(self.__runNSL())      
+        self._env.process(self.__runNSL())
 
     def runOL(self):
-        self._env.process(self.__runOL())        
+        self._env.process(self.__runOL())
 
     def run(self):
         """
@@ -205,7 +212,8 @@ class Input(HasOnlyOutputConnections):
 
         self.__input = inputList
         super().__init__(maxOutSize=maxOutSize, **kwargs)
-        self._scopeDump.add(f"Input to {self.getBlockID()}", 0, self._output[0])
+        self._scopeDump.add(
+            f"Input to {self.getBlockID()}", 0, self._output[0])
 
     def __str__(self):
         """
@@ -221,7 +229,8 @@ class Input(HasOnlyOutputConnections):
             yield self._env.timeout(i[0]-self._env.now)
 
             self._output[0] = i[1]
-            self._scopeDump.add(f"Input to {self.getBlockID()}", self._env.now, self._output[0])
+            self._scopeDump.add(
+                f"Input to {self.getBlockID()}", self._env.now, self._output[0])
             self.processFanOut()
 
 
@@ -245,9 +254,11 @@ class Clock(HasOnlyOutputConnections):
         onTime = kwargs.get("onTime", 0.5)
         initialValue = kwargs.get("initialValue", 0)
 
-        checkType([(timePeriod, (int, float)),(onTime, (int, float)), (initialValue, int)])
+        checkType([(timePeriod, (int, float)),
+                  (onTime, (int, float)), (initialValue, int)])
         if (timePeriod < onTime):
-            printErrorAndExit(f"Clock {self} cannot have timePeriod = {timePeriod} less than onTime = {onTime}.")
+            printErrorAndExit(f"Clock {self} cannot have timePeriod = {
+                              timePeriod} less than onTime = {onTime}.")
 
         self.__timePeriod = timePeriod
         self.__onTime = onTime
@@ -255,8 +266,8 @@ class Clock(HasOnlyOutputConnections):
         self._output[0] = initialValue
         self._scopeDump.add(f"Clock {self.getBlockID()}", 0, self._output[0])
 
-
     # left, right are for future versions. NOT USED IN CURRENT VERSION.
+
     def output(self, left=None, right=None):
         """
         @return Clock : this object for connection purposes.
@@ -276,7 +287,8 @@ class Clock(HasOnlyOutputConnections):
         while True:
             yield self._env.timeout((1-self._output[0])*(self.__timePeriod - self.__onTime)+self._output[0]*(self.__onTime))
             self._output[0] = 1 - self._output[0]
-            self._scopeDump.add(f"Clock {self.getBlockID()}", self._env.now, self._output[0])
+            self._scopeDump.add(
+                f"Clock {self.getBlockID()}", self._env.now, self._output[0])
             self.processFanOut()
 
 
@@ -308,7 +320,8 @@ class Output(HasInputConnections):
         Adds the output value to this class every time there is a change in it.
         """
         yield self._env.timeout(0.01)
-        self._scopeDump.add(f"Final Output from {self.getBlockID()}", self._env.now, self.getInputVal())
+        self._scopeDump.add(f"Final Output from {
+                            self.getBlockID()}", self._env.now, self.getInputVal())
 
     def run(self):
         """
@@ -361,7 +374,8 @@ class Combinational(HasInputConnections, HasOutputConnections):
         yield self._env.timeout(self.__delay)
         self._output[0] = self.__value
 
-        self._scopeDump.add(f"{self.getBlockID()} output", self._env.now, self._output[0])
+        self._scopeDump.add(f"{self.getBlockID()} output",
+                            self._env.now, self._output[0])
 
         self.processFanOut()
 
