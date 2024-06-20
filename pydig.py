@@ -232,6 +232,28 @@ class pydig:
         self.__components.append(temp)
         return temp
 
+    def register(self, clock, delay, initalValue=0, plot=False, blockID=None):
+        """
+        @param clock : the clock object for this register
+        @param delay : the delay in the register
+        @param initialValue : the initial value of the register
+        @param plot : boolean value whether to plot this register or not
+        @param blockID : the id of this register. If None, then new unique ID is given.
+        @return Register : the register object
+        """
+        self.__count += 1
+        if (blockID == None):
+            blockID = self.__makeUniqueID("Register")
+        elif blockID in self.__uniqueIDlist:
+            id = self.__makeUniqueID("Register")
+            print(f"{blockID} is already used so changing to {id}")
+            blockID = id
+        
+        self.__uniqueIDlist.append(blockID)
+        temp = Register(env=self.__env, clock=clock, delay=delay, initialValue=initalValue, plot=plot, blockID=blockID)
+        self.__components.append(temp)
+        return temp
+
     def run(self, until: int):
         """
         Runs each of the blocks that are added to this class for "until" time units. 
