@@ -1,3 +1,8 @@
+import random
+from blocks import HasRegisters
+from usableBlocks import Combinational as Comb
+from pydig import pydig as pd
+from utilities import checkType, bitCount
 import os
 import sys
 
@@ -6,18 +11,13 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-from utilities import checkType, bitCount
-from pydig import pydig as pd
-from usableBlocks import Combinational as Comb
-import random
-
 
 def n(val):
     """
     @param val (int): The value to be negated
     @return (int): The negated value
     """
-    
+
     mask = 1 if val == 0 else (1 << bitCount(val)) - 1
     return mask & ~val
 
@@ -36,10 +36,13 @@ class NOT(Comb):
         @param plot : boolean value whether to plot this moore machine or not
         @param blockID : the id of this moore machine. If None, then new unique ID is given.
         """
-        checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
-        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID, maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
+        checkType([(pydig, pd), (delay, (float, int)),
+                  (initialValue, int), (plot, bool), (blockID, str)])
+        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID,
+                         maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
 
-        pydig.combinationalFromObject(self)  # make this object a part of the pydig object
+        # make this object a part of the pydig object
+        pydig.combinationalFromObject(self)
 
     def __func(self, val):
         """
@@ -66,10 +69,13 @@ class AND(Comb):
         @param plot : boolean value whether to plot this block or not
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
-        checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
-        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID, maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
+        checkType([(pydig, pd), (delay, (float, int)),
+                  (initialValue, int), (plot, bool), (blockID, str)])
+        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID,
+                         maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
 
-        pydig.combinationalFromObject(self)  # make this object a part of the pydig object
+        # make this object a part of the pydig object
+        pydig.combinationalFromObject(self)
 
     def __func(self, val):
         """
@@ -78,7 +84,7 @@ class AND(Comb):
         """
         ans = 1
         while val:
-            ans = ans & (val%2)
+            ans = ans & (val % 2)
             val = val >> 1
         return ans
 
@@ -100,10 +106,13 @@ class OR(Comb):
         @param plot : boolean value whether to plot this block or not
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
-        checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
-        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID, maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
+        checkType([(pydig, pd), (delay, (float, int)),
+                  (initialValue, int), (plot, bool), (blockID, str)])
+        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID,
+                         maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
 
-        pydig.combinationalFromObject(self)  # make this object a part of the pydig object
+        # make this object a part of the pydig object
+        pydig.combinationalFromObject(self)
 
     def __func(self, val):
         """
@@ -112,7 +121,7 @@ class OR(Comb):
         """
         ans = 1
         while val:
-            ans = ans | (val%2)
+            ans = ans | (val % 2)
             val = val >> 1
         return ans
 
@@ -134,10 +143,13 @@ class XOR(Comb):
         @param plot : boolean value whether to plot this block or not
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
-        checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
-        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID, maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
+        checkType([(pydig, pd), (delay, (float, int)),
+                  (initialValue, int), (plot, bool), (blockID, str)])
+        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID,
+                         maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
 
-        pydig.combinationalFromObject(self)  # make this object a part of the pydig object
+        # make this object a part of the pydig object
+        pydig.combinationalFromObject(self)
 
     def __func(self, val):
         """
@@ -146,7 +158,7 @@ class XOR(Comb):
         """
         ans = 1
         while val:
-            ans = ans ^ (val%2)
+            ans = ans ^ (val % 2)
             val = val >> 1
         return ans
 
@@ -168,7 +180,8 @@ class NAND(Comb):
         @param plot : boolean value whether to plot this block or not
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
-        self.__andGate = AND(pydig, delay, initialValue, False, blockID + str(random.randint(10, 10000)))
+        self.__andGate = AND(pydig, delay, initialValue,
+                             False, blockID + str(random.randint(10, 10000)))
         self.__notGate = NOT(pydig, 0, initialValue, plot, blockID)
 
         self.__andGate.output() > self.__notGate.input()
@@ -184,7 +197,7 @@ class NAND(Comb):
         @return obj : instance of the notGate object
         """
         return self.__notGate.output(left, right)
-    
+
     def getScopeDump(self):
         """
         @return dict : the scope dump values for this block.
@@ -209,11 +222,12 @@ class NOR(Comb):
         @param plot : boolean value whether to plot this block or not
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
-        self.__orGate = OR(pydig, delay, initialValue, False, blockID + str(random.randint(10, 10000)))
+        self.__orGate = OR(pydig, delay, initialValue, False,
+                           blockID + str(random.randint(10, 10000)))
         self.__notGate = NOT(pydig, 0, initialValue, plot, blockID)
 
         self.__orGate.output() > self.__notGate.input()
-    
+
     def input(self, left=None, right=None):
         """
         @return obj : instance of the orGate object
@@ -225,7 +239,7 @@ class NOR(Comb):
         @return obj : instance of the notGate object
         """
         return self.__notGate.output(left, right)
-    
+
     def getScopeDump(self):
         """
         @return dict : the scope dump values for this block.
@@ -250,11 +264,12 @@ class XNOR(Comb):
         @param plot : boolean value whether to plot this block or not
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
-        self.__xorGate = XOR(pydig, delay, initialValue, False, blockID + str(random.randint(10, 10000)))
+        self.__xorGate = XOR(pydig, delay, initialValue,
+                             False, blockID + str(random.randint(10, 10000)))
         self.__notGate = NOT(pydig, 0, initialValue, plot, blockID)
 
         self.__xorGate.output() > self.__notGate.input()
-    
+
     def input(self, left=None, right=None):
         """
         @return obj : instance of the xorGate object
@@ -266,7 +281,7 @@ class XNOR(Comb):
         @return obj : instance of the notGate object
         """
         return self.__notGate.output(left, right)
-    
+
     def getScopeDump(self):
         """
         @return dict : the scope dump values for this block.
@@ -290,10 +305,13 @@ class MUX(Comb):
         @param plot : boolean value whether to plot this block or not
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
-        checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
-        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID, maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
+        checkType([(pydig, pd), (delay, (float, int)),
+                  (initialValue, int), (plot, bool), (blockID, str)])
+        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID,
+                         maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
 
-        pydig.combinationalFromObject(self)  # make this object a part of the pydig object
+        # make this object a part of the pydig object
+        pydig.combinationalFromObject(self)
 
     def __func(self, val):
         """
@@ -327,10 +345,13 @@ class DMUX(Comb):
         @param plot : boolean value whether to plot this block or not
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
-        checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
-        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID, maxOutSize=2, delay=delay, plot=plot, initialValue=initialValue)
+        checkType([(pydig, pd), (delay, (float, int)),
+                  (initialValue, int), (plot, bool), (blockID, str)])
+        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID,
+                         maxOutSize=2, delay=delay, plot=plot, initialValue=initialValue)
 
-        pydig.combinationalFromObject(self)  # make this object a part of the pydig object
+        # make this object a part of the pydig object
+        pydig.combinationalFromObject(self)
 
     def __func(self, val):
         """
@@ -342,6 +363,24 @@ class DMUX(Comb):
         val = val | (val << 1)
         ans = (sel << 1) | n(sel)
         return ans & val
+
+
+class Register(Comb, HasRegisters):
+    """
+    This class represents an 1 bit register.
+    """
+
+    def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
+        """
+        @param pydig : pydig object
+        @param delay : the time delay for the register
+        @param initialValue : The initial output value given by this block at t = 0 while running
+        @param plot : boolean value whether to plot this block or not
+        @param blockID : the id of this block. If None, then new unique ID is given.
+        """
+
+        super().__init__(env=pydig.getEnv(), blockID=blockID, maxOutSize=1,
+                         delay=delay, plot=plot, initialValue=initialValue)
 
 
 class SISO:
@@ -358,19 +397,21 @@ class SISO:
         @param plot : boolean value whether to plot this block or not
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
-        checkType([(pydig, pd), (delay, (float, int)), (num, (int)), (initialValue, int), (plot, bool), (blockID, str)])
+        checkType([(pydig, pd), (delay, (float, int)), (num, (int)),
+                  (initialValue, int), (plot, bool), (blockID, str)])
 
-        self.__registers = [pd.moore(pydig, 1, True, blockID + f" - {str(i)}", lambda x, y: y, lambda x : x, initialValue, True, clock, 0, 0, delay) for i in range(num)]
+        self.__registers = [pd.moore(pydig, 1, True, blockID + f" - {str(
+            i)}", lambda x, y: y, lambda x: x, initialValue, True, clock, 0, 0, delay) for i in range(num)]
 
         for i in range(num - 1):
             self.__registers[i].output() > self.__registers[i+1].input()
-    
+
     def input(self, left=None, right=None):
         """
         @return obj : instance of the first register object
         """
         return self.__registers[0].input(left, right)
-    
+
     def output(self, left=0, right=None):
         """
         @return obj : instance of the last register object
@@ -382,7 +423,7 @@ class SISO:
         @return obj : instance of the clock object
         """
         return self
-    
+
     def __le__(self, other):
         """
         @param other : the other object to which the clock is connected to
@@ -390,8 +431,9 @@ class SISO:
         for i in self.__registers:
             other > i.clock()
 
+
 if __name__ == "__main__":
-    
+
     pysim = pd("Basic Gates")
 
     clock = pysim.clock(plot=True, onTime=0.5, timePeriod=1, initialValue=1)

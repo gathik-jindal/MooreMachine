@@ -77,8 +77,7 @@ class MooreMachine(HasInputConnections, HasOutputConnections, HasRegisters):
         Runs this block.
         """
         self._env.process(self.__runNSL())
-        if self._env.now == 0:
-            self._env.process(self.__runOL())
+        self._env.process(self.__runOL())
 
     def isConnected(self):
         """

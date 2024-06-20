@@ -117,8 +117,11 @@ class Plotter:
             headerFields.append(i)
             prevValue = 0  # the value of the previous time unit (for now zero)
             timePointer = 0
-
-            for j in range(len(data[i])):
+            
+            j = 0
+            while (j < len(data[i])):
+                while (j != len(data[i]) - 1 and data[i][j][0] == data[i][j + 1][0]):
+                    j += 1
                 if (timeValues[timePointer] < data[i][j][0]):
                     while (timeValues[timePointer] < data[i][j][0]):
                         timeCorresValues[timePointer].append(prevValue)
@@ -127,6 +130,7 @@ class Plotter:
                 timeCorresValues[timePointer].append(data[i][j][1])
                 timePointer += 1
                 prevValue = data[i][j][1]
+                j += 1
 
             while (timePointer < len(timeValues)):
                 timeCorresValues[timePointer].append(prevValue)
