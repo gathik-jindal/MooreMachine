@@ -533,7 +533,7 @@ class Moore extends RectangleBlock
     {
         return getObjectName() + " = pysim.moore(maxOutSize = "+getMaxOutSize() + ", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +  
             ", nsl = " + getNSL() +", ol = " + getOL() + ", startingState = " + getStartingState() + ", risingEdge = " + getRisingEdge() +
-            "nsl_delay = " + getNSLDelay() + "ol_delay = " + getOLDelay() + "register_delay = " + getRegisterDelay()  + ")";
+            ", nsl_delay = " + getNSLDelay() + ", ol_delay = " + getOLDelay() + ", register_delay = " + getRegisterDelay()  + ")";
     }
 
     /**
@@ -660,7 +660,7 @@ class Mealy extends Moore
     {
         return getObjectName() + " = pysim.mealy(maxOutSize = "+getMaxOutSize() + ", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +  
             ", nsl = " + getNSL() +", ol = " + getOL() + ", startingState = " + getStartingState() + ", risingEdge = " + getRisingEdge() +
-            "nsl_delay = " + getNSLDelay() + "ol_delay = " + getOLDelay() + "register_delay = " + getRegisterDelay()  + ")";
+            ", nsl_delay = " + getNSLDelay() + ", ol_delay = " + getOLDelay() + ", register_delay = " + getRegisterDelay()  + ")";
     }
 
     /**
@@ -669,7 +669,8 @@ class Mealy extends Moore
     @Override
     public String getObjectName()
     {
-        return "mealy" + super.toString();
+        String parent = super.getObjectName();
+        return "mealy" + parent.substring(parent.indexOf("moore") + 1);
     }
 
     /**
