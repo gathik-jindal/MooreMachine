@@ -670,7 +670,7 @@ class Mealy extends Moore
     public String getObjectName()
     {
         String parent = super.getObjectName();
-        return "mealy" + parent.substring(parent.indexOf("moore") + 1);
+        return "mealy" + parent.substring(parent.indexOf("moore") + 5);
     }
 
     /**
