@@ -381,6 +381,7 @@ class Combinational(HasInputConnections, HasOutputConnections):
         """
         return self.isConnectedToInput()
 
+#### Change this
 
 class Register(Combinational, HasRegisters):
     """
