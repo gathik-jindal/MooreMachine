@@ -250,7 +250,7 @@ class Clock(HasOnlyOutputConnections):
         self.__timePeriod = timePeriod
         self.__onTime = onTime
         super().__init__(**kwargs)
-        self._output[0] = initialValue
+        self._output[0] = initialValue & 1
         self._scopeDump.add(f"Clock {self.getBlockID()}", 0, self._output[0])
 
     # left, right are for future versions. NOT USED IN CURRENT VERSION.
@@ -381,6 +381,7 @@ class Combinational(HasInputConnections, HasOutputConnections):
         """
         return self.isConnectedToInput()
 
+#### Change this
 
 class Register(Combinational, HasRegisters):
     """
