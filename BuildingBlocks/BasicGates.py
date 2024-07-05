@@ -363,11 +363,11 @@ class SISO:
         self.__register.nsl = self.__nsl
         self.__register.ol = self.__ol
 
-    def __nsl():
-        pass
+    def __nsl(ps,i):
+        return (ps<<1 + i&1)&(2**self.__size - 1)
 
-    def __ol():
-        pass
+    def __ol(ps):
+        return ps>>(self.__size)&1
     
     def input(self, left=None, right=None):
         """
