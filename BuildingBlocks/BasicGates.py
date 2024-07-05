@@ -348,7 +348,7 @@ class SISO:
     This class represents the SISO gate.
     """
 
-    def __init__(self, pydig: pd, clock, delay: float, num: int, initialValue: int, plot: bool, blockID: str):
+    def __init__(self, pydig: pd, size:int, clock, delay: float, num: int, initialValue: int, plot: bool, blockID: str):
         """
         @param pydig : pydig object
         @param delay : the time delay for each register in the SISO block.
@@ -358,36 +358,40 @@ class SISO:
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
         checkType([(pydig, pd), (delay, (float, int)), (num, (int)), (initialValue, int), (plot, bool), (blockID, str)])
+        self.__register = pydig.moore(maxOutSize=1, plot=plot, blockID=blockID, startingState=initialValue, clock = clock, register_delay = delay)
+        self.__size = size
+        self.__register.nsl = self.__nsl
+        self.__register.ol = self.__ol
 
-        self.__registers = [pydig.register(clock, delay, 0, True, blockID+f"-{i}") for i in range(num)]
+    def __nsl():
+        pass
 
-        for i in range(num - 1):
-            self.__registers[i].output() > self.__registers[i+1].input()
+    def __ol():
+        pass
     
     def input(self, left=None, right=None):
         """
         @return obj : instance of the first register object
         """
-        return self.__registers[0].input(left, right)
+        return self.__register.input(left,right)
     
     def output(self, left=0, right=None):
         """
         @return obj : instance of the last register object
         """
-        return self.__registers[-1].output(left, right)
+        return self.__register.output(left, right)
 
     def clock(self):
         """
         @return obj : instance of the clock object
         """
-        return self
+        return self.__register.clock()
     
     def __le__(self, other):
-        """
-        @param other : the other object to which the clock is connected to
-        """
-        for i in self.__registers:
-            other > i.clock()
+        self.__register.input() <= other
+
+    def __gt__(self,other):
+        self.__register.output() > other
 
 if __name__ == "__main__":
     
