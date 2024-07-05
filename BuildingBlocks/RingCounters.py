@@ -8,6 +8,5 @@ sys.path.append(parent)
 
 from utilities import checkType, bitCount
 from pydig import pydig as pd
-from usableBlocks import Combinational as Comb
-import random
+from usableBlocks import Combinational 
 
