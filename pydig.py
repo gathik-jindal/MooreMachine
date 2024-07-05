@@ -250,9 +250,7 @@ class pydig:
             blockID = id
         
         self.__uniqueIDlist.append(blockID)
-        temp = Register(env=self.__env, clock=clock, delay=delay, initialValue=initalValue, plot=plot, blockID=blockID)
-        self.__components.append(temp)
-        return temp
+        return Register(env=self.__env, clock=clock, delay=delay, initialValue=initalValue, plot=plot, blockID=blockID)
 
     def run(self, until: int):
         """
