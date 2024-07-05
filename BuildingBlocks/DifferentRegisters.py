@@ -58,9 +58,11 @@ class SISO:
     
     def __le__(self, other):
         self.__register.input() <= other
+        return True
 
     def __gt__(self,other):
         self.__register.output() > other
+        return True
 
 
 class SIPO:
@@ -116,9 +118,11 @@ class SIPO:
     
     def __le__(self, other):
         self.__register.input() <= other
+        return True
 
     def __gt__(self,other):
         self.__register.output() > other
+        return True
 
 
 class PIPO:
@@ -167,9 +171,11 @@ class PIPO:
     
     def __le__(self, other):
         self.__register.input() <= other
+        return True
 
     def __gt__(self,other):
         self.__register.output() > other    
+        return True
 
 class PISO:
     pass
