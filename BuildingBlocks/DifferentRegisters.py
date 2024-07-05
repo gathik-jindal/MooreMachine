@@ -170,6 +170,9 @@ class PIPO:
     def __gt__(self,other):
         self.__register.output() > other    
 
+class PISO:
+    pass
+
 
 if __name__ == "__main__":
     
