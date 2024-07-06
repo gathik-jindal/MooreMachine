@@ -12,9 +12,9 @@ from DifferrentRegisters import SIPO
 
 class StraightRingCounter():
 
-  def __init__(self,pydig: pd, size:int, clock, delay: float, plot: bool, blockID: str):
+  def __init__(self,pydig: pd, size:int, clock, plot: bool, blockID: str):
 
-    self.__register = SIPO(pd, size, clock, delay, 0.01, plot, blockID)
+    self.__register = SIPO(pd, size, clock, 0.01, 0, plot, blockID)
     self.__register.output() > self.__register.input()
 
   def input(self, left=None, right=None):
@@ -32,21 +32,21 @@ class StraightRingCounter():
       """
       return self.__register.clock()
     
-    def __le__(self, other):
-        self.__register.clock() <= other
-        return True
+  def __le__(self, other):
+      self.__register.clock() <= other
+      return True
 
-    def __gt__(self,other):
-        self.__register.output() > other
-        return True
+  def __gt__(self,other):
+      self.__register.output() > other
+      return True
 
 class JohnsonCounter():
 
-  def __init__(self,pydig: pd, size:int, clock, delay: float, plot: bool, blockID: str):
+  def __init__(self,pydig: pd, size:int, clock, plot: bool, blockID: str):
 
-    self.__register = SIPO(pydid, size, clock, delay, 0.01, plot, blockID)
-    self.__not = pydig.combinational(1, plot=False, blockID+"'s NOT Gate", func=lambda x: (1-(x&1))&1, delay=0.01, initialValue=0):
-    self.__register.output() > self.__not.input()
+    self.__register = SIPO(pydid, size, clock, 0.01, 0, plot, blockID)
+    self.__not = pydig.combinational(maxOutSize = 1, plot=False, blockID = blockID+"'s NOT Gate", func=lambda x: (1-(x&1))&1, delay=0.01, initialValue=0)
+    self.__register.output(0,1) > self.__not.input()
     self.__not.output() > self.__register.input()
 
   def input(self, left=None, right=None):
@@ -64,10 +64,26 @@ class JohnsonCounter():
       """
       return self.__register.clock()
     
-    def __le__(self, other):
-        self.__register.clock() <= other
-        return True
+  def __le__(self, other):
+      self.__register.clock() <= other
+      return True
 
-    def __gt__(self,other):
-        self.__register.output() > other
-        return True
+  def __gt__(self,other):
+      self.__register.output() > other
+      return True
+
+
+if __name__ == "__main__":
+  
+  pysim = pd("Ring Counters")
+  
+  clock = pysim.clock(plot=True, onTime=0.5, timePeriod=1, initialValue = 1)
+  src = StraightRingCounter(pysim, 4, clock, True, "src")
+  o1 = pysim.output(plot = True,blockID = "o1")
+  jrc = JohnsonCounter(pysim, 4, clock, 15, True, "jrc")
+  o2 = pysim.output(plot = True, blockID = "o2")
+  
+  src > o1
+  jrc > o2
+  
+  pysim.run(20)
