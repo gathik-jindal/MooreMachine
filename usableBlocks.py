@@ -388,7 +388,7 @@ class Register:
     This class represents an 1 bit register.
     """
 
-    def __init__(self, pydig: pd, size:int, clock, delay: float, initialValue: int, plot: bool, blockID: str):
+    def __init__(self, env, size:int, clock, delay: float, initialValue: int, plot: bool, blockID: str):
         """
         @param pydig : pydig object
         @param delay : the time delay for each register.
@@ -396,10 +396,10 @@ class Register:
         @param plot : boolean value whether to plot this block or not
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
-        checkType([(pydig, pd), (delay, (float, int)), (size, (int)), (initialValue, int), (plot, bool), (blockID, str)])
-        self.__register = pydig.moore(maxOutSize=1, plot=plot, blockID=blockID, startingState=initialValue&1, clock = clock, register_delay = delay)
-        self.__register.nsl = lambda ps,i: return i&1
-        self.__register.ol = lambda ps: return ps&1
+        checkType([(delay, (float, int)), (size, (int)), (initialValue, int), (plot, bool), (blockID, str)])
+        self.__register = MooreMachine(maxOutSize=1, plot=plot, blockID=blockID, startingState=initialValue&1, clock = clock, register_delay = delay)
+        self.__register.nsl = lambda ps,i: i&1
+        self.__register.ol = lambda ps: ps&1
     
     def input(self, left=None, right=None):
         """
