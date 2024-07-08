@@ -380,39 +380,3 @@ class Combinational(HasInputConnections, HasOutputConnections):
         @return bool : True if this block is connected to everything, False otherwise.
         """
         return self.isConnectedToInput()
-
-#### Check This
-
-class Register:
-    """
-    This class represents an 1 bit register.
-    """
-
-    def __init__(self, env, size = 1, clock = None, delay = 0.1, initialValue = 0, plot = False, blockID = None,  posEdge = True):
-        self.__register = MooreMachine(env = env, maxOutSize=1, plot=plot, nsl = lambda ps,i: i&1, ol = lambda ps: ps&1, blockID=blockID, startingState=initialValue&1, clk = clock, register_delay = delay,  posEdge = risingEdge)
-    
-    def input(self, left=None, right=None):
-        """
-        @return obj : instance of the first register object
-        """
-        return self.__register.input(left,right)
-    
-    def output(self, left=0, right=None):
-        """
-        @return obj : instance of the last register object
-        """
-        return self.__register.output(left, right)
-
-    def clock(self):
-        """
-        @return obj : instance of the clock object
-        """
-        return self.__register.clock()
-    
-    def __le__(self, other):
-        self.__register.input() <= other
-        return True
-
-    def __gt__(self,other):
-        self.__register.output() > other
-        return True
