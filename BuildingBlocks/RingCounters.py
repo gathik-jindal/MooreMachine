@@ -14,7 +14,7 @@ class StraightRingCounter():
 
   def __init__(self, pydig: pd, size:int, clock, plot: bool, blockID: str):
 
-    self.__register = SIPO(pydig, size, clock, 0.01, 2**(size-1), plot, blockID)
+    self.__register = SIPO(pydig, size, clock, 0.01, 1, plot, blockID)
     self.__register.output() > self.__register.input()
 
   def input(self, left=None, right=None):
