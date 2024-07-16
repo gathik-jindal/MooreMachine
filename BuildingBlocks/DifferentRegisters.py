@@ -182,7 +182,7 @@ class PISO:
     This class represents the PISO register.
     """
 
-    def __init__(self, pydig: pd, size:int, clock, load, delay: float, initialValue: int, plot: bool, blockID: str):
+    def __init__(self, pydig: pd, size:int, clock, load, drive, delay: float, initialValue: int, plot: bool, blockID: str):
         """
         @param pydig : pydig object
         @param delay : the time delay for each register in the SISO block.
@@ -191,18 +191,21 @@ class PISO:
         @param plot : boolean value whether to plot this block or not
         @param blockID : the id of this block. If None, then new unique ID is given.
         """
-        checkType([(pydig, pd), (delay, (float, int)), (size, (int)), (initialValue, int), (plot, bool), (blockID, str),(load,HasOutputConnections)])
+        checkType([(pydig, pd), (delay, (float, int)), (size, (int)), (initialValue, int), (drive,int), (plot, bool), (blockID, str),(load,HasOutputConnections)])
         self.__register = pydig.moore(maxOutSize=size, plot=plot, blockID=blockID, startingState=initialValue, clock = clock, register_delay = delay)
+        self.__drive = drive&1
         load.output() > self.__register.input()
         self.__size = size
         self.__register.nsl = self.__nsl
         self.__register.ol = self.__ol
 
     def __nsl(self, ps, i):
-        return i&(2**self.__size-1)
+        if i&1:
+            return (i>>1)&(2**self.__size-1)
+        return ((ps*2)%(2**self.__size) + self.__drive) 
 
     def __ol(self, ps):
-        return ps&(2**self.__size-1)
+        return (ps>>(self.__size-1))&1
     
     def input(self, left=None, right=None):
         """
