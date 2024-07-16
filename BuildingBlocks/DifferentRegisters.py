@@ -238,10 +238,10 @@ if __name__ == "__main__":
     
     pysim = pd("Basic Gates")
 
-    clock = pysim.clock(plot=True, onTime=0.2, timePeriod=0.4, initialValue = 1)
-    clock2 = pysim.clock(plot=True, onTime=2, timePeriod=4,initialValue = 1)
+    clock = pysim.clock(plot=True, onTime=0.2, timePeriod=0.4, initialValue = 0)
+    clock2 = pysim.clock(plot=True, onTime=2, timePeriod=3,initialValue = 0)
     o = pysim.output(plot = True)
-    siso = SIPO(pysim, 4, clock, 0.1, 14, True, "SISO")
+    siso = SIPO(pysim, 4, clock, 0.1, 3, True, "SIPO")
     clock2.output() > siso.input()
     siso.output() > o.input()
 
