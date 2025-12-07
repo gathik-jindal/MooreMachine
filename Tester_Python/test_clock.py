@@ -17,6 +17,12 @@ The tester() function:
 
 """
 
+import sys
+import os
+
+# Add parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import csv
 from pydig import pydig
 
@@ -73,8 +79,8 @@ def test_clock_basic():
     tester(
         sim,
         clk,
-        input_file="Tests/clock_input1.csv",
-        expected_file="Tests/clock_expected1.csv",
+        input_file="../Tests/clock_input1.csv",
+        expected_file="../Tests/clock_expected1.csv",
         until=20
     )
 
@@ -87,8 +93,8 @@ def test_clock_duty_cycle():
     tester(
         sim,
         clk,
-        input_file="Tests/clock_input2.csv",
-        expected_file="Tests/clock_expected2.csv",
+        input_file="../Tests/clock_input2.csv",
+        expected_file="../Tests/clock_expected2.csv",
         until=40
     )
 
@@ -101,8 +107,8 @@ def test_clock_fast():
     tester(
         sim,
         clk,
-        input_file="Tests/clock_input3.csv",
-        expected_file="Tests/clock_expected3.csv",
+        input_file="../Tests/clock_input3.csv",
+        expected_file="../Tests/clock_expected3.csv",
         until=20
     )
 
@@ -115,8 +121,8 @@ def test_clock_initial_high():
     tester(
         sim,
         clk,
-        input_file="Tests/clock_input4.csv",
-        expected_file="Tests/clock_expected4.csv",
+        input_file="../Tests/clock_input4.csv",
+        expected_file="../Tests/clock_expected4.csv",
         until=20
     )
 
