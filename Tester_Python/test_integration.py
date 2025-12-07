@@ -493,7 +493,7 @@ def integration_testing_pwm_malformed():
 
 # ---------- Timing integration tests: SR latch & D latch ----------
 
-def integration_timing_test_1():
+def integration_timing_test_SRLatch_WithoutCSV():
     """
     Timing / functional test for SRLatch.
 
@@ -561,7 +561,7 @@ def integration_timing_test_1():
     print("PASS: integration_timing_test_1 (SRLatch functional & timing OK)")
 
 
-def integration_timing_test_2():
+def integration_timing_test_DLatch_WithoutCSV():
     """
     Timing / functional test for DLatch.
 
@@ -665,6 +665,7 @@ if __name__ == "__main__":
     print("\n" + "=" * 60 + "\n")
     integration_testing_pwm_malformed()
     print("\n" + "=" * 60 + "\n")
-    integration_timing_test_1()
+    integration_timing_test_SRLatch_WithoutCSV()
     print("\n" + "=" * 60 + "\n")
-    integration_timing_test_2()
+    integration_timing_test_DLatch_WithoutCSV()
+
