@@ -37,7 +37,7 @@ def read_csv_values(path):
     return values
 
 
-def tester(sim, clock, input_file, expected_file, until):
+def tester(sim, clock, expected_file, until):
     """
     sim: pydig instance
     clock: Clock block
@@ -45,10 +45,6 @@ def tester(sim, clock, input_file, expected_file, until):
     expected_file: expected clock waveform
     until: time to simulate
     """
-
-    # Load input block for consistency with the testing framework
-    _inp = sim.source(filePath=input_file, plot=False, blockID="ClockDummyInput")
-
 
     sim.run(until=until)
 
@@ -79,7 +75,6 @@ def test_clock_basic():
     tester(
         sim,
         clk,
-        input_file="../Tests/clock_input1.csv",
         expected_file="../Tests/clock_expected1.csv",
         until=20
     )
