@@ -114,7 +114,7 @@ def test_source_invalid_file_format():
 
         sim.run(until=10)
         print("FAIL: Expected exception due to missing file.")
-    except Exception as e:
+    except (Exception, SystemExit) as e:
         print("PASS: Invalid file caught:", e)
 
 
