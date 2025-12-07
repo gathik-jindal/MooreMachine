@@ -68,12 +68,12 @@ def test_source_basic():
     Basic test: Source reads small CSV file and outputs values correctly.
     """
     sim = pydig("source_basic")
-    src = sim.source("Tests/source_input1.csv", plot=False, blockID="src_basic")
+    src = sim.source("../../Tests/source_input1.csv", plot=False, blockID="src_basic")
 
     tester(
         sim,
         src,
-        expected_file="Tests/source_expected1.csv",
+        expected_file="../../Tests/source_expected1.csv",
         until=20
     )
 
@@ -83,12 +83,12 @@ def test_source_long_file():
     Larger input file to confirm Source handles long sequences.
     """
     sim = pydig("source_long")
-    src = sim.source("Tests/source_input2.csv", plot=False, blockID="src_long")
+    src = sim.source("../../Tests/source_input2.csv", plot=False, blockID="src_long")
 
     tester(
         sim,
         src,
-        expected_file="Tests/source_expected2.csv",
+        expected_file="../../Tests/source_expected2.csv",
         until=40
     )
 
@@ -98,12 +98,12 @@ def test_source_multibit():
     Source file containing values > 1 (e.g., 2-bit or 4-bit inputs encoded as decimals).
     """
     sim = pydig("source_multibit")
-    src = sim.source("Tests/source_input3.csv", plot=False, blockID="src_multi")
+    src = sim.source("../../Tests/source_input3.csv", plot=False, blockID="src_multi")
 
     tester(
         sim,
         src,
-        expected_file="Tests/source_expected3.csv",
+        expected_file="../../Tests/source_expected3.csv",
         until=20
     )
 
@@ -114,7 +114,7 @@ def test_source_invalid_file_format():
     """
     try:
         sim = pydig("source_invalid")
-        src = sim.source("Tests/not_a_real_file.csv", plot=False, blockID="src_bad")
+        src = sim.source("../../Tests/not_a_real_file.csv", plot=False, blockID="src_bad")
 
         sim.run(until=10)
         print("FAIL: Expected exception due to missing file.")
@@ -127,12 +127,12 @@ def test_source_text_format():
     Test using a .txt input file to ensure non-CSV formats work.
     """
     sim = pydig("source_text_test")
-    src = sim.source("Tests/source_input4.txt", plot=False, blockID="src_txt")
+    src = sim.source("../../Tests/source_input4.txt", plot=False, blockID="src_txt")
 
     tester(
         sim,
         src,
-        expected_file="Tests/source_expected4.csv",
+        expected_file="../../Tests/source_expected4.csv",
         until=30
     )
 

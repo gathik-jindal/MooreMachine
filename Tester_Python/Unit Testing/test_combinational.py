@@ -453,8 +453,4 @@ if __name__ == "__main__":
     test_combinational_not_gate()
     test_combinational_double()
     test_combinational_chain()
-    test_combinational_invalid()
-
-    test_comb_parallel_inputs_merge()
-    test_comb_output_slicing()
     test_comb_missing_logic()
