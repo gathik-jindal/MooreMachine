@@ -47,10 +47,10 @@ def tester(sim, clock, expected_file, until):
     """
 
     sim.run(until=until)
-
-    expected_values = read_csv_values(expected_file)
-
+    
     dump = clock.getScopeDump()
+    
+    expected_values = read_csv_values(expected_file)
 
     if not dump:
         print("FAIL: No scope data recorded for clock block.")
