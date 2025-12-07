@@ -163,7 +163,7 @@ def test_output_invalid_connection():
         sim.run(until=10)
 
         print("FAIL: Expected unconnected output to cause an error")
-    except Exception as e:
+    except (Exception, SystemExit) as e:
         print("PASS: Unconnected output caught:", e)
 
 
