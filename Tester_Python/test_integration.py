@@ -161,7 +161,6 @@ def integration_testing_pwm():
         return
 
     # --- Check that PWM Output actually changes over time ---
-    # Find the column index for PWM Output
     idx = header.index("PWM Output")
 
     pwm_values = []
@@ -170,7 +169,6 @@ def integration_testing_pwm():
             try:
                 pwm_values.append(int(row[idx]))
             except ValueError:
-                # Non-integer in the column; ignore for this simple sanity check
                 pass
 
     if len(pwm_values) < 2:
@@ -185,5 +183,92 @@ def integration_testing_pwm():
     print("PASS: integration_testing_pwm")
 
 
+# ---------- Malformed integration test ----------
+
+def integration_testing_pwm_malformed():
+    """
+    Integration test that *intentionally* mis-connects the PWM design.
+
+    We leave one of the required blocks not fully connected so that
+    pydig.run() calls printErrorAndExit("<block> is not connected."),
+    which raises SystemExit.
+
+    The test PASSES if SystemExit is raised, and FAILS otherwise.
+    """
+    print("Running integration_testing_pwm_malformed...")
+
+    PWM_Path = "Tests\\PWM.csv"
+    if not os.path.exists(PWM_Path):
+        print(f"FAIL: Input file {PWM_Path} not found. "
+              "Make sure Tests\\PWM.csv exists.")
+        return
+
+    try:
+        # --- Set up simulator ---
+        pysim = pydig.pydig(name="PWM_malformed")
+
+        # --- Source, clock, counter as usual ---
+        PWM_Input = pysim.source(filePath=PWM_Path, plot=False, blockID="PWM Input")
+        clk = pysim.clock(plot=False, blockID="clk", timePeriod=1, onTime=0.5)
+
+        mod4Counter = pysim.moore(
+            maxOutSize=2,
+            plot=False,
+            blockID="Mod 4 Counter",
+            startingState=0
+        )
+        mod4Counter.nsl = nsl_pwm
+        mod4Counter.ol = ol_pwm
+
+        # --- Comparators ---
+        syncResetComparator = pysim.combinational(
+            maxOutSize=1,
+            plot=False,
+            blockID="Sync Reset Comparator",
+            func=lambda x: int((x & 3) == (x >> 2)),
+            delay=0,
+        )
+
+        outputComparator = pysim.combinational(
+            maxOutSize=1,
+            plot=False,
+            blockID="Output Comparator",
+            func=lambda x: int((x & 3) > (x >> 2)),
+            delay=0,
+        )
+
+        finalOutput = pysim.output(plot=False, blockID="PWM Output")
+
+        # --- MALFORMED CONNECTIONS ---
+
+        # 1) We DO connect the output comparator and final output like before:
+        outputComparator.output() > finalOutput.input()
+
+        # 2) We connect *only one* input into outputComparator (missing input from mod4Counter)
+        PWM_Input.output(0, 2) > outputComparator.input()
+
+        # 3) We create syncResetComparator but NEVER connect *any* inputs to it.
+        #    This means syncResetComparator.isConnected() == False.
+
+        # 4) We ALSO forget to connect the clock to the counter:
+        #    (no clk.output() > mod4Counter.clock())
+        #    So mod4Counter.isConnected() will also be False.
+        #
+        #    Either of these will cause pydig.run() to call printErrorAndExit()
+        #    when it reaches the first unconnected block in its list.
+
+        # --- Run without generateCSV (we just care about the error) ---
+        pysim.run(until=10)
+
+        # If we get here, no SystemExit was raised -> FAIL
+        print("FAIL: Expected malformed connections to trigger printErrorAndExit/SystemExit")
+
+    except SystemExit:
+        # This is the behavior we expect from malformed connections
+        print("PASS: integration_testing_pwm_malformed (caught SystemExit due to malformed wiring)")
+
+
 if __name__ == "__main__":
     integration_testing_pwm()
+    print("\n" + "=" * 60 + "\n")
+    integration_testing_pwm_malformed()
