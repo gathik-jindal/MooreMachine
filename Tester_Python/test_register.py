@@ -14,14 +14,10 @@ The tester function:
 6. Compares against register dump
 """
 
-import sys
-import os
-
-# Add parent directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import csv
 from pydig import pydig
+
+
 
 def read_csv_values(path):
     values = []
@@ -69,7 +65,7 @@ def tester(sim, register, clock, input_file, expected_file, until):
 
 
 
-def test_register_basic():
+def test_register_basic(input_file, expected_file):
     sim = pydig("reg_basic")
 
     clk = sim.clock(timePeriod=1, onTime=0.5, blockID="clk_basic")
@@ -79,13 +75,13 @@ def test_register_basic():
         sim,
         reg,
         clk,
-        input_file="Tests/register_input1.csv",
-        expected_file="Tests/register_expected1.csv",
+        input_file=input_file,
+        expected_file=expected_file,
         until=20
     )
 
 
-def test_register_with_delay():
+def test_register_with_delay(input_file, expected_file):
     sim = pydig("reg_delay")
 
     clk = sim.clock(timePeriod=1, onTime=0.5, blockID="clk_delay")
@@ -95,13 +91,13 @@ def test_register_with_delay():
         sim,
         reg,
         clk,
-        input_file="Tests/register_input2.csv",
-        expected_file="Tests/register_expected2.csv",
+        input_file=input_file,
+        expected_file=expected_file,
         until=30
     )
 
 
-def test_register_initial_value():
+def test_register_initial_value(input_file, expected_file):
     sim = pydig("reg_init")
 
     clk = sim.clock(timePeriod=1, onTime=0.5, blockID="clk_init")
@@ -111,13 +107,13 @@ def test_register_initial_value():
         sim,
         reg,
         clk,
-        input_file="Tests/register_input3.csv",
-        expected_file="Tests/register_expected3.csv",
+        input_file=input_file,
+        expected_file=expected_file,
         until=20
     )
 
 
-def test_register_hold_behavior():
+def test_register_hold_behavior(input_file, expected_file):
     sim = pydig("reg_hold")
 
     clk = sim.clock(timePeriod=1, onTime=0.5, blockID="clk_hold")
@@ -127,8 +123,8 @@ def test_register_hold_behavior():
         sim,
         reg,
         clk,
-        input_file="Tests/register_input4.csv",
-        expected_file="Tests/register_expected4.csv",
+        input_file=input_file,
+        expected_file=expected_file,
         until=15
     )
 

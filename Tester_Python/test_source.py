@@ -15,14 +15,10 @@ Tester verifies:
 4. Raises AssertionError on mismatch
 """
 
-import sys
-import os
-
-# Add parent directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import csv
 from pydig import pydig
+
+
 
 def read_csv_values(path):
     values = []
@@ -78,43 +74,43 @@ def test_source_basic():
     )
 
 
-def test_source_long_file():
+def test_source_long_file(input_file, expected_file):
     """
     Larger input file to confirm Source handles long sequences.
     """
     sim = pydig("source_long")
-    src = sim.source("Tests/source_input2.csv", plot=False, blockID="src_long")
+    src = sim.source(input_file, plot=False, blockID="src_long")
 
     tester(
         sim,
         src,
-        expected_file="Tests/source_expected2.csv",
+        expected_file=expected_file,
         until=40
     )
 
 
-def test_source_multibit():
+def test_source_multibit(input_file, expected_file):
     """
     Source file containing values > 1 (e.g., 2-bit or 4-bit inputs encoded as decimals).
     """
     sim = pydig("source_multibit")
-    src = sim.source("Tests/source_input3.csv", plot=False, blockID="src_multi")
+    src = sim.source(input_file, plot=False, blockID="src_multi")
 
     tester(
         sim,
         src,
-        expected_file="Tests/source_expected3.csv",
+        expected_file=expected_file,
         until=20
     )
 
 
-def test_source_invalid_file_format():
+def test_source_invalid_file_format(input_file):
     """
     Should fail if file is malformed or not readable.
     """
     try:
         sim = pydig("source_invalid")
-        src = sim.source("Tests/not_a_real_file.csv", plot=False, blockID="src_bad")
+        src = sim.source(input_file, plot=False, blockID="src_bad")
 
         sim.run(until=10)
         print("FAIL: Expected exception due to missing file.")
@@ -122,17 +118,17 @@ def test_source_invalid_file_format():
         print("PASS: Invalid file caught:", e)
 
 
-def test_source_text_format():
+def test_source_text_format(input_file, expected_file):
     """
     Test using a .txt input file to ensure non-CSV formats work.
     """
     sim = pydig("source_text_test")
-    src = sim.source("Tests/source_input4.txt", plot=False, blockID="src_txt")
+    src = sim.source(input_file, plot=False, blockID="src_txt")
 
     tester(
         sim,
         src,
-        expected_file="Tests/source_expected4.csv",
+        expected_file=expected_file,
         until=30
     )
 

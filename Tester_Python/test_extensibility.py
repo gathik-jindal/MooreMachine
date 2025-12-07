@@ -6,13 +6,15 @@ Tests for:
 2) Register wrappers (SISO, SIPO, PIPO, PISO) built on top of Moore machines
 """
 
-import sys
 import os
-
-# Add parent directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
+import sys
 import random
+
+# directory reach (same pattern as your reference files)
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
 from utilities import checkType, bitCount
 from pydig import pydig as pd
 from usableBlocks import Combinational as Comb, Input

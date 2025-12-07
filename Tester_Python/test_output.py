@@ -18,14 +18,10 @@ The tester:
 5. Compares Output block's dump with expected CSV file
 """
 
-import sys
-import os
-
-# Add parent directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import csv
 from pydig import pydig
+
+
 
 def read_csv_values(path):
     values = []
@@ -74,7 +70,7 @@ def tester(sim, output_block, input_file, expected_file, until):
 
 
 
-def test_output_basic():
+def test_output_basic(input_file, expected_file):
     """Simple pass-through test."""
     sim = pydig("output_basic")
     out = sim.output(plot=False, blockID="out_basic")
@@ -82,13 +78,13 @@ def test_output_basic():
     tester(
         sim,
         out,
-        input_file="Tests/output_input1.csv",
-        expected_file="Tests/output_expected1.csv",
+        input_file=input_file,
+        expected_file=expected_file,
         until=20
     )
 
 
-def test_output_empty():
+def test_output_empty(input_file, expected_file):
     """
     Output should handle empty or all-zero inputs gracefully.
     """
@@ -98,13 +94,13 @@ def test_output_empty():
     tester(
         sim,
         out,
-        input_file="Tests/output_input2.csv",
-        expected_file="Tests/output_expected2.csv",
+        input_file,
+        expected_file,
         until=10
     )
 
 
-def test_output_multibit():
+def test_output_multibit(input_file, expected_file):
     """
     Output must correctly store multi-bit encoded integer signals.
     """
@@ -114,13 +110,13 @@ def test_output_multibit():
     tester(
         sim,
         out,
-        input_file="Tests/output_input3.csv",
-        expected_file="Tests/output_expected3.csv",
+        input_file,
+        expected_file,
         until=20
     )
 
 
-def test_output_with_combinational():
+def test_output_with_combinational(input_file, expected_file):
     """
     Data flows through a combinational block before reaching output.
     Ensures Output records downstream values, not raw input.
@@ -128,7 +124,7 @@ def test_output_with_combinational():
     sim = pydig("output_combi")
     out = sim.output(plot=False, blockID="out_combi")
 
-    src = sim.source("Tests/output_input4.csv", plot=False, blockID="src4")
+    src = sim.source(input_file, plot=False, blockID="src4")
 
     comb = sim.combinational(
         maxOutSize=1,
@@ -142,7 +138,7 @@ def test_output_with_combinational():
 
     sim.run(until=20)
 
-    expected = read_csv_values("Tests/output_expected4.csv")
+    expected = read_csv_values(expected_file)
     dump = out.getScopeDump()
     key = list(dump.keys())[0]
     actual = [val for (_, val) in dump[key]]

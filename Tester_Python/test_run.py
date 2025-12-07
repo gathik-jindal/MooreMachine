@@ -4,14 +4,9 @@ It verifies correct simulation execution, exception handling,
 and behavior across various circuit configurations.
 """
 
-import sys
-import os
-
-# Add parent directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 from pydig import pydig
 import csv
+
 
 def read_csv_values(path):
     vals = []
@@ -54,10 +49,10 @@ def tester(sim, until, expected_exception=None):
             raise
 
 
-def test_run_basic():
+def test_run_basic(input_file):
     sim = pydig("run_basic")
 
-    src = sim.source("Tests/run_input1.csv", blockID="src1")
+    src = sim.source(input_file, blockID="src1")
     out = sim.output(plot=False, blockID="out1")
 
     src.output() > out.input()
@@ -65,10 +60,10 @@ def test_run_basic():
     tester(sim, until=20)
 
 
-def test_run_with_dump():
+def test_run_with_dump(input_file):
     sim = pydig("run_dump")
 
-    src = sim.source("Tests/run_input2.csv", blockID="src2")
+    src = sim.source(input_file, blockID="src2")
     out = sim.output(plot=False, blockID="out2")
 
     src.output() > out.input()
@@ -78,14 +73,14 @@ def test_run_with_dump():
     tester(sim, until=20)
 
 
-def test_run_unconnected_error():
+def test_run_unconnected_error(input_file):
     """
     Output is created but never connected to any input → pydig.run()
     should call printErrorAndExit -> sys.exit(1) -> SystemExit.
     """
     sim = pydig("run_unconnected")
 
-    src = sim.source("Tests/run_input3.csv", blockID="src3")
+    src = sim.source(input_file, blockID="src3")
     out = sim.output(plot=False, blockID="out3")
 
     # src.output() is never connected to out.input() -> out.isConnected() is False
@@ -93,14 +88,14 @@ def test_run_unconnected_error():
     tester(sim, until=15, expected_exception=SystemExit)
 
 
-def test_run_invalid_until():
+def test_run_invalid_until(input_file):
     """
     Passing a non-int 'until' should hit checkType in pydig.run()
     -> printErrorAndExit -> sys.exit(1) -> SystemExit.
     """
     sim = pydig("run_invalid_until")
 
-    src = sim.source("Tests/run_input4.csv", blockID="src4")
+    src = sim.source(input_file, blockID="src4")
     out = sim.output(plot=False, blockID="out4")
 
     src.output() > out.input()
@@ -108,10 +103,10 @@ def test_run_invalid_until():
     tester(sim, until="abc", expected_exception=SystemExit)
 
 
-def test_run_full_pipeline():
+def test_run_full_pipeline(input_file):
     sim = pydig("run_full")
 
-    src = sim.source("Tests/run_input5.csv", blockID="src5")
+    src = sim.source(input_file, blockID="src5")
 
     comb = sim.combinational(
         maxOutSize=1,

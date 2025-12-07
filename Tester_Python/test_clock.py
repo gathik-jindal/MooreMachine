@@ -17,12 +17,6 @@ The tester() function:
 
 """
 
-import sys
-import os
-
-# Add parent directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import csv
 from pydig import pydig
 
@@ -37,7 +31,7 @@ def read_csv_values(path):
     return values
 
 
-def tester(sim, clock, expected_file, until):
+def tester(sim, clock, input_file, expected_file, until):
     """
     sim: pydig instance
     clock: Clock block
@@ -46,11 +40,15 @@ def tester(sim, clock, expected_file, until):
     until: time to simulate
     """
 
+    # Load input block for consistency with the testing framework
+    _inp = sim.source(filePath=input_file, plot=False, blockID="ClockDummyInput")
+
+
     sim.run(until=until)
-    
-    dump = clock.getScopeDump()
-    
+
     expected_values = read_csv_values(expected_file)
+
+    dump = clock.getScopeDump()
 
     if not dump:
         print("FAIL: No scope data recorded for clock block.")
@@ -67,7 +65,7 @@ def tester(sim, clock, expected_file, until):
         raise AssertionError("Clock waveform mismatch")
 
 
-def test_clock_basic():
+def test_clock_basic(input_file, expected_file):
     sim = pydig("clock_basic")
 
     clk = sim.clock(timePeriod=2, onTime=1, blockID="clk_basic")
@@ -75,12 +73,13 @@ def test_clock_basic():
     tester(
         sim,
         clk,
-        expected_file="../Tests/clock_expected1.csv",
+        input_file,
+        expected_file,
         until=20
     )
 
 
-def test_clock_duty_cycle():
+def test_clock_duty_cycle(input_file, expected_file):
     sim = pydig("clock_duty")
 
     clk = sim.clock(timePeriod=4, onTime=1, blockID="clk_duty")
@@ -88,12 +87,13 @@ def test_clock_duty_cycle():
     tester(
         sim,
         clk,
-        expected_file="../Tests/clock_expected2.csv",
+        input_file,
+        expected_file,
         until=40
     )
 
 
-def test_clock_fast():
+def test_clock_fast(input_file, expected_file):
     sim = pydig("clock_fast")
 
     clk = sim.clock(timePeriod=1, onTime=0.5, blockID="clk_fast")
@@ -101,12 +101,13 @@ def test_clock_fast():
     tester(
         sim,
         clk,
-        expected_file="../Tests/clock_expected3.csv",
+        input_file,
+        expected_file,
         until=20
     )
 
 
-def test_clock_initial_high():
+def test_clock_initial_high(input_file, expected_file):
     sim = pydig("clock_init_high")
 
     clk = sim.clock(timePeriod=2, onTime=1, initialValue=1, blockID="clk_init_high")
@@ -114,7 +115,8 @@ def test_clock_initial_high():
     tester(
         sim,
         clk,
-        expected_file="../Tests/clock_expected4.csv",
+        input_file,
+        expected_file,
         until=20
     )
 

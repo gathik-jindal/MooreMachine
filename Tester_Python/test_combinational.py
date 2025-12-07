@@ -16,12 +16,6 @@ Each test uses:
 Tester checks functional correctness.
 """
 
-import sys
-import os
-
-# Add parent directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import csv
 from pydig import pydig
 from usableBlocks import Input  # added for combinational wiring tests
@@ -122,7 +116,7 @@ def get_block_values(block, prefix):
 
 # ---------- 1) basic testing of Combinational ----------
 
-def test_combinational_identity():
+def test_combinational_identity(input_file, expected_file):
     """
     Comb(x) = x  (identity function)
     """
@@ -137,13 +131,13 @@ def test_combinational_identity():
 
     tester(
         sim, comb,
-        input_file="Tests/combi_input1.csv",
-        expected_file="Tests/combi_expected1.csv",
+        input_file,
+        expected_file,
         until=20
     )
 
 
-def test_combinational_not_gate():
+def test_combinational_not_gate(input_file, expected_file):
     """
     Comb(x) = NOT(x & 1)
     """
@@ -158,13 +152,13 @@ def test_combinational_not_gate():
 
     tester(
         sim, comb,
-        input_file="Tests/combi_input2.csv",
-        expected_file="Tests/combi_expected2.csv",
+        input_file=input_file,
+        expected_file=expected_file,
         until=20
     )
 
 
-def test_combinational_double():
+def test_combinational_double(input_file, expected_file):
     """
     Comb(x) = x * 2
     """
@@ -179,13 +173,13 @@ def test_combinational_double():
 
     tester(
         sim, comb,
-        input_file="Tests/combi_input3.csv",
-        expected_file="Tests/combi_expected3.csv",
+        input_file,
+        expected_file,
         until=20
     )
 
 
-def test_combinational_chain():
+def test_combinational_chain(input_file, expected_file):
     """
     Test: Source → Comb1 → Comb2 → Output
     The combinational block under test is Comb2.
@@ -193,7 +187,7 @@ def test_combinational_chain():
 
     sim = pydig("combi_chain")
 
-    src_file = "Tests/combi_input4.csv"
+    src_file = input_file
 
     comb1 = sim.combinational(
         maxOutSize=1,
@@ -213,7 +207,7 @@ def test_combinational_chain():
 
     sim.run(until=25)
 
-    expected = read_csv_values("Tests/combi_expected4.csv")
+    expected = read_csv_values(expected_file)
     dump = comb2.getScopeDump()
     key = list(dump.keys())[0]
     actual = [v for (_, v) in dump[key]]
