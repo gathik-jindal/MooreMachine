@@ -16,6 +16,12 @@ Each test uses:
 Tester checks functional correctness.
 """
 
+import sys
+import os
+
+# Add parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import csv
 from pydig import pydig
 from usableBlocks import Input  # added for combinational wiring tests

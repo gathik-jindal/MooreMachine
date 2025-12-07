@@ -15,10 +15,14 @@ Tester verifies:
 4. Raises AssertionError on mismatch
 """
 
+import sys
+import os
+
+# Add parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import csv
 from pydig import pydig
-
-
 
 def read_csv_values(path):
     values = []

@@ -18,10 +18,14 @@ The tester:
 5. Compares Output block's dump with expected CSV file
 """
 
+import sys
+import os
+
+# Add parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import csv
 from pydig import pydig
-
-
 
 def read_csv_values(path):
     values = []

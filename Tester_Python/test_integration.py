@@ -18,7 +18,12 @@ and then:
 We intentionally mirror the example PWM code structure as closely as possible.
 """
 
+import sys
 import os
+
+# Add parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import csv
 import pydig
 

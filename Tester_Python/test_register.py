@@ -14,10 +14,14 @@ The tester function:
 6. Compares against register dump
 """
 
+import sys
+import os
+
+# Add parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import csv
 from pydig import pydig
-
-
 
 def read_csv_values(path):
     values = []
@@ -140,7 +144,7 @@ def test_register_invalid_config():
         reg = sim.register(clock=clk, delay=-1, initalValue=0, blockID="reg_invalid")
 
         print("FAIL: Negative delay should raise error")
-    except except (Exception, SystemExit) as e:
+    except (Exception, SystemExit) as e:
         print("PASS: Invalid config caught:", e)
 
 
