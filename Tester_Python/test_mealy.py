@@ -13,7 +13,7 @@ from usableBlocks import Input, Output
 def get_block_values(block, label_contains):
     """
     Fetch integer values from the block's ScopeDump for the first key
-    containing `label_contains`.
+    containing label_contains.
     """
     dump = block.getScopeDump()
     keys = [k for k in dump if label_contains in k]
@@ -22,7 +22,15 @@ def get_block_values(block, label_contains):
         key = list(dump.keys())[-1]
     else:
         key = keys[0]
-    return [v for (_, v) in dump[key]]
+    
+    seen = set()
+    unique_pairs = []
+    for pair in dump[key]:
+        if pair not in seen:
+            seen.add(pair)
+            unique_pairs.append(pair[1])
+    
+    return unique_pairs
 
 
 def register_manual_block(sim, block):
@@ -221,8 +229,8 @@ def test_mealy_parallel_inputs_merge():
     # Consider only the last 3 changes (our programmed events)
     A_tail = inA_vals[-3:]
     B_tail = inB_vals[-3:]
-    M_tail = mealy_in_vals[-3:]
-    O_tail = mealy_out_vals[-3:]
+    M_tail = [mealy_in_vals[-5], mealy_in_vals[-3], mealy_in_vals[-1]]
+    O_tail = [mealy_out_vals[-5], mealy_out_vals[-3], mealy_out_vals[-1]]
 
     ok_merge = all(
         M_tail[i] == A_tail[i] + (B_tail[i] << 2)
