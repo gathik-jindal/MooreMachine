@@ -22,7 +22,7 @@ import sys
 import os
 
 # Add parent directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 import csv
 import pydig
@@ -118,10 +118,10 @@ def integration_testing_pwm():
     pysim = pydig.pydig(name="PWM")
 
     # --- Source from file ---
-    PWM_Path = "..\\Tests\\PWM.csv"
+    PWM_Path = "../../Tests/PWM.csv"
     if not os.path.exists(PWM_Path):
         print(f"FAIL: Input file {PWM_Path} not found. "
-              "Make sure Tests\\PWM.csv exists.")
+              "Make sure Tests/PWM.csv exists.")
         return
 
     PWM_Input = pysim.source(filePath=PWM_Path, plot=False, blockID="PWM Input")
@@ -233,7 +233,7 @@ def integration_testing_pwm_malformed():
     """
     print("Running integration_testing_pwm_malformed...")
 
-    PWM_Path = "..\\Tests\\PWM.csv"
+    PWM_Path = "..\\..\\Tests\\PWM.csv"
     if not os.path.exists(PWM_Path):
         print(f"FAIL: Input file {PWM_Path} not found. "
               "Make sure Tests\\PWM.csv exists.")
