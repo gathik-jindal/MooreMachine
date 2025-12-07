@@ -130,7 +130,7 @@ def test_clock_invalid():
         clk = sim.clock(timePeriod=-2, onTime=1, blockID="clk_invalid")
 
         print("FAIL: Negative timePeriod should cause an exception")
-    except Exception as e:
+    except (Exception, SystemExit) as e:
         print("PASS: Invalid clock caught:", e)
 
 
