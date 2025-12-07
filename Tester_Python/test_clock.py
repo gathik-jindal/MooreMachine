@@ -88,7 +88,6 @@ def test_clock_duty_cycle():
     tester(
         sim,
         clk,
-        input_file="../Tests/clock_input2.csv",
         expected_file="../Tests/clock_expected2.csv",
         until=40
     )
@@ -102,7 +101,6 @@ def test_clock_fast():
     tester(
         sim,
         clk,
-        input_file="../Tests/clock_input3.csv",
         expected_file="../Tests/clock_expected3.csv",
         until=20
     )
@@ -116,7 +114,6 @@ def test_clock_initial_high():
     tester(
         sim,
         clk,
-        input_file="../Tests/clock_input4.csv",
         expected_file="../Tests/clock_expected4.csv",
         until=20
     )
