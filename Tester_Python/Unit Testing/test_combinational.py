@@ -30,10 +30,16 @@ from usableBlocks import Input  # added for combinational wiring tests
 def read_csv_values(path):
     values = []
     with open(path, "r") as f:
-        for row in csv.reader(f):
-            if row and row[0].strip().lstrip("-").isdigit():
-                values.append(int(row[0]))
+        reader = csv.reader(f)
+        next(reader)  # skip header
+        for row in reader:
+            if len(row) >= 2:
+                try:
+                    values.append(int(row[1]))
+                except ValueError:
+                    pass
     return values
+
 
 
 def tester(sim, combi_block, input_file, expected_file, until):
@@ -137,8 +143,8 @@ def test_combinational_identity():
 
     tester(
         sim, comb,
-        input_file="Tests/combi_input1.csv",
-        expected_file="Tests/combi_expected1.csv",
+        input_file="../../Tests/combi_input1.csv",
+        expected_file="../../Tests/combi_expected1.csv",
         until=20
     )
 
@@ -158,8 +164,8 @@ def test_combinational_not_gate():
 
     tester(
         sim, comb,
-        input_file="Tests/combi_input2.csv",
-        expected_file="Tests/combi_expected2.csv",
+        input_file="../../Tests/combi_input2.csv",
+        expected_file="../../Tests/combi_expected2.csv",
         until=20
     )
 
@@ -179,8 +185,8 @@ def test_combinational_double():
 
     tester(
         sim, comb,
-        input_file="Tests/combi_input3.csv",
-        expected_file="Tests/combi_expected3.csv",
+        input_file="../../Tests/combi_input3.csv",
+        expected_file="../../Tests/combi_expected3.csv",
         until=20
     )
 
@@ -193,7 +199,7 @@ def test_combinational_chain():
 
     sim = pydig("combi_chain")
 
-    src_file = "Tests/combi_input4.csv"
+    src_file = "../../Tests/combi_input4.csv"
 
     comb1 = sim.combinational(
         maxOutSize=1,
@@ -213,7 +219,7 @@ def test_combinational_chain():
 
     sim.run(until=25)
 
-    expected = read_csv_values("Tests/combi_expected4.csv")
+    expected = read_csv_values("../../Tests/combi_expected4.csv")
     dump = comb2.getScopeDump()
     key = list(dump.keys())[0]
     actual = [v for (_, v) in dump[key]]
