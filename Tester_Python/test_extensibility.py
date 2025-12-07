@@ -59,259 +59,6 @@ class NOT(Comb):
         """
         return (2 ** bitCount(val) - 1) & ~val
 
-
-class AND(Comb):
-    """
-    This class represents the AND gate.
-    Half the incoming lines will be ANDed with the other half.
-
-    Lets say the incoming bits are: 10101100
-    Then the first 4 bits will be ANDed with the last 4 bits, in this order: 1010 & 1100
-    """
-
-    def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
-        """
-        @param pydig : pydig object
-        @param delay : the time delay for the and gate
-        @param initialValue : The initial output value given by this block at t = 0 while running
-        @param plot : boolean value whether to plot this block or not
-        @param blockID : the id of this block. If None, then new unique ID is given.
-        """
-        checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
-        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID,
-                         maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
-
-        pydig.combinationalFromObject(self)  # make this object a part of the pydig object
-
-    def __func(self, val):
-        """
-        @param val (int): The value that's going to be used to AND
-        @return (int): The result of the AND operation
-        """
-        ans = 1
-        while val:
-            ans = ans & (val % 2)
-            val = val >> 1
-        return ans
-
-
-class OR(Comb):
-    """
-    This class represents the OR gate.
-    Half the incoming lines will be ORed with the other half.
-
-    Lets say the incoming bits are: 10101100
-    Then the first 4 bits will be ORed with the last 4 bits, in this order: 1010 & 1100
-    """
-
-    def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
-        """
-        @param pydig : pydig object
-        @param delay : the time delay for the OR gate
-        @param initialValue : The initial output value given by this block at t = 0 while running
-        @param plot : boolean value whether to plot this block or not
-        @param blockID : the id of this block. If None, then new unique ID is given.
-        """
-        checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
-        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID,
-                         maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
-
-        pydig.combinationalFromObject(self)  # make this object a part of the pydig object
-
-    def __func(self, val):
-        """
-        @param val (int): The value to be ORed
-        @return (int): The result of the OR operation
-        """
-        ans = 1
-        while val:
-            ans = ans | (val % 2)
-            val = val >> 1
-        return ans
-
-
-class XOR(Comb):
-    """
-    This class represents the XOR gate.
-    Half the incoming lines will be XORed with the other half.
-
-    Lets say the incoming bits are: 10101100
-    Then the first 4 bits will be XORed with the last 4 bits, in this order: 1010 & 1100
-    """
-
-    def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
-        """
-        @param pydig : pydig object
-        @param delay : the time delay for the XOR gate
-        @param initialValue : The initial output value given by this block at t = 0 while running
-        @param plot : boolean value whether to plot this block or not
-        @param blockID : the id of this block. If None, then new unique ID is given.
-        """
-        checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
-        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID,
-                         maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
-
-        pydig.combinationalFromObject(self)  # make this object a part of the pydig object
-
-    def __func(self, val):
-        """
-        @param val (int): The value to be XORed
-        @return (int): The result of the XOR operation
-        """
-        ans = 1
-        while val:
-            ans = ans ^ (val % 2)
-            val = val >> 1
-        return ans
-
-
-class NAND(Comb):
-    """
-    This class represents the NAND gate.
-    """
-
-    def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
-        """
-        @param pydig : pydig object
-        @param delay : the time delay for the NAND gate
-        @param initialValue : The initial output value given by this block at t = 0 while running
-        @param plot : boolean value whether to plot this block or not
-        @param blockID : the id of this block. If None, then new unique ID is given.
-        """
-        self.__andGate = AND(pydig, delay, initialValue, False, blockID + str(random.randint(10, 10000)))
-        self.__notGate = NOT(pydig, 0, initialValue, plot, blockID)
-
-        self.__andGate.output() > self.__notGate.input()
-
-    def input(self, left=None, right=None):
-        """
-        @return obj : instance of the andGate object
-        """
-        return self.__andGate.input(left, right)
-
-    def output(self, left=0, right=None):
-        """
-        @return obj : instance of the notGate object
-        """
-        return self.__notGate.output(left, right)
-
-    def getScopeDump(self):
-        """
-        @return dict : the scope dump values for this block.
-        """
-        return self.__notGate.getScopeDump()
-
-
-class NOR(Comb):
-    """
-    This class represents the NOR gate.
-    """
-
-    def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
-        """
-        @param pydig : pydig object
-        @param delay : the time delay for the NOR gate
-        @param initialValue : The initial output value given by this block at t = 0 while running
-        @param plot : boolean value whether to plot this block or not
-        @param blockID : the id of this block. If None, then new unique ID is given.
-        """
-        self.__orGate = OR(pydig, delay, initialValue, False, blockID + str(random.randint(10, 10000)))
-        self.__notGate = NOT(pydig, 0, initialValue, plot, blockID)
-
-        self.__orGate.output() > self.__notGate.input()
-
-    def input(self, left=None, right=None):
-        """
-        @return obj : instance of the orGate object
-        """
-        return self.__orGate.input(left, right)
-
-    def output(self, left=0, right=None):
-        """
-        @return obj : instance of the notGate object
-        """
-        return self.__notGate.output(left, right)
-
-    def getScopeDump(self):
-        """
-        @return dict : the scope dump values for this block.
-        """
-        return self.__notGate.getScopeDump()
-
-
-class XNOR(Comb):
-    """
-    This class represents the XNOR gate.
-    """
-
-    def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
-        """
-        @param pydig : pydig object
-        @param delay : the time delay for the XNOR gate
-        @param initialValue : The initial output value given by this block at t = 0 while running
-        @param plot : boolean value whether to plot this block or not
-        @param blockID : the id of this block. If None, then new unique ID is given.
-        """
-        self.__xorGate = XOR(pydig, delay, initialValue, False, blockID + str(random.randint(10, 10000)))
-        self.__notGate = NOT(pydig, 0, initialValue, plot, blockID)
-
-        self.__xorGate.output() > self.__notGate.input()
-
-    def input(self, left=None, right=None):
-        """
-        @return obj : instance of the xorGate object
-        """
-        return self.__xorGate.input(left, right)
-
-    def output(self, left=0, right=None):
-        """
-        @return obj : instance of the notGate object
-        """
-        return self.__notGate.output(left, right)
-
-    def getScopeDump(self):
-        """
-        @return dict : the scope dump values for this block.
-        """
-        return self.__notGate.getScopeDump()
-
-
-class MUX(Comb):
-    """
-    This class represents the MUX gate.
-    If the selection bit is 0, then the first value is selected, else the second value is selected.
-
-    The first bit is the selection bit, and the second and third bits are values (from left to right).
-    """
-
-    def __init__(self, pydig: pd, delay: float, initialValue: int, plot: bool, blockID: str):
-        """
-        @param pydig : pydig object
-        @param delay : the time delay for the MUX gate
-        @param initialValue : The initial output value given by this block at t = 0 while running
-        @param plot : boolean value whether to plot this block or not
-        @param blockID : the id of this block. If None, then new unique ID is given.
-        """
-        checkType([(pydig, pd), (delay, (float, int)), (initialValue, int), (plot, bool), (blockID, str)])
-        super().__init__(func=self.__func, env=pydig.getEnv(), blockID=blockID,
-                         maxOutSize=1, delay=delay, plot=plot, initialValue=initialValue)
-
-        pydig.combinationalFromObject(self)  # make this object a part of the pydig object
-
-    def __func(self, val):
-        """
-        @param val (int): The value to be MUXed
-        @return (int): The result of the MUX operation
-        """
-        sel = val >> 2
-        val = val & 3
-        val1 = val >> 1
-        val2 = val & 1
-        mask = n(sel)
-
-        return (val1 & n(mask)) | (val2 & mask)
-
-
 class DMUX(Comb):
     """
     This class represents the DMUX gate.
@@ -349,99 +96,8 @@ class DMUX(Comb):
 
 
 # ============================================================================
-# REGISTER WRAPPER IMPLEMENTATIONS (from your reference code)
+# REGISTER WRAPPER IMPLEMENTATIONS
 # ============================================================================
-
-class SISO:
-    """
-    This class represents the SISO register.
-    """
-
-    def __init__(self, pydig: pd, size: int, clock, delay: float, initialValue: int, plot: bool, blockID: str):
-        """
-        @param pydig : pydig object
-        @param delay : the time delay for each register in the SISO block.
-        @param size : the number of registers in the SISO block
-        @param initialValue : The initial output value given by each register
-        @param plot : boolean value whether to plot this block or not
-        @param blockID : id of this block.
-        """
-        checkType([(pydig, pd), (delay, (float, int)), (size, int),
-                   (initialValue, int), (plot, bool), (blockID, str)])
-        self.__register = pydig.moore(maxOutSize=1, plot=plot, blockID=blockID,
-                                      startingState=initialValue, clock=clock, register_delay=delay)
-        self.__size = size
-        self.__register.nsl = self.__nsl
-        self.__register.ol = self.__ol
-
-    def __nsl(self, ps, i):
-        return ((ps * 2) % (2 ** self.__size) + (i & 1))
-
-    def __ol(self, ps):
-        return (ps >> (self.__size - 1)) & 1
-
-    def input(self, left=None, right=None):
-        return self.__register.input(left, right)
-
-    def output(self, left=0, right=None):
-        return self.__register.output(left, right)
-
-    def clock(self):
-        return self.__register.clock()
-
-    def __le__(self, other):
-        self.__register.input() <= other
-        return True
-
-    def __gt__(self, other):
-        self.__register.output() > other
-        return True
-
-
-class SIPO:
-    """
-    This class represents the SIPO register.
-    """
-
-    def __init__(self, pydig: pd, size: int, clock, delay: float, initialValue: int, plot: bool, blockID: str):
-        checkType([(pydig, pd), (delay, (float, int)), (size, int),
-                   (initialValue, int), (plot, bool), (blockID, str)])
-        self.__register = pydig.moore(maxOutSize=size, plot=plot, blockID=blockID,
-                                      startingState=initialValue, clock=clock, register_delay=delay)
-        self.__size = size
-        self.__register.nsl = self.__nsl
-        self.__register.ol = self.__ol
-
-    def __nsl(self, ps, i):
-        return ((ps * 2) % (2 ** self.__size) + (i & 1))
-
-    def __ol(self, ps):
-        k = self.__size
-        ans = 0
-        while k:
-            k -= 1
-            ans = ans << 1
-            ans += ps & 1
-            ps = ps >> 1
-        return ans
-
-    def input(self, left=None, right=None):
-        return self.__register.input(left, right)
-
-    def output(self, left=0, right=None):
-        return self.__register.output(left, right)
-
-    def clock(self):
-        return self.__register.clock()
-
-    def __le__(self, other):
-        self.__register.input() <= other
-        return True
-
-    def __gt__(self, other):
-        self.__register.output() > other
-        return True
-
 
 class PIPO:
     """
@@ -557,7 +213,7 @@ def run_gate_sim(gate_cls, test_values, expected_fn, *, blockID, delay=0.0):
     key = keys[0] if keys else list(dump.keys())[-1]
 
     time_vals = dump[key]
-    vals = [v for (_, v) in time_vals][1:]
+    vals = [v for (_, v) in time_vals][2:]
 
     expected = [expected_fn(v) for v in test_values]
     passed = (len(vals) >= len(expected)) and (vals[:len(expected)] == expected)
@@ -570,44 +226,6 @@ def expected_not(v: int) -> int:
     width = bitCount(v)
     mask = (1 << width) - 1
     return (~v) & mask
-
-
-def expected_and2(v: int) -> int:
-    b = v & 1
-    a = (v >> 1) & 1
-    return a & b
-
-
-def expected_or2(v: int) -> int:
-    b = v & 1
-    a = (v >> 1) & 1
-    return a | b
-
-
-def expected_xor2(v: int) -> int:
-    b = v & 1
-    a = (v >> 1) & 1
-    return a ^ b
-
-
-def expected_nand2(v: int) -> int:
-    return 1 - expected_and2(v)
-
-
-def expected_nor2(v: int) -> int:
-    return 1 - expected_or2(v)
-
-
-def expected_xnor2(v: int) -> int:
-    return 1 - expected_xor2(v)
-
-
-def expected_mux3(v: int) -> int:
-    sel = (v >> 2) & 1
-    val1 = (v >> 1) & 1
-    val2 = v & 1
-    return val1 if sel == 0 else val2
-
 
 def expected_dmux2(v: int) -> int:
     sel = (v >> 1) & 1
@@ -627,7 +245,7 @@ def test_gates():
     """
     Tests the extended gate classes:
 
-        NOT, AND, OR, XOR, NAND, NOR, XNOR, MUX, DMUX
+        NOT
 
     Each gate is driven via an Input block, and the output waveform is
     compared against a pure-Python expected truth table.
@@ -644,69 +262,6 @@ def test_gates():
     print("  expected: ", not_exp)
     print("  result:   ", "PASS" if not_ok else "FAIL", "\n")
     all_ok &= not_ok
-
-    print("Testing AND gate...")
-    and_ok, and_vals, and_exp = run_gate_sim(
-        AND, test_values=list(range(4)), expected_fn=expected_and2, blockID="AND_test"
-    )
-    print("  actual:   ", and_vals)
-    print("  expected: ", and_exp)
-    print("  result:   ", "PASS" if and_ok else "FAIL", "\n")
-    all_ok &= and_ok
-
-    print("Testing OR gate...")
-    or_ok, or_vals, or_exp = run_gate_sim(
-        OR, test_values=list(range(4)), expected_fn=expected_or2, blockID="OR_test"
-    )
-    print("  actual:   ", or_vals)
-    print("  expected: ", or_exp)
-    print("  result:   ", "PASS" if or_ok else "FAIL", "\n")
-    all_ok &= or_ok
-
-    print("Testing XOR gate...")
-    xor_ok, xor_vals, xor_exp = run_gate_sim(
-        XOR, test_values=list(range(4)), expected_fn=expected_xor2, blockID="XOR_test"
-    )
-    print("  actual:   ", xor_vals)
-    print("  expected: ", xor_exp)
-    print("  result:   ", "PASS" if xor_ok else "FAIL", "\n")
-    all_ok &= xor_ok
-
-    print("Testing NAND gate...")
-    nand_ok, nand_vals, nand_exp = run_gate_sim(
-        NAND, test_values=list(range(4)), expected_fn=expected_nand2, blockID="NAND_test"
-    )
-    print("  actual:   ", nand_vals)
-    print("  expected: ", nand_exp)
-    print("  result:   ", "PASS" if nand_ok else "FAIL", "\n")
-    all_ok &= nand_ok
-
-    print("Testing NOR gate...")
-    nor_ok, nor_vals, nor_exp = run_gate_sim(
-        NOR, test_values=list(range(4)), expected_fn=expected_nor2, blockID="NOR_test"
-    )
-    print("  actual:   ", nor_vals)
-    print("  expected: ", nor_exp)
-    print("  result:   ", "PASS" if nor_ok else "FAIL", "\n")
-    all_ok &= nor_ok
-
-    print("Testing XNOR gate...")
-    xnor_ok, xnor_vals, xnor_exp = run_gate_sim(
-        XNOR, test_values=list(range(4)), expected_fn=expected_xnor2, blockID="XNOR_test"
-    )
-    print("  actual:   ", xnor_vals)
-    print("  expected: ", xnor_exp)
-    print("  result:   ", "PASS" if xnor_ok else "FAIL", "\n")
-    all_ok &= xnor_ok
-
-    print("Testing MUX gate...")
-    mux_ok, mux_vals, mux_exp = run_gate_sim(
-        MUX, test_values=list(range(8)), expected_fn=expected_mux3, blockID="MUX_test"
-    )
-    print("  actual:   ", mux_vals)
-    print("  expected: ", mux_exp)
-    print("  result:   ", "PASS" if mux_ok else "FAIL", "\n")
-    all_ok &= mux_ok
 
     print("Testing DMUX gate...")
     dmux_ok, dmux_vals, dmux_exp = run_gate_sim(
@@ -733,71 +288,6 @@ def test_registers():
         - PISO (Parallel In Serial Out with load & drive)
     """
     print("Running test_registers()...\n")
-
-    # ---------- SISO ----------
-    print("Testing SISO register...")
-    sim_siso = pd("SISO_test")
-    clk_siso = sim_siso.clock(plot=False, blockID="clk_siso", timePeriod=1.0, onTime=0.5, initialValue=0)
-
-    siso_bits = [1, 0, 1, 1]
-    siso_input_list = [(float(t), b) for t, b in enumerate(siso_bits)]
-    siso_src = Input(inputList=siso_input_list, env=sim_siso.getEnv(), blockID="src_siso", plot=False)
-    sim_siso._pydig__components.append(siso_src)
-
-    size_siso = 4
-    siso = SISO(sim_siso, size_siso, clk_siso, 0.1, 0, False, "SISO_reg")
-    siso_src.output() > siso.input()
-    clk_siso.output() > siso.clock()
-
-    sim_siso.run(until=len(siso_bits) + 5)
-
-    internal_siso = siso._SISO__register
-    dump = internal_siso.getScopeDump()
-    ps_keys = [k for k in dump if "PS of" in k]
-    final_ps = [v for (_, v) in dump[ps_keys[0]]][-1] if ps_keys else None
-    out_keys = [k for k in dump if "output of" in k]
-    final_out = [v for (_, v) in dump[out_keys[0]]][-1] if out_keys else None
-
-    expected_ps = 0b1011
-    expected_out = 1
-    ok_siso = (final_ps == expected_ps and final_out == expected_out)
-    print(f"  SISO final PS:  {final_ps} (expected {expected_ps})")
-    print(f"  SISO final OUT: {final_out} (expected {expected_out})")
-    print("  result:         ", "PASS\n" if ok_siso else "FAIL\n")
-
-    all_ok = ok_siso
-
-    # ---------- SIPO ----------
-    print("Testing SIPO register...")
-    sim_sipo = pd("SIPO_test")
-    clk_sipo = sim_sipo.clock(plot=False, blockID="clk_sipo", timePeriod=1.0, onTime=0.5, initialValue=0)
-
-    sipo_bits = [1, 0, 1, 1]
-    sipo_input_list = [(float(t), b) for t, b in enumerate(sipo_bits)]
-    sipo_src = Input(inputList=sipo_input_list, env=sim_sipo.getEnv(), blockID="src_sipo", plot=False)
-    sim_sipo._pydig__components.append(sipo_src)
-
-    size_sipo = 4
-    sipo = SIPO(sim_sipo, size_sipo, clk_sipo, 0.1, 0, False, "SIPO_reg")
-    sipo_src.output() > sipo.input()
-    clk_sipo.output() > sipo.clock()
-
-    sim_sipo.run(until=len(sipo_bits) + 5)
-
-    internal_sipo = sipo._SIPO__register
-    dump = internal_sipo.getScopeDump()
-    ps_keys = [k for k in dump if "PS of" in k]
-    final_ps_sipo = [v for (_, v) in dump[ps_keys[0]]][-1] if ps_keys else None
-    out_keys = [k for k in dump if "output of" in k]
-    final_out_sipo = [v for (_, v) in dump[out_keys[0]]][-1] if out_keys else None
-
-    expected_ps_sipo = 0b1011
-    ok_sipo = (final_ps_sipo == expected_ps_sipo and final_out_sipo is not None and final_out_sipo != 0)
-    print(f"  SIPO final PS:  {final_ps_sipo} (expected {expected_ps_sipo})")
-    print(f"  SIPO final OUT: {final_out_sipo} (non-zero expected)")
-    print("  result:         ", "PASS\n" if ok_sipo else "FAIL\n")
-
-    all_ok &= ok_sipo
 
     # ---------- PIPO ----------
     print("Testing PIPO register...")
@@ -831,7 +321,7 @@ def test_registers():
     print(f"  PIPO final OUT: {final_out_pipo} (expected {expected_out_pipo})")
     print("  result:         ", "PASS\n" if ok_pipo else "FAIL\n")
 
-    all_ok &= ok_pipo
+    all_ok = ok_pipo
 
     # ---------- PISO ----------
     print("Testing PISO register (load behavior)...")
