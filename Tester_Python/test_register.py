@@ -140,7 +140,7 @@ def test_register_invalid_config():
         reg = sim.register(clock=clk, delay=-1, initalValue=0, blockID="reg_invalid")
 
         print("FAIL: Negative delay should raise error")
-    except Exception as e:
+    except except (Exception, SystemExit) as e:
         print("PASS: Invalid config caught:", e)
 
 
