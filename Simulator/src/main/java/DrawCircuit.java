@@ -1,59 +1,31 @@
 /**
- * This is the DrawCircuit file which allows the user to draw different components on the panel. 
- * 
+ * This is the DrawCircuit file which allows the user to draw different components on the panel.
+ *
  * @author Aryan, Abhirath, Gathik
  * @version 1.0
  * @since 06/08/2024
  */
 
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-
 /**
  * Draw in which the user can draw the blocks.
  */
-public class DrawCircuit extends JPanel 
+public class DrawCircuit extends JPanel
 {
     /**
      * Enum which determines whether the user wants to draw a box or a line.
      */
-    public enum Mode {NONE, BOX, LINE}
+    public enum Mode
+    {NONE, BOX, LINE}
 
     public static final double TOLERANCE = 10.0;    //Tolerance to determine whether the point is near
     private double zoom, translateX, translateY;    //Allows for zooming in and out
@@ -74,47 +46,47 @@ public class DrawCircuit extends JPanel
      * Creates a new DrawCircuit
      * @param manager : the Manager object in which this drawing panel is in
      */
-    public DrawCircuit(Manager manager) 
+    public DrawCircuit(Manager manager)
     {
         setBackground(Color.WHITE);
-        
+
         this.manager = manager;
         zoom = 1.0;
         drawingMode = Mode.NONE;
         rectangles = new ArrayList<>();
         wires = new ArrayList<>();
         isDragging = false;
-        
-        MouseAdapter mouseAdapter = new MouseAdapter() 
+
+        MouseAdapter mouseAdapter = new MouseAdapter()
         {
             /**
              * Is called when the mouse is pressed
              * @param e : the mouse event
              */
             @Override
-            public void mousePressed(MouseEvent e) 
+            public void mousePressed(MouseEvent e)
             {
-                if (SwingUtilities.isRightMouseButton(e)) 
+                if (SwingUtilities.isRightMouseButton(e))
                 {
-                    int x = (int)((e.getX() - translateX) / zoom);
-                    int y = (int)((e.getY() - translateY) / zoom);
+                    int x = (int) ((e.getX() - translateX) / zoom);
+                    int y = (int) ((e.getY() - translateY) / zoom);
                     Point pt = new Point(x, y);
                     handleRightClick(pt);
                     repaint();
-                } 
-                else if (drawingMode == Mode.BOX) 
+                }
+                else if (drawingMode == Mode.BOX)
                 {
-                    int x = (int)((e.getX() - translateX) / zoom);
-                    int y = (int)((e.getY() - translateY) / zoom);
+                    int x = (int) ((e.getX() - translateX) / zoom);
+                    int y = (int) ((e.getY() - translateY) / zoom);
                     startPoint = new Point(x, y);
                     currentRect = new Rectangle(startPoint);
                     adjustPreferredSize(currentRect);
                     repaint();
                 }
-                else if(drawingMode == Mode.LINE)
+                else if (drawingMode == Mode.LINE)
                 {
-                    int x = (int)((e.getX() - translateX) / zoom);
-                    int y = (int)((e.getY() - translateY) / zoom);
+                    int x = (int) ((e.getX() - translateX) / zoom);
+                    int y = (int) ((e.getY() - translateY) / zoom);
                     startPoint = new Point(x, y);
                     currentLine = new Line2D.Double(startPoint, startPoint);
                     adjustPreferredSize(currentLine);
@@ -127,22 +99,22 @@ public class DrawCircuit extends JPanel
              * @param e : the mouse event
              */
             @Override
-            public void mouseDragged(MouseEvent e) 
+            public void mouseDragged(MouseEvent e)
             {
-                if (drawingMode == Mode.BOX && startPoint != null) 
+                if (drawingMode == Mode.BOX && startPoint != null)
                 {
                     isDragging = true;
-                    int x = (int)((e.getX() - translateX) / zoom);
-                    int y = (int)((e.getY() - translateY) / zoom);
+                    int x = (int) ((e.getX() - translateX) / zoom);
+                    int y = (int) ((e.getY() - translateY) / zoom);
                     Point pt = new Point(x, y);
                     updateRectangle(pt);
                     repaint();
                 }
-                else if(drawingMode == Mode.LINE && startPoint != null)
+                else if (drawingMode == Mode.LINE && startPoint != null)
                 {
                     isDragging = true;
-                    int x = (int)((e.getX() - translateX) / zoom);
-                    int y = (int)((e.getY() - translateY) / zoom);
+                    int x = (int) ((e.getX() - translateX) / zoom);
+                    int y = (int) ((e.getY() - translateY) / zoom);
                     Point pt = new Point(x, y);
                     updateLine(pt);
                     repaint();
@@ -154,43 +126,43 @@ public class DrawCircuit extends JPanel
              * @param e : the mouse event
              */
             @Override
-            public void mouseReleased(MouseEvent e) 
+            public void mouseReleased(MouseEvent e)
             {
-                if (drawingMode == Mode.BOX && startPoint != null) 
+                if (drawingMode == Mode.BOX && startPoint != null)
                 {
-                    if(isDragging)
+                    if (isDragging)
                     {
-                        int x = (int)((e.getX() - translateX) / zoom);
-                        int y = (int)((e.getY() - translateY) / zoom);
+                        int x = (int) ((e.getX() - translateX) / zoom);
+                        int y = (int) ((e.getY() - translateY) / zoom);
                         Point pt = new Point(x, y);
                         updateRectangle(pt);
                         isDragging = false;
 
-                        if(!isIntersecting(currentRect))    
+                        if (!isIntersecting(currentRect))
                         {
                             rectangles.add(manager.createBlock(currentName, null, currentRect, currentColor));
-                            handleRightClick(new Point(currentRect.x + currentRect.width/2, currentRect.y + currentRect.height/2));
+                            handleRightClick(new Point(currentRect.x + currentRect.width / 2, currentRect.y + currentRect.height / 2));
                         }
                     }
 
                     repaint();
                     startPoint = null;
-                    currentRect = null;            
+                    currentRect = null;
                 }
-                else if(drawingMode == Mode.LINE && startPoint != null)
+                else if (drawingMode == Mode.LINE && startPoint != null)
                 {
-                    if(isDragging)
+                    if (isDragging)
                     {
-                        int x = (int)((e.getX() - translateX) / zoom);
-                        int y = (int)((e.getY() - translateY) / zoom);
+                        int x = (int) ((e.getX() - translateX) / zoom);
+                        int y = (int) ((e.getY() - translateY) / zoom);
                         Point pt = new Point(x, y);
                         updateLine(pt);
                         isDragging = false;
 
-                        if(!isIntersecting(currentLine))
+                        if (!isIntersecting(currentLine))
                         {
                             wires.add(manager.createBlock(currentName, currentLine, null, currentColor));
-                            handleRightClick(wires.getLast());
+                            handleRightClick(wires.get(wires.size() - 1));
                         }
                     }
 
@@ -201,22 +173,22 @@ public class DrawCircuit extends JPanel
             }
         };
 
-        addMouseWheelListener(new MouseWheelListener() 
+        addMouseWheelListener(new MouseWheelListener()
         {
             /**
              * Is called when the mouse wheel moves.
-             * 
+             *
              * @param e : the mouse wheel event
              */
             @Override
-            public void mouseWheelMoved(MouseWheelEvent e) 
+            public void mouseWheelMoved(MouseWheelEvent e)
             {
                 double oldZoom = zoom;
-                if (e.getPreciseWheelRotation() < 0) 
+                if (e.getPreciseWheelRotation() < 0)
                 {
                     manager.setZoomValue(5);
-                } 
-                else 
+                }
+                else
                 {
                     manager.setZoomValue(-5);
                 }
@@ -234,7 +206,7 @@ public class DrawCircuit extends JPanel
     /**
      * Sets the zoom value to the one given.
      * @param zoom : the new zoom value
-    */
+     */
     public void setZoom(double zoom)
     {
         this.zoom = zoom;
@@ -273,20 +245,20 @@ public class DrawCircuit extends JPanel
      * Is called to handle right clicked events.
      * @param point : the point where the mouse is clicked
      */
-    private void handleRightClick(Point point) 
+    private void handleRightClick(Point point)
     {
-        for(Block block : rectangles) 
+        for (Block block : rectangles)
         {
-            if(block.getRect().contains(point)) 
+            if (block.getRect().contains(point))
             {
                 handleRightClick(block);
                 return;
             }
         }
 
-        for (Block wire : wires) 
+        for (Block wire : wires)
         {
-            if (isPointNearLine(wire.getLine(), point, TOLERANCE)) 
+            if (isPointNearLine(wire.getLine(), point, TOLERANCE))
             {
                 handleRightClick(wire);
                 return;
@@ -303,14 +275,14 @@ public class DrawCircuit extends JPanel
         manager.getInfoPanel().updateInfo(block.getMap());
         highlightedBlock = block;
     }
-    
+
     /**
      * @param line : the line to check if the point is near
      * @param point : the point to check if the line is near
      * @param tolerance : the tolerance level
      * @return true if the point is close to the line within tolerance level; false otherwise
      */
-    private boolean isPointNearLine(Line2D line, Point point, double tolerance) 
+    private boolean isPointNearLine(Line2D line, Point point, double tolerance)
     {
         double dx = line.getX2() - line.getX1();
         double dy = line.getY2() - line.getY1();
@@ -343,7 +315,7 @@ public class DrawCircuit extends JPanel
      * @param color : the current color
      * @param name : the type of object
      */
-    public void setDrawingMode(Mode mode, Color color, Manager.Blocks name) 
+    public void setDrawingMode(Mode mode, Color color, Manager.Blocks name)
     {
         this.drawingMode = mode;
         this.currentColor = color;
@@ -354,7 +326,7 @@ public class DrawCircuit extends JPanel
      * Updates the current rectangle.
      * @param endPoint : the other end point of the rectangle
      */
-    private void updateRectangle(Point endPoint) 
+    private void updateRectangle(Point endPoint)
     {
         int x = Math.min(startPoint.x, endPoint.x);
         int y = Math.min(startPoint.y, endPoint.y);
@@ -379,7 +351,7 @@ public class DrawCircuit extends JPanel
      * @param g : the Graphics object
      */
     @Override
-    protected void paintComponent(Graphics g) 
+    protected void paintComponent(Graphics g)
     {
         super.paintComponent(g);
 
@@ -393,18 +365,18 @@ public class DrawCircuit extends JPanel
 
         g.setFont(new Font("Arial", Font.BOLD, 15));
         g.setColor(Color.BLACK);
-        
+
         //paints all the blocks
-        for (Block block : rectangles) 
+        for (Block block : rectangles)
         {
             Rectangle rect = block.getRect();
-            
+
             g.setColor(block.getColor());
 
             g.fillRect(rect.x, rect.y, rect.width, rect.height);
 
             //is the block the selected block
-            if(block == highlightedBlock)
+            if (block == highlightedBlock)
                 g.setColor(Color.MAGENTA);
             else
                 g.setColor(Color.black);
@@ -417,7 +389,7 @@ public class DrawCircuit extends JPanel
             int textY = rect.y + (rect.height - textHeight) / 2 + metrics.getAscent();
 
             //if the user wants to plot the block, then the text color should be black
-            if(block.getPlot().equals("True"))
+            if (block.getPlot().equals("True"))
                 g.setColor(Color.BLACK);
             else
                 g.setColor(Color.WHITE);
@@ -428,41 +400,41 @@ public class DrawCircuit extends JPanel
         //paints all the wires
         for (Block block : wires)
         {
-            ((Wire)(block)).updateBlocks();
+            ((Wire) (block)).updateBlocks();
             Line2D.Double line = block.getLine();
-            
+
             g.setColor(block.getColor());
 
-            if(block == highlightedBlock)
+            if (block == highlightedBlock)
                 g.setColor(Color.MAGENTA);
-            else if(((Wire)(block)).isClocked())
+            else if (((Wire) (block)).isClocked())
                 g.setColor(new Color(255, 127, 80));
 
-            int x1 = (int)(line.x1), y1 = (int)(line.y1), x2 = (int)(line.x2), y2 = (int)(line.y2);
-    
+            int x1 = (int) (line.x1), y1 = (int) (line.y1), x2 = (int) (line.x2), y2 = (int) (line.y2);
+
             g.drawLine(x1, y1, x2, y2);
-            
+
             g.fillOval(x1 - 5, y1 - 5, 10, 10);
-            
+
             double angle = Math.atan2(y2 - y1, x2 - x1);
-            
-            g.drawPolygon(((Wire)(block)).getArrowHead());
+
+            g.drawPolygon(((Wire) (block)).getArrowHead());
 
             //Draws the bits of the wires
-            String startText = ((Wire)(block)).getOutputString();
+            String startText = ((Wire) (block)).getOutputString();
             FontMetrics metrics = g.getFontMetrics(g.getFont());
 
             AffineTransform originalTransform = g2.getTransform();
-            
+
             int startTextX = x1 - metrics.stringWidth(startText) / 2;
             int startTextY = y1 - 10;
             g2.rotate(angle, x1, y1);
             g2.drawString(startText, startTextX, startTextY);
-            
+
             g2.setTransform(originalTransform);
         }
 
-        if (currentRect != null) 
+        if (currentRect != null)
         {
             g.setColor(currentColor);
             g.fillRect(currentRect.x, currentRect.y, currentRect.width, currentRect.height);
@@ -470,10 +442,10 @@ public class DrawCircuit extends JPanel
             g2.drawRect(currentRect.x, currentRect.y, currentRect.width, currentRect.height);
         }
 
-        if(currentLine != null)
+        if (currentLine != null)
         {
             g.setColor(currentColor);
-            g.drawLine((int)(currentLine.x1), (int)(currentLine.y1), (int)(currentLine.x2), (int)(currentLine.y2));
+            g.drawLine((int) (currentLine.x1), (int) (currentLine.y1), (int) (currentLine.x2), (int) (currentLine.y2));
         }
     }
 
@@ -481,17 +453,17 @@ public class DrawCircuit extends JPanel
      * @param r1 : the rectangle to check
      * @return true if this rectangle intersects with any object; false otherwise
      */
-    public boolean isIntersecting(Rectangle r1) 
+    public boolean isIntersecting(Rectangle r1)
     {
-        for(Block block:rectangles)
+        for (Block block : rectangles)
         {
-            if(block.getRect().intersects(r1))
+            if (block.getRect().intersects(r1))
                 return true;
         }
 
-        for(Block block:wires)
+        for (Block block : wires)
         {
-            if(r1.intersectsLine(block.getLine()) && (!isTouchingBorder(r1, block.getLine()) || r1.contains(block.getLine().getP1()) || r1.contains(block.getLine().getP2())))
+            if (r1.intersectsLine(block.getLine()) && (!isTouchingBorder(r1, block.getLine()) || r1.contains(block.getLine().getP1()) || r1.contains(block.getLine().getP2())))
                 return true;
         }
 
@@ -502,52 +474,52 @@ public class DrawCircuit extends JPanel
      * @param l1 : the line to check
      * @return true if this line intersects any object; false otherwise
      */
-    public boolean isIntersecting(Line2D l1) 
+    public boolean isIntersecting(Line2D l1)
     {
         int intersectingRectanglesCount = 0;
-        
-        for (Block block : rectangles) 
+
+        for (Block block : rectangles)
         {
             Rectangle rect = block.getRect();
-            
-            if (rect.contains(l1.getP1()) && rect.contains(l1.getP2())) 
+
+            if (rect.contains(l1.getP1()) && rect.contains(l1.getP2()))
             {
                 return true;
             }
-            
-            if (rect.intersectsLine(l1)) 
+
+            if (rect.intersectsLine(l1))
             {
                 intersectingRectanglesCount++;
-                if (intersectingRectanglesCount > 2) 
+                if (intersectingRectanglesCount > 2)
                 {
                     return true;
                 }
             }
         }
 
-        for (Block block : rectangles) 
+        for (Block block : rectangles)
         {
             Rectangle rect = block.getRect();
-            if (rect.contains(l1.getP1())) 
+            if (rect.contains(l1.getP1()))
             {
                 l1.setLine(shortenLineStart(l1, rect).getP1(), l1.getP2());
                 if (!rect.intersectsLine(l1)) break;
             }
         }
 
-        for (Block block : rectangles) 
+        for (Block block : rectangles)
         {
             Rectangle rect = block.getRect();
-            if (rect.contains(l1.getP2())) 
+            if (rect.contains(l1.getP2()))
             {
                 l1.setLine(l1.getP1(), shortenLineEnd(l1, rect).getP2());
                 if (!rect.intersectsLine(l1)) break;
             }
         }
 
-        for (Block block : wires) 
+        for (Block block : wires)
         {
-            if (l1.intersectsLine(block.getLine())) 
+            if (l1.intersectsLine(block.getLine()))
             {
                 return true;
             }
@@ -562,17 +534,17 @@ public class DrawCircuit extends JPanel
      * @param rect : the rectangle that this line intersects
      * @return a new line which does not intersect the rectangle
      */
-    private static Line2D shortenLineStart(Line2D l1, Rectangle rect) 
+    private static Line2D shortenLineStart(Line2D l1, Rectangle rect)
     {
         double dx = l1.getX2() - l1.getX1();
         double dy = l1.getY2() - l1.getY1();
         double step = Math.min(Math.abs(dx), Math.abs(dy)) * 0.1;
-        
-        while (rect.contains(l1.getP1())) 
+
+        while (rect.contains(l1.getP1()))
         {
             l1.setLine(l1.getX1() + step, l1.getY1() + step, l1.getX2(), l1.getY2());
         }
-        
+
         return l1;
     }
 
@@ -582,32 +554,32 @@ public class DrawCircuit extends JPanel
      * @param rect : the rectangle that this line intersects
      * @return a new line which does not intersect the rectangle
      */
-    private static Line2D shortenLineEnd(Line2D l1, Rectangle rect) 
+    private static Line2D shortenLineEnd(Line2D l1, Rectangle rect)
     {
         double dx = l1.getX2() - l1.getX1();
         double dy = l1.getY2() - l1.getY1();
         double step = Math.min(Math.abs(dx), Math.abs(dy)) * 0.1;
-        
-        while (rect.contains(l1.getP2())) 
+
+        while (rect.contains(l1.getP2()))
         {
             l1.setLine(l1.getX1(), l1.getY1(), l1.getX2() - step, l1.getY2() - step);
         }
-        
+
         return l1;
     }
-    
+
     /**
      * @param rect : the rectangle
      * @param line : the line
      * @return true if the rectangle touches the border of the line
      */
-    private boolean isTouchingBorder(Rectangle rect, Line2D line) 
+    private boolean isTouchingBorder(Rectangle rect, Line2D line)
     {
         Line2D top = new Line2D.Double(rect.getMinX(), rect.getMinY(), rect.getMaxX(), rect.getMinY());
         Line2D bottom = new Line2D.Double(rect.getMinX(), rect.getMaxY(), rect.getMaxX(), rect.getMaxY());
         Line2D left = new Line2D.Double(rect.getMinX(), rect.getMinY(), rect.getMinX(), rect.getMaxY());
         Line2D right = new Line2D.Double(rect.getMaxX(), rect.getMinY(), rect.getMaxX(), rect.getMaxY());
-    
+
         return top.intersectsLine(line) || bottom.intersectsLine(line) || left.intersectsLine(line) || right.intersectsLine(line);
     }
 
@@ -633,9 +605,9 @@ public class DrawCircuit extends JPanel
      */
     public void deleteBlock(Block block)
     {
-        for(Block b : rectangles)
+        for (Block b : rectangles)
         {
-            if(b == block)
+            if (b == block)
             {
                 rectangles.remove(b);
                 reset();
@@ -643,9 +615,9 @@ public class DrawCircuit extends JPanel
             }
         }
 
-        for(Block b : wires)
+        for (Block b : wires)
         {
-            if(b == block)
+            if (b == block)
             {
                 wires.remove(b);
                 reset();
@@ -674,7 +646,7 @@ public class DrawCircuit extends JPanel
         manager.getInfoPanel().removeInfo();
         manager.getInfoPanel().getTextArea().setText("");
         setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-    }   
+    }
 
     /**
      * Used to change the width and height of the panel
@@ -703,7 +675,7 @@ public class DrawCircuit extends JPanel
      */
     private void adjustPreferredSize(Line2D line)
     {
-        int x1 = (int)(line.getX1()), y1 = (int)(line.getY1()), x2 = (int)(line.getX2()), y2 = (int)(line.getY2());
+        int x1 = (int) (line.getX1()), y1 = (int) (line.getY1()), x2 = (int) (line.getX2()), y2 = (int) (line.getY2());
         adjustPreferredSize(x1, y1, x2, y2);
     }
 
@@ -728,9 +700,9 @@ public class DrawCircuit extends JPanel
      * @return Dimension: the preferred size of this panel
      */
     @Override
-    public Dimension getPreferredSize() 
+    public Dimension getPreferredSize()
     {
-        if (baseWidth == 0 || baseHeight == 0) 
+        if (baseWidth == 0 || baseHeight == 0)
         {
             baseWidth = getWidth();
             baseHeight = getHeight();
@@ -738,7 +710,7 @@ public class DrawCircuit extends JPanel
 
         int width = (int) (baseWidth * zoom);
         int height = (int) (baseHeight * zoom);
-            
+
         return new Dimension(width, height);
     }
 }
@@ -746,7 +718,7 @@ public class DrawCircuit extends JPanel
 /**
  * This class handles the information of each Block
  */
-class InfoPanel extends JPanel 
+class InfoPanel extends JPanel
 {
     private Map<String, Component> infoMap; //this map contains the information where the first element is the header and Component is the component to be drawn
     private JPanel infoPanel;               //this panel is the main center panel that contains the information
@@ -756,7 +728,7 @@ class InfoPanel extends JPanel
      * Creates a new information panel
      * @param manage : the manager class
      */
-    public InfoPanel(Manager manage)    
+    public InfoPanel(Manager manage)
     {
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(350, 0));
@@ -786,16 +758,16 @@ class InfoPanel extends JPanel
         generateFile.setBackground(new Color(173, 216, 230));
         generateFile.setHorizontalAlignment(JButton.CENTER);
         generateFile.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
+
         //change the color of the button when the mouse is hovering
-        generateFile.addMouseListener(new MouseAdapter() 
+        generateFile.addMouseListener(new MouseAdapter()
         {
             /**
              * Is called when the mouse enters the button.
              * @param evt : the mouse event
              */
             @Override
-            public void mouseEntered(MouseEvent evt) 
+            public void mouseEntered(MouseEvent evt)
             {
                 generateFile.setBackground(Color.CYAN);
             }
@@ -805,28 +777,28 @@ class InfoPanel extends JPanel
              * @param evt : the mouse event
              */
             @Override
-            public void mouseExited(MouseEvent evt) 
+            public void mouseExited(MouseEvent evt)
             {
                 generateFile.setBackground(new Color(173, 216, 230));
             }
         });
 
         //creates the python file when the button is clicked
-        generateFile.addActionListener(new ActionListener() 
+        generateFile.addActionListener(new ActionListener()
         {
             /**
              * Is called when the button is clicked.
              * @param e : the action event
              */
             @Override
-            public void actionPerformed(ActionEvent e) 
+            public void actionPerformed(ActionEvent e)
             {
-                if(manage.setClosestBlock(true))
-                    if(manage.isValidConnections(manage.getDrawCircuit().getWires()))
+                if (manage.setClosestBlock(true))
+                    if (manage.isValidConnections(manage.getDrawCircuit().getWires()))
                     {
                         manage.generateFile(getTextArea());
                     }
-            } 
+            }
         });
 
         southPanel.add(generateFile, BorderLayout.SOUTH);
@@ -872,11 +844,11 @@ class InfoPanel extends JPanel
      * Sets the information objects to the one given
      * @param info : a map containing the label and the component
      */
-    public void updateInfo(Map<String, Component> info) 
+    public void updateInfo(Map<String, Component> info)
     {
         removeInfo();
 
-        for (String label : info.keySet()) 
+        for (String label : info.keySet())
         {
             JLabel jLabel = new JLabel(label);
             jLabel.setFont(new Font("Arial", Font.BOLD, 9));

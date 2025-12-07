@@ -1,55 +1,31 @@
 /**
- * This is the Block class that stores the information that all blocks needs to have. 
- * 
+ * This is the Block class that stores the information that all blocks needs to have.
+ *
  * @author Aryan, Abhirath, Gathik
  * @version 1.0
  * @since 06/08/2024
  */
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import java.awt.geom.Line2D;
-
 import java.io.File;
-
 import java.text.NumberFormat;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import javax.swing.BorderFactory;
-import javax.swing.InputVerifier;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
-
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
 
 /**
  * The Block class stores the information that is inherent to all blockss
  */
-public abstract class Block 
+public abstract class Block
 {
     private Rectangle rect;                 //rectangle object for rectangular blocks
     private Line2D.Double line;             //line object for wires
@@ -67,7 +43,7 @@ public abstract class Block
      * @param color : the color of the rectangle
      * @param panel : the DrawCircuit in which the rectangle is drawn
      */
-    public Block(String name, Rectangle rect, Color color, DrawCircuit panel) 
+    public Block(String name, Rectangle rect, Color color, DrawCircuit panel)
     {
         this.name = name;
         this.rect = rect;
@@ -108,7 +84,7 @@ public abstract class Block
      * @param rect : the new rectangle object
      * @param color : the color of the rectangle
      */
-    public void setRect(Rectangle rect, Color color) 
+    public void setRect(Rectangle rect, Color color)
     {
         this.rect = rect;
         this.color = color;
@@ -128,7 +104,7 @@ public abstract class Block
     /**
      * @return the rectangle that is drawn
      */
-    public Rectangle getRect() 
+    public Rectangle getRect()
     {
         return this.rect;
     }
@@ -144,7 +120,7 @@ public abstract class Block
     /**
      * @return the color of the line or the rectangle
      */
-    public Color getColor() 
+    public Color getColor()
     {
         return this.color;
     }
@@ -152,11 +128,11 @@ public abstract class Block
     /**
      * @return name the of the block
      */
-    public String getName() 
+    public String getName()
     {
-        if(map.containsKey("blockID"))
-            return ((JTextField)(map.get("blockID"))).getText();
-        
+        if (map.containsKey("blockID"))
+            return ((JTextField) (map.get("blockID"))).getText();
+
         return this.name;
     }
 
@@ -196,30 +172,30 @@ public abstract class Block
     protected JTextField createTextField(String value)
     {
         JTextField jTextField = new JTextField(value);
-        
+
         applyFormatting(jTextField);
         jTextField.setEditable(true);
         jTextField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        
+
         //repaint whenever the field is updated
-        jTextField.getDocument().addDocumentListener(new DocumentListener() 
+        jTextField.getDocument().addDocumentListener(new DocumentListener()
         {
             @Override
-            public void insertUpdate(DocumentEvent e) 
+            public void insertUpdate(DocumentEvent e)
             {
                 drawingPanel.repaint();
             }
 
             @Override
-            public void removeUpdate(DocumentEvent e) 
+            public void removeUpdate(DocumentEvent e)
             {
-                drawingPanel.repaint();            
+                drawingPanel.repaint();
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e) 
+            public void changedUpdate(DocumentEvent e)
             {
-                drawingPanel.repaint();            
+                drawingPanel.repaint();
             }
 
         });
@@ -228,7 +204,7 @@ public abstract class Block
     }
 
     /**
-     * Creats a new button that can access files
+     * Creates a new button that can access files
      * @param value : the text on the button
      * @param field : the JTextField whose text field would be set to the new path
      * @return JButton that can access files
@@ -240,36 +216,36 @@ public abstract class Block
         button.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         button.setBackground(new Color(173, 216, 230));
 
-        button.addActionListener(new ActionListener() 
+        button.addActionListener(new ActionListener()
         {
             @Override
-            public void actionPerformed(ActionEvent e) 
+            public void actionPerformed(ActionEvent e)
             {
                 JFileChooser fileChooser = new JFileChooser();
-        
+
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        
+
                 int result = fileChooser.showOpenDialog(null);
-        
-                if (result == JFileChooser.APPROVE_OPTION) 
+
+                if (result == JFileChooser.APPROVE_OPTION)
                 {
                     File selectedFile = fileChooser.getSelectedFile();
-        
+
                     field.setText(selectedFile.getAbsolutePath());
                 }
             }
         });
 
-        button.addMouseListener(new MouseAdapter() 
+        button.addMouseListener(new MouseAdapter()
         {
             @Override
-            public void mouseEntered(MouseEvent evt) 
+            public void mouseEntered(MouseEvent evt)
             {
                 button.setBackground(Color.CYAN);
             }
 
             @Override
-            public void mouseExited(MouseEvent evt) 
+            public void mouseExited(MouseEvent evt)
             {
                 button.setBackground(new Color(173, 216, 230));
             }
@@ -315,28 +291,27 @@ public abstract class Block
      * @param initialValue : the initial value of the JTextField
      * @return JTextField with the above specifications
      */
-    protected JTextField createFloatField(double initialValue) 
+    protected JTextField createFloatField(double initialValue)
     {
         JTextField numberField = new JTextField(initialValue + "");
-        
+
         applyFormatting(numberField);
         numberField.setEditable(true);
         numberField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
-        numberField.setInputVerifier(new InputVerifier() 
+        numberField.setInputVerifier(new InputVerifier()
         {
             @Override
-            public boolean verify(JComponent input) 
+            public boolean verify(JComponent input)
             {
                 JTextField textField = (JTextField) input;
                 String text = textField.getText();
-                
-                try 
+
+                try
                 {
                     Double.parseDouble(text);
                     return true;
-                } 
-                catch (NumberFormatException e) 
+                } catch (NumberFormatException e)
                 {
                     numberField.setText(initialValue + "");
                     return false;
@@ -353,7 +328,7 @@ public abstract class Block
      * @param selectedOption : the starting selected options
      * @return JComboBox<String> with the above specifications
      */
-    protected JComboBox<String> createOptions(String [] options, String selectedOption)
+    protected JComboBox<String> createOptions(String[] options, String selectedOption)
     {
         JComboBox<String> comboBox = new JComboBox<>(options);
         comboBox.setSelectedItem(selectedOption);
@@ -362,14 +337,14 @@ public abstract class Block
         comboBox.setEditable(false);
         comboBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
-        comboBox.addActionListener(new ActionListener() 
+        comboBox.addActionListener(new ActionListener()
         {
             @Override
-            public void actionPerformed(ActionEvent e) 
+            public void actionPerformed(ActionEvent e)
             {
                 drawingPanel.repaint();
             }
-            
+
         });
 
         return comboBox;
@@ -400,31 +375,31 @@ public abstract class Block
         button.setBackground(new Color(178, 34, 34));
         button.setForeground(Color.WHITE);
 
-        button.addMouseListener(new MouseAdapter() 
+        button.addMouseListener(new MouseAdapter()
         {
             @Override
-            public void mouseEntered(MouseEvent evt) 
+            public void mouseEntered(MouseEvent evt)
             {
                 button.setBackground(Color.RED);
             }
 
             @Override
-            public void mouseExited(MouseEvent evt) 
+            public void mouseExited(MouseEvent evt)
             {
                 button.setBackground(new Color(178, 34, 34));
             }
         });
 
         Block b = this;
-        button.addActionListener(new ActionListener() 
+        button.addActionListener(new ActionListener()
         {
             @Override
-            public void actionPerformed(ActionEvent e) 
+            public void actionPerformed(ActionEvent e)
             {
-                int option = JOptionPane.showInternalConfirmDialog(null, "Are you sure you want to delete this block?", 
-                            "Delete Block?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                
-                if(option == 0)
+                int option = JOptionPane.showInternalConfirmDialog(null, "Are you sure you want to delete this block?",
+                        "Delete Block?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+                if (option == 0)
                     drawingPanel.deleteBlock(b);
             }
         });
@@ -447,7 +422,7 @@ public abstract class Block
     @SuppressWarnings("unchecked")
     public String getPlot()
     {
-        return (String)(((JComboBox<String>)(map.get("plot"))).getSelectedItem());
+        return (String) (((JComboBox<String>) (map.get("plot"))).getSelectedItem());
     }
 
     /**
@@ -455,7 +430,7 @@ public abstract class Block
      */
     public String getBlockID()
     {
-        return (String)(((JTextField)(map.get("blockID"))).getText());
+        return (String) (((JTextField) (map.get("blockID"))).getText());
     }
 }
 
@@ -511,12 +486,12 @@ class Moore extends RectangleBlock
         super(name, rect, color, panel);
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
         map.put("maxOutSize", createIntField(1, 0, Integer.MAX_VALUE));
-        map.put("plot", createOptions(new String [] {"True", "False"}, "False"));
+        map.put("plot", createOptions(new String[]{"True", "False"}, "False"));
         map.put("blockID", createTextField(name));
         map.put("nsl", createTextField("lambda ps, i: 0"));
         map.put("ol", createTextField("lambda ps, i: 0"));
         map.put("startingState", createIntField(0, 0, Integer.MAX_VALUE));
-        map.put("risingEdge", createOptions(new String [] {"True", "False"}, "True"));
+        map.put("risingEdge", createOptions(new String[]{"True", "False"}, "True"));
         map.put("nsl_delay", createTextField("0.01"));
         map.put("ol_delay", createTextField("0.01"));
         map.put("register_delay", createTextField("0.01"));
@@ -531,9 +506,9 @@ class Moore extends RectangleBlock
     @Override
     public String toString()
     {
-        return getObjectName() + " = pysim.moore(maxOutSize = "+getMaxOutSize() + ", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +  
-            ", nsl = " + getNSL() +", ol = " + getOL() + ", startingState = " + getStartingState() + ", risingEdge = " + getRisingEdge() +
-            ", nsl_delay = " + getNSLDelay() + ", ol_delay = " + getOLDelay() + ", register_delay = " + getRegisterDelay()  + ")";
+        return getObjectName() + " = pysim.moore(maxOutSize = " + getMaxOutSize() + ", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +
+                ", nsl = " + getNSL() + ", ol = " + getOL() + ", startingState = " + getStartingState() + ", risingEdge = " + getRisingEdge() +
+                ", nsl_delay = " + getNSLDelay() + ", ol_delay = " + getOLDelay() + ", register_delay = " + getRegisterDelay() + ")";
     }
 
     /**
@@ -541,7 +516,7 @@ class Moore extends RectangleBlock
      */
     public Integer getMaxOutSize()
     {
-        return (Integer)(((JSpinner)(getMap().get("maxOutSize"))).getValue());
+        return (Integer) (((JSpinner) (getMap().get("maxOutSize"))).getValue());
     }
 
     /**
@@ -549,7 +524,7 @@ class Moore extends RectangleBlock
      */
     public String getNSL()
     {
-        return (String)(((JTextField)(getMap().get("nsl"))).getText());
+        return (String) (((JTextField) (getMap().get("nsl"))).getText());
     }
 
     /**
@@ -557,7 +532,7 @@ class Moore extends RectangleBlock
      */
     public String getOL()
     {
-        return (String)(((JTextField)(getMap().get("ol"))).getText());
+        return (String) (((JTextField) (getMap().get("ol"))).getText());
     }
 
     /**
@@ -565,7 +540,7 @@ class Moore extends RectangleBlock
      */
     public Integer getStartingState()
     {
-        return (Integer)(((JSpinner)(getMap().get("startingState"))).getValue());
+        return (Integer) (((JSpinner) (getMap().get("startingState"))).getValue());
     }
 
     /**
@@ -574,7 +549,7 @@ class Moore extends RectangleBlock
     @SuppressWarnings("unchecked")
     public String getRisingEdge()
     {
-        return (String)(((JComboBox<String>)(getMap().get("risingEdge"))).getSelectedItem());
+        return (String) (((JComboBox<String>) (getMap().get("risingEdge"))).getSelectedItem());
     }
 
     /**
@@ -582,7 +557,7 @@ class Moore extends RectangleBlock
      */
     public String getNSLDelay()
     {
-        return (String)(((JTextField)(getMap().get("nsl_delay"))).getText());
+        return (String) (((JTextField) (getMap().get("nsl_delay"))).getText());
     }
 
     /**
@@ -590,7 +565,7 @@ class Moore extends RectangleBlock
      */
     public String getOLDelay()
     {
-        return (String)(((JTextField)(getMap().get("ol_delay"))).getText());
+        return (String) (((JTextField) (getMap().get("ol_delay"))).getText());
     }
 
     /**
@@ -598,7 +573,7 @@ class Moore extends RectangleBlock
      */
     public String getRegisterDelay()
     {
-        return (String)(((JTextField)(getMap().get("register_delay"))).getText());
+        return (String) (((JTextField) (getMap().get("register_delay"))).getText());
     }
 
     /**
@@ -614,16 +589,16 @@ class Moore extends RectangleBlock
      * @return true
      */
     @Override
-    public boolean hasOutput() 
+    public boolean hasOutput()
     {
         return true;
     }
-    
+
     /**
      * @return true
      */
     @Override
-    public boolean hasInput() 
+    public boolean hasInput()
     {
         return true;
     }
@@ -632,7 +607,7 @@ class Moore extends RectangleBlock
      * @return the type of the block ("Moore")
      */
     @Override
-    public String getType() 
+    public String getType()
     {
         return "Moore";
     }
@@ -640,7 +615,7 @@ class Moore extends RectangleBlock
 
 class Mealy extends Moore
 {
-     /**
+    /**
      * Creates a Mealy machine block.
      * @param name : the name of the block
      * @param rect : the rectangle which is to be drawn
@@ -658,9 +633,9 @@ class Mealy extends Moore
     @Override
     public String toString()
     {
-        return getObjectName() + " = pysim.mealy(maxOutSize = "+getMaxOutSize() + ", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +  
-            ", nsl = " + getNSL() +", ol = " + getOL() + ", startingState = " + getStartingState() + ", risingEdge = " + getRisingEdge() +
-            ", nsl_delay = " + getNSLDelay() + ", ol_delay = " + getOLDelay() + ", register_delay = " + getRegisterDelay()  + ")";
+        return getObjectName() + " = pysim.mealy(maxOutSize = " + getMaxOutSize() + ", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +
+                ", nsl = " + getNSL() + ", ol = " + getOL() + ", startingState = " + getStartingState() + ", risingEdge = " + getRisingEdge() +
+                ", nsl_delay = " + getNSLDelay() + ", ol_delay = " + getOLDelay() + ", register_delay = " + getRegisterDelay() + ")";
     }
 
     /**
@@ -696,8 +671,8 @@ class Input extends RectangleBlock
         super(name, rect, color, panel);
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
         map.put("filePath", createTextField("filePath"));
-        map.put("", createFileButton("Choose File", (JTextField)(map.get("filePath"))));
-        map.put("plot", createOptions(new String [] {"True", "False"}, "False"));
+        map.put("", createFileButton("Choose File", (JTextField) (map.get("filePath"))));
+        map.put("plot", createOptions(new String[]{"True", "False"}, "False"));
         map.put("blockID", createTextField(name));
         map.put("Delete", createDeleteButton("Delete Input Block"));
         setMap(map);
@@ -709,15 +684,15 @@ class Input extends RectangleBlock
     @Override
     public String toString()
     {
-        return getObjectName() + " = pysim.source(filePath = \""+getFilePath() + "\", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\")";
-    }   
+        return getObjectName() + " = pysim.source(filePath = \"" + getFilePath() + "\", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\")";
+    }
 
     /**
      * @return the filePath
      */
     public String getFilePath()
     {
-        return (String)(((JTextField)(getMap().get("filePath"))).getText()).replaceAll("\\\\", "\\\\\\\\");
+        return (String) (((JTextField) (getMap().get("filePath"))).getText()).replaceAll("\\\\", "\\\\\\\\");
     }
 
     /**
@@ -733,7 +708,7 @@ class Input extends RectangleBlock
      * @return true
      */
     @Override
-    public boolean hasOutput() 
+    public boolean hasOutput()
     {
         return true;
     }
@@ -742,7 +717,7 @@ class Input extends RectangleBlock
      * @return false
      */
     @Override
-    public boolean hasInput() 
+    public boolean hasInput()
     {
         return false;
     }
@@ -751,7 +726,7 @@ class Input extends RectangleBlock
      * @return the type of the block ("Input Block")
      */
     @Override
-    public String getType() 
+    public String getType()
     {
         return "Input Block";
     }
@@ -770,7 +745,7 @@ class Clock extends RectangleBlock
     {
         super(name, rect, color, panel);
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
-        map.put("plot", createOptions(new String [] {"True", "False"}, "False"));
+        map.put("plot", createOptions(new String[]{"True", "False"}, "False"));
         map.put("blockID", createTextField(name));
         map.put("timePeriod", createFloatField(1.2));
         map.put("onTime", createFloatField(0.6));
@@ -785,8 +760,8 @@ class Clock extends RectangleBlock
     @Override
     public String toString()
     {
-        return getObjectName() + " = pysim.clock(plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +  
-            ", timePeriod = " + getTimePeriod() +", onTime = " + getOnTime() + ", initialValue = " + getInitialValue() + ")";
+        return getObjectName() + " = pysim.clock(plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +
+                ", timePeriod = " + getTimePeriod() + ", onTime = " + getOnTime() + ", initialValue = " + getInitialValue() + ")";
     }
 
     /**
@@ -803,7 +778,7 @@ class Clock extends RectangleBlock
      */
     public String getTimePeriod()
     {
-        return (String)(((JTextField)(getMap().get("timePeriod"))).getText());
+        return (String) (((JTextField) (getMap().get("timePeriod"))).getText());
     }
 
     /**
@@ -811,7 +786,7 @@ class Clock extends RectangleBlock
      */
     public String getOnTime()
     {
-        return (String)(((JTextField)(getMap().get("onTime"))).getText());
+        return (String) (((JTextField) (getMap().get("onTime"))).getText());
     }
 
     /**
@@ -819,14 +794,14 @@ class Clock extends RectangleBlock
      */
     public String getInitialValue()
     {
-        return ((JSpinner)(getMap().get("initialValue"))).getValue().toString();
+        return ((JSpinner) (getMap().get("initialValue"))).getValue().toString();
     }
 
     /**
      * @return true
      */
     @Override
-    public boolean hasOutput() 
+    public boolean hasOutput()
     {
         return true;
     }
@@ -835,7 +810,7 @@ class Clock extends RectangleBlock
      * @return false
      */
     @Override
-    public boolean hasInput() 
+    public boolean hasInput()
     {
         return false;
     }
@@ -844,7 +819,7 @@ class Clock extends RectangleBlock
      * @return the type of the object "Clock"
      */
     @Override
-    public String getType() 
+    public String getType()
     {
         return "Clock";
     }
@@ -863,7 +838,7 @@ class Output extends RectangleBlock
     {
         super(name, rect, color, panel);
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
-        map.put("plot", createOptions(new String [] {"True", "False"}, "False"));
+        map.put("plot", createOptions(new String[]{"True", "False"}, "False"));
         map.put("blockID", createTextField(name));
         map.put("Delete", createDeleteButton("Delete Output Block"));
         setMap(map);
@@ -891,7 +866,7 @@ class Output extends RectangleBlock
      * @return false
      */
     @Override
-    public boolean hasOutput() 
+    public boolean hasOutput()
     {
         return false;
     }
@@ -900,7 +875,7 @@ class Output extends RectangleBlock
      * @return true
      */
     @Override
-    public boolean hasInput() 
+    public boolean hasInput()
     {
         return true;
     }
@@ -909,7 +884,7 @@ class Output extends RectangleBlock
      * @return type of the object "Output Block"
      */
     @Override
-    public String getType() 
+    public String getType()
     {
         return "Output Block";
     }
@@ -929,7 +904,7 @@ class Combinational extends RectangleBlock
         super(name, rect, color, panel);
         LinkedHashMap<String, Component> map = new LinkedHashMap<>();
         map.put("maxOutSize", createIntField(1, 0, Integer.MAX_VALUE));
-        map.put("plot", createOptions(new String [] {"True", "False"}, "False"));
+        map.put("plot", createOptions(new String[]{"True", "False"}, "False"));
         map.put("blockID", createTextField(name));
         map.put("func", createTextField("lambda x: x"));
         map.put("delay", createIntField(0, 0, Integer.MAX_VALUE));
@@ -944,8 +919,8 @@ class Combinational extends RectangleBlock
     @Override
     public String toString()
     {
-        return getObjectName() + " = pysim.combinational(maxOutSize = "+getMaxOutSize() + ", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +  
-            ", func = " + getFunc() +", delay = " + getDelay() + ", initialValue = " + getInitialValue() + ")";
+        return getObjectName() + " = pysim.combinational(maxOutSize = " + getMaxOutSize() + ", plot = " + getPlot() + ", blockID = \"" + getBlockID() + "\"" +
+                ", func = " + getFunc() + ", delay = " + getDelay() + ", initialValue = " + getInitialValue() + ")";
     }
 
     /**
@@ -953,15 +928,15 @@ class Combinational extends RectangleBlock
      */
     public Integer getMaxOutSize()
     {
-        return (Integer)(((JSpinner)(getMap().get("maxOutSize"))).getValue());
+        return (Integer) (((JSpinner) (getMap().get("maxOutSize"))).getValue());
     }
 
     /**
      * @return String representation of the function of the combinational block
      */
-    public String getFunc() 
+    public String getFunc()
     {
-        return (String)(((JTextField)(getMap().get("func"))).getText());
+        return (String) (((JTextField) (getMap().get("func"))).getText());
     }
 
     /**
@@ -969,7 +944,7 @@ class Combinational extends RectangleBlock
      */
     public String getDelay()
     {
-        return ((JSpinner)(getMap().get("delay"))).getValue().toString();
+        return ((JSpinner) (getMap().get("delay"))).getValue().toString();
     }
 
     /**
@@ -977,7 +952,7 @@ class Combinational extends RectangleBlock
      */
     public String getInitialValue()
     {
-        return ((JSpinner)(getMap().get("initialValue"))).getValue().toString();
+        return ((JSpinner) (getMap().get("initialValue"))).getValue().toString();
     }
 
     /**
@@ -993,7 +968,7 @@ class Combinational extends RectangleBlock
      * @return true
      */
     @Override
-    public boolean hasOutput() 
+    public boolean hasOutput()
     {
         return true;
     }
@@ -1002,7 +977,7 @@ class Combinational extends RectangleBlock
      * @return true
      */
     @Override
-    public boolean hasInput() 
+    public boolean hasInput()
     {
         return true;
     }
@@ -1011,7 +986,7 @@ class Combinational extends RectangleBlock
      * @return the type of the block "Combinational Block"
      */
     @Override
-    public String getType() 
+    public String getType()
     {
         return "Combinational Block";
     }
@@ -1050,28 +1025,28 @@ class Wire extends Block
         map.put("Output MSB (exclusive)", createTextField("--"));
         map.put("Input Block (with output wires)", startLabel);
         map.put("Output Block (with input wires)", endLabel);
-        map.put("Is Clock Line", createOptions(new String [] {"True", "False"}, "False"));
+        map.put("Is Clock Line", createOptions(new String[]{"True", "False"}, "False"));
         map.put("Delete", createDeleteButton("Delete Wire"));
         setMap(map);
 
         //Creates the arrow object at the tip of the wire
-        int x1 = (int)(line.x1), y1 = (int)(line.y1), x2 = (int)(line.x2), y2 = (int)(line.y2);
-    
+        int x1 = (int) (line.x1), y1 = (int) (line.y1), x2 = (int) (line.x2), y2 = (int) (line.y2);
+
         double angle = Math.atan2(y2 - y1, x2 - x1);
         int arrowLength = 10;
 
-        int[] arrowX = 
-        {
-            x2,                                            
-            (int) (x2 - arrowLength * Math.cos(angle - Math.PI / 6)),
-            (int) (x2 - arrowLength * Math.cos(angle + Math.PI / 6))
-        };
-        int[] arrowY = 
-        {
-            y2,                                            
-            (int) (y2 - arrowLength * Math.sin(angle - Math.PI / 6)),
-            (int) (y2 - arrowLength * Math.sin(angle + Math.PI / 6))
-        };
+        int[] arrowX =
+                {
+                        x2,
+                        (int) (x2 - arrowLength * Math.cos(angle - Math.PI / 6)),
+                        (int) (x2 - arrowLength * Math.cos(angle + Math.PI / 6))
+                };
+        int[] arrowY =
+                {
+                        y2,
+                        (int) (y2 - arrowLength * Math.sin(angle - Math.PI / 6)),
+                        (int) (y2 - arrowLength * Math.sin(angle + Math.PI / 6))
+                };
 
         arrowHead = new Polygon(arrowX, arrowY, 3);
 
@@ -1084,7 +1059,7 @@ class Wire extends Block
      */
     public void setBlock(Block block)
     {
-        if(startBlock == null) 
+        if (startBlock == null)
         {
             startBlock = block;
         }
@@ -1107,9 +1082,9 @@ class Wire extends Block
     @SuppressWarnings("unchecked")
     public boolean isClocked()
     {
-        if(((JComboBox<String>)(getMap().get("Is Clock Line"))).getSelectedItem().equals("True"))
+        if (((JComboBox<String>) (getMap().get("Is Clock Line"))).getSelectedItem().equals("True"))
             return true;
-        
+
         return false;
     }
 
@@ -1136,9 +1111,8 @@ class Wire extends Block
     {
         try
         {
-            return Integer.parseInt(((JTextField)(getMap().get("Output MSB (exclusive)"))).getText()) + "";
-        }
-        catch(NumberFormatException e)
+            return Integer.parseInt(((JTextField) (getMap().get("Output MSB (exclusive)"))).getText()) + "";
+        } catch (NumberFormatException e)
         {
             return null;
         }
@@ -1151,9 +1125,8 @@ class Wire extends Block
     {
         try
         {
-            return Integer.parseInt(((JTextField)(getMap().get("Output LSB (inclusive)"))).getText()) + "";
-        }
-        catch(NumberFormatException e)
+            return Integer.parseInt(((JTextField) (getMap().get("Output LSB (inclusive)"))).getText()) + "";
+        } catch (NumberFormatException e)
         {
             return null;
         }
@@ -1165,10 +1138,10 @@ class Wire extends Block
     public String getOutputString()
     {
         String outputMSB = getOutputMSB(), outputLSB = getOutputLSB();
-        
-        if(outputMSB == null || outputLSB == null)
+
+        if (outputMSB == null || outputLSB == null)
             return "";
-        
+
         return outputLSB + ":" + outputMSB;
     }
 

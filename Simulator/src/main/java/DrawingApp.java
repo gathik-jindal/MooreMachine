@@ -1,24 +1,22 @@
 /**
- * This is the DrawingApp file which allows the user to draw different components. 
- * 
+ * This is the DrawingApp file which allows the user to draw different components.
+ *
  * @author Aryan, Abhirath, Gathik
  * @version 1.0
  * @since 06/08/2024
  */
 
-import java.awt.CardLayout;
-
+import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 /**
  * The DrawingApp class manages the frame and allows one to run the program.
  */
-public class DrawingApp extends JFrame 
+public class DrawingApp extends JFrame
 {
     private JPanel cards;                           //CardLayout JPanel
+    private Manager manager;                        //main manager
     public static final String MAIN = "Main";       //the cards that are in the cardlayout
 
     /**
@@ -30,11 +28,11 @@ public class DrawingApp extends JFrame
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(1500, 800);
         this.setResizable(false);
-        
+
         cards = new JPanel(new CardLayout());
 
-        Manager manageMain = new ManageMainCircuit(this);
-        cards.add(manageMain, MAIN);
+        manager = new ManageMainCircuit(this);
+        cards.add(manager, MAIN);
 
         change(MAIN);
 
@@ -50,9 +48,18 @@ public class DrawingApp extends JFrame
      */
     public void change(String str)
     {
-        if(!str.equals(MAIN))
+        if (!str.equals(MAIN))
             throw new IllegalArgumentException(str + " is not a valid panel type.");
-        ((CardLayout)(cards.getLayout())).show(cards, str);
+        ((CardLayout) (cards.getLayout())).show(cards, str);
+    }
+
+    /**
+     * Returns the Manager object
+     * @return the Manager object
+     */
+    public Manager getManager()
+    {
+        return manager;
     }
 
     public static void main(String[] args) throws IOException
