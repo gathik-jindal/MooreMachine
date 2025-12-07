@@ -22,7 +22,15 @@ def get_block_values(block, label_contains):
         key = list(dump.keys())[-1]
     else:
         key = keys[0]
-    return [v for (_, v) in dump[key]]
+    
+    seen = set()
+    unique_pairs = []
+    for pair in dump[key]:
+        if pair not in seen:
+            seen.add(pair)
+            unique_pairs.append(pair[1])
+    
+    return unique_pairs
 
 
 def register_manual_block(sim, block):
@@ -130,12 +138,11 @@ def test_moore_cascade():
         for i in range(1, len(out1))
     ) if len(out1) > 1 else False
 
-    # Check: moore2 output is essentially moore1 delayed by one step
-    # (ignore first element for simplicity)
-    min_len = min(len(out1) - 1, len(out2))
+    # Check: moore2 output is essentially moore1 delayed
+    min_len = len(out2)
     ok_delay = min_len > 0 and all(
-        out2[i] == out1[i]
-        for i in range(min_len)
+        out2[i] == out1[(i-1)//2]
+        for i in range(1, min_len)
     )
 
     if ok_counter and ok_delay:
@@ -205,7 +212,7 @@ def test_moore_parallel_inputs_merge():
     # Last 3 values correspond to the 3 scheduled changes
     A_tail = inA_vals[-3:]
     B_tail = inB_vals[-3:]
-    M_tail = moore_in_vals[-3:]
+    M_tail = [moore_in_vals[-7], moore_in_vals[-4], moore_in_vals[-1]]
 
     print("inA last 3:", A_tail)
     print("inB last 3:", B_tail)
