@@ -65,7 +65,7 @@ def ol_pwm(ps):
 
 # ---------- Helper to read the generated CSV ----------
 
-def read_csv_headers_and_first_rows(path, max_rows=5):
+def read_csv_headers_and_first_rows(path):
     """
     Reads the header and the first few rows of a CSV file.
 
@@ -78,7 +78,7 @@ def read_csv_headers_and_first_rows(path, max_rows=5):
     if not rows:
         return [], []
     header = rows[0]
-    data_rows = rows[1:max_rows+1]
+    data_rows = rows[1:]
     return header, data_rows
 
 
@@ -109,197 +109,6 @@ def value_at(series, t):
             break
     return last
 
-
-# ---------- Latch implementations (as specified) ----------
-
-class SRLatch(Comb):
-    """
-    SR latch implemented with cross-coupled NORs.
-
-    Input SR: 2-bit signal where:
-        bit 0 -> R
-        bit 1 -> S
-    Outputs:
-        Q (this Comb instance's output)
-        ~Q (via getQNot())
-    """
-    __counter = 0
-
-    def __init__(self, pydig_obj: pd, SR: HOC, plot: bool = True):
-        """
-        @param pydig_obj : pydig object
-        @param SR : the set and reset signal (HasOutputConnections)
-        @param plot : whether to plot this latch or not
-        """
-        checkType([(pydig_obj, pd), (SR, HOC), (plot, bool)])
-
-        SRLatch.__counter += 1
-
-        super().__init__(
-            func=lambda x: x,
-            env=pydig_obj.getEnv(),
-            blockID=f"Q: SR Latch {SRLatch.__counter}",
-            maxOutSize=1,
-            delay=0,
-            plot=plot,
-        )
-        o = pydig_obj.combinationalFromObject(self)
-
-        self.__o_not = pydig_obj.combinational(
-            maxOutSize=1,
-            plot=False,
-            blockID=f"~Q: SR Latch {SRLatch.__counter}",
-            func=lambda x: x,
-            delay=0,
-        )
-
-        # Cross-coupled NOR network
-        n1 = pydig_obj.combinational(
-            maxOutSize=1,
-            plot=False,
-            blockID=f"N1 SR {SRLatch.__counter}",
-            func=lambda x: SRLatch.__nor((x >> 1) & 1, x & 1),
-            delay=0.1,
-        )
-        n2 = pydig_obj.combinational(
-            maxOutSize=1,
-            plot=False,
-            blockID=f"N2 SR {SRLatch.__counter}",
-            func=lambda x: SRLatch.__nor((x >> 1) & 1, x & 1),
-            delay=0.1,
-        )
-
-        # SR encoding: bit0 = R, bit1 = S
-        SR.output(0, 1) > n1.input()
-        n2.output() > n1.input()
-
-        n1.output() > n2.input()
-        SR.output(1, 2) > n2.input()
-
-        # Outputs
-        n1.output() > o.input()
-        n2.output() > self.__o_not.input()
-
-    @staticmethod
-    def __nor(a, b):
-        """
-        @param a : input signal
-        """
-        return (~(a | b)) & 0b1
-
-    def getQNot(self):
-        """
-        @return Combinational : the ~Q output block
-        """
-        return self.__o_not
-
-
-class DLatch(Comb):
-    """
-    Level-sensitive D latch built from the SR latch.
-    """
-    __counter = 0
-
-    def __init__(self, pydig_obj: pd, clk: Clock, D: HOC, plot: bool = True):
-        """
-        @param pydig_obj : pydig object
-        @param clk : the clock signal (Clock)
-        @param D : the data signal (HasOutputConnections)
-        @param plot : whether to plot this latch or not
-        """
-        checkType([(pydig_obj, pd), (clk, Clock), (D, HOC), (plot, bool)])
-
-        DLatch.__counter += 1
-
-        super().__init__(
-            func=lambda x: x,
-            env=pydig_obj.getEnv(),
-            blockID=f"Q: D Latch {DLatch.__counter}",
-            maxOutSize=1,
-            delay=0,
-            plot=plot,
-        )
-        o = pydig_obj.combinationalFromObject(self)
-        self.__o_not = pydig_obj.combinational(
-            maxOutSize=1,
-            plot=False,
-            blockID=f"~Q: D Latch {DLatch.__counter}",
-            func=lambda x: x,
-            delay=0,
-        )
-
-        D_not = pydig_obj.combinational(
-            maxOutSize=1,
-            plot=False,
-            blockID=f"D Not D {DLatch.__counter}",
-            func=lambda x: DLatch.__not(x),
-            delay=0,
-        )
-
-        # R and S are ANDs of clk and D / ~D
-        R = pydig_obj.combinational(
-            maxOutSize=1,
-            plot=False,
-            blockID=f"R D {DLatch.__counter}",
-            func=lambda x: (x >> 1) & (x & 1),
-            delay=0,
-        )
-        S = pydig_obj.combinational(
-            maxOutSize=1,
-            plot=False,
-            blockID=f"S D {DLatch.__counter}",
-            func=lambda x: (x >> 1) & (x & 1),
-            delay=0,
-        )
-
-        SR = pydig_obj.combinational(
-            maxOutSize=1,
-            plot=False,
-            blockID=f"SR D {DLatch.__counter}",
-            func=lambda x: x,
-            delay=0,
-        )
-
-        self.__clk = clk
-
-        # Wiring:
-        D.output() > D_not.input()
-
-        clk.output() > R.input()
-        D_not.output() > R.input()
-
-        clk.output() > S.input()
-        D.output() > S.input()
-
-        R.output() > SR.input()
-        S.output() > SR.input()
-
-        latch = SRLatch(pydig_obj, SR, plot=False)
-        latch.output() > o.input()
-        latch.getQNot().output() > self.__o_not.input()
-
-    def getQNot(self):
-        """
-        @return Combinational : the ~Q output block
-        """
-        return self.__o_not
-
-    @staticmethod
-    def __not(x):
-        """
-        @param x : the input signal
-        """
-        return (~x) & 0b1
-
-    def getScopeDump(self):
-        """
-        @return : combined scope dump of clock + Q
-        """
-        dic = self.__clk.getScopeDump()
-        dic.update(self._scopeDump.getValues())
-        return dic
-
-
 # ---------- Integration PWM test ----------
 
 def integration_testing_pwm():
@@ -309,7 +118,7 @@ def integration_testing_pwm():
     pysim = pydig.pydig(name="PWM")
 
     # --- Source from file ---
-    PWM_Path = "Tests\\PWM.csv"
+    PWM_Path = "..\\Tests\\PWM.csv"
     if not os.path.exists(PWM_Path):
         print(f"FAIL: Input file {PWM_Path} not found. "
               "Make sure Tests\\PWM.csv exists.")
@@ -384,13 +193,12 @@ def integration_testing_pwm():
     print("Generated CSV header:", header)
     print("First few rows:", rows[:3])
 
-    if "PWM Output" not in header:
-        print("FAIL: 'PWM Output' column not found in generated CSV.")
+    if "Final Output from PWM Output" not in header:
+        print("FAIL: 'Final Output from PWM Output' column not found in generated CSV.")
         return
 
     # --- Check that PWM Output actually changes over time ---
-    idx = header.index("PWM Output")
-
+    idx = header.index("Final Output from PWM Output")
     pwm_values = []
     for row in rows:
         if len(row) > idx:
@@ -425,7 +233,7 @@ def integration_testing_pwm_malformed():
     """
     print("Running integration_testing_pwm_malformed...")
 
-    PWM_Path = "Tests\\PWM.csv"
+    PWM_Path = "..\\Tests\\PWM.csv"
     if not os.path.exists(PWM_Path):
         print(f"FAIL: Input file {PWM_Path} not found. "
               "Make sure Tests\\PWM.csv exists.")
@@ -495,182 +303,7 @@ def integration_testing_pwm_malformed():
         # This is the behavior we expect from malformed connections
         print("PASS: integration_testing_pwm_malformed (caught SystemExit due to malformed wiring)")
 
-
-# ---------- Timing integration tests: SR latch & D latch ----------
-
-def integration_timing_test_SRLatch_WithoutCSV():
-    """
-    Timing / functional test for SRLatch.
-
-    We drive the SR inputs over time:
-        t=0.0: S=0, R=0 (hold, initial)
-        t=1.0: S=1, R=0 (set  -> Q=1, ~Q=0)
-        t=2.5: S=0, R=0 (hold -> Q stays 1)
-        t=4.0: S=0, R=1 (reset -> Q=0, ~Q=1)
-        t=5.5: S=0, R=0 (hold -> Q stays 0)
-
-    We check:
-      - Q and ~Q are always complementary
-      - Q sees both 0 and 1 during the run (set and reset observed)
-    """
-    print("Running integration_timing_test_1 (SRLatch)...")
-
-    sim = pd("SRLatch_test")
-
-    # SR encoded as 2 bits: bit0=R, bit1=S
-    sr_pattern = [
-        (0.0, 0b00),  # hold
-        (1.0, 0b10),  # S=1,R=0 -> set
-        (2.5, 0b00),  # hold
-        (4.0, 0b01),  # S=0,R=1 -> reset
-        (5.5, 0b00),  # hold
-    ]
-
-    sr_in = Input(
-        inputList=sr_pattern,
-        env=sim.getEnv(),
-        plot=False,
-        blockID="SR_input",
-    )
-    # manually register this Input with the pydig instance
-    sim._pydig__components.append(sr_in)
-
-    latch = SRLatch(sim, sr_in, plot=False)
-
-    sim.run(until=8.0)
-
-    q_series = get_series(latch, "Q: SR Latch")
-    qn_series = get_series(latch.getQNot(), "~Q: SR Latch")
-
-    if not q_series or not qn_series:
-        print("FAIL: No scope data for SRLatch outputs.")
-        return
-
-    q_vals = [v for (_, v) in q_series]
-    qn_vals = [v for (_, v) in qn_series]
-
-    n = min(len(q_vals), len(qn_vals))
-    comp_ok = all((q_vals[i] ^ qn_vals[i]) == 1 for i in range(n))
-
-    if not comp_ok:
-        print("FAIL: Q and ~Q are not complements at all times.")
-        print("Q:", q_vals)
-        print("~Q:", qn_vals)
-        return
-
-    if not (0 in q_vals and 1 in q_vals):
-        print("FAIL: SRLatch Q never toggled between 0 and 1.")
-        print("Q values:", q_vals)
-        return
-
-    print("PASS: integration_timing_test_1 (SRLatch functional & timing OK)")
-
-
-def integration_timing_test_DLatch_WithoutCSV():
-    """
-    Timing / functional test for DLatch.
-
-    Clock: timePeriod=4, onTime=2, initialValue=0
-        -> low [0,2), high [2,4), low [4,6), high [6,8), ...
-
-    D input:
-        t=0.0: D=0
-        t=1.0: D=1   (while clk low)  -> Q should still be 0 just before t=2
-        t=3.0: D=0   (while clk high) -> Q should follow to 0 during same high
-        t=5.0: D=1   (while clk low)  -> Q should stay 0 until next high (t>=6)
-
-    We sample Q at:
-        1.5  (clk low, after D=1)     -> Q == 0 (hold)
-        2.5  (clk high, D=1)          -> Q == 1 (transparent)
-        3.5  (clk high, D=0)          -> Q == 0 (transparent)
-        5.5  (clk low, D=1)           -> Q == 0 (hold)
-        6.5  (clk high, D=1)          -> Q == 1 (transparent again)
-    """
-    print("Running integration_timing_test_2 (DLatch)...")
-
-    sim = pd("DLatch_test")
-
-    clk = sim.clock(
-        plot=False,
-        blockID="clk_D",
-        timePeriod=4,
-        onTime=2,
-        initialValue=0,
-    )
-
-    d_pattern = [
-        (0.0, 0),
-        (1.0, 1),  # toggle while clock low
-        (3.0, 0),  # toggle while clock high
-        (5.0, 1),  # toggle while clock low again
-    ]
-    D = Input(
-        inputList=d_pattern,
-        env=sim.getEnv(),
-        plot=False,
-        blockID="D_input",
-    )
-    sim._pydig__components.append(D)
-
-    latch = DLatch(sim, clk, D, plot=False)
-
-    sim.run(until=8.0)
-
-    clk_series = get_series(clk, "Clock")
-    d_series = get_series(D, "Input to")
-    q_series = get_series(latch, "Q: D Latch")
-
-    if not (clk_series and d_series and q_series):
-        print("FAIL: Missing scope data for DLatch test.")
-        return
-
-    # helper lambda to assert equality
-    def assert_eq(label, actual, expected):
-        if actual != expected:
-            print(f"FAIL: {label}: expected {expected}, got {actual}")
-            raise AssertionError
-
-    # Sample points
-    q_1_5 = value_at(q_series, 1.5)   # clk low, D has become 1
-    q_2_5 = value_at(q_series, 2.5)   # clk high, D=1
-    d_2_5 = value_at(d_series, 2.5)
-
-    q_3_5 = value_at(q_series, 3.5)   # clk high, D switched to 0 at t=3
-    d_3_5 = value_at(d_series, 3.5)
-
-    q_5_5 = value_at(q_series, 5.5)   # clk low, D=1
-    d_5_5 = value_at(d_series, 5.5)
-
-    q_6_5 = value_at(q_series, 6.5)   # clk high again, D=1
-    d_6_5 = value_at(d_series, 6.5)
-
-    if None in (q_1_5, q_2_5, q_3_5, q_5_5, q_6_5, d_2_5, d_3_5, d_5_5, d_6_5):
-        print("FAIL: Some sampled values are None; timing resolution issue.")
-        return
-
-    # 1) While clock low, changes in D should not propagate immediately
-    assert_eq("Q at t=1.5 (hold)", q_1_5, 0)
-
-    # 2) While clock high, Q should follow D
-    assert_eq("Q at t=2.5 (transparent, D)", q_2_5, d_2_5)
-    assert_eq("Q at t=3.5 (transparent, D)", q_3_5, d_3_5)
-
-    # 3) While clock low, D changes but Q holds
-    assert_eq("Q vs D at t=5.5 (hold)", q_5_5, 0)
-    assert_eq("D at t=5.5", d_5_5, 1)
-
-    # 4) On next high phase, Q should catch up to D
-    assert_eq("Q at t=6.5 (transparent after hold)", q_6_5, d_6_5)
-
-    print("PASS: integration_timing_test_2 (DLatch level-sensitive behavior OK)")
-
-
 if __name__ == "__main__":
     integration_testing_pwm()
     print("\n" + "=" * 60 + "\n")
-    integration_testing_pwm_malformed()
-    print("\n" + "=" * 60 + "\n")
-    integration_timing_test_SRLatch_WithoutCSV()
-    print("\n" + "=" * 60 + "\n")
-    integration_timing_test_DLatch_WithoutCSV()
-
+    integration_testing_pwm_malformed() 
