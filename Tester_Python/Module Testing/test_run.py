@@ -57,7 +57,7 @@ def tester(sim, until, expected_exception=None):
 def test_run_basic():
     sim = pydig("run_basic")
 
-    src = sim.source("Tests/run_input1.csv", blockID="src1")
+    src = sim.source("../../Tests/run_input1.csv", blockID="src1")
     out = sim.output(plot=False, blockID="out1")
 
     src.output() > out.input()
@@ -68,7 +68,7 @@ def test_run_basic():
 def test_run_with_dump():
     sim = pydig("run_dump")
 
-    src = sim.source("Tests/run_input2.csv", blockID="src2")
+    src = sim.source("../../Tests/run_input2.csv", blockID="src2")
     out = sim.output(plot=False, blockID="out2")
 
     src.output() > out.input()
@@ -85,7 +85,7 @@ def test_run_unconnected_error():
     """
     sim = pydig("run_unconnected")
 
-    src = sim.source("Tests/run_input3.csv", blockID="src3")
+    src = sim.source("../../Tests/run_input3.csv", blockID="src3")
     out = sim.output(plot=False, blockID="out3")
 
     # src.output() is never connected to out.input() -> out.isConnected() is False
@@ -100,7 +100,7 @@ def test_run_invalid_until():
     """
     sim = pydig("run_invalid_until")
 
-    src = sim.source("Tests/run_input4.csv", blockID="src4")
+    src = sim.source("../../Tests/run_input4.csv", blockID="src4")
     out = sim.output(plot=False, blockID="out4")
 
     src.output() > out.input()
@@ -111,7 +111,7 @@ def test_run_invalid_until():
 def test_run_full_pipeline():
     sim = pydig("run_full")
 
-    src = sim.source("Tests/run_input5.csv", blockID="src5")
+    src = sim.source("../../Tests/run_input5.csv", blockID="src5")
 
     comb = sim.combinational(
         maxOutSize=1,
