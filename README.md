@@ -20,6 +20,8 @@ A comprehensive **Python** and **Java** implementation of Moore Machine finite s
 
 A **Moore Machine** is a type of finite state machine (FSM) where outputs are determined solely by the current state, independent of inputs or transitions. This simulator provides a flexible framework for designing, simulating, and visualizing Moore Machine systems with professional-grade tools.
 
+![MainWindow](images/Connections.png)
+
 ### Key Characteristics
 
 - **States**: Finite set of discrete states the system can occupy
@@ -494,6 +496,6 @@ Permission is hereby granted to use, modify, and distribute this software for bo
 
 **[Back to Top](#moore-machine-simulator)**
 
-Made with ❤️ by the Moore Machine community
+Made with ❤️ by us
 
 </div>
